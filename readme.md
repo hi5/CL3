@@ -4,10 +4,6 @@ CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
 written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
 
-<div style="float: right">
-    ![CL3 menu](https://raw.github.com/hi5/CL3/master/img/cl3.png)
-</div>
-
 It is not meant to compete with the many clipboard caching utilities
 that are (freely) available, but merely as minimal program with some
 basic very features.
@@ -96,6 +92,10 @@ Some ideas for further development you may wish to consider:
 
 The [WinClip class](http://www.autohotkey.com/board/topic/74670-class-winclip-direct-clipboard-manipulations/)
 by Deo may be of interest to develop some of these ideas.
+
+# Screenshot
+
+![CL3 menu](https://raw.github.com/hi5/CL3/master/img/cl3.png)
 
 # Credits
 
