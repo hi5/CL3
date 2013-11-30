@@ -21,8 +21,8 @@ CL3 gets its name from CLCL CLone = CL3
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
 - Remove (yank) entries from history
 - No duplicate entries in clipboard (automatically removed)
-- Templates: simply textfiles which are read at start up
-- Plugins: AutoHotkey functions (scripts) defined in seperate files
+- Templates: simply text files which are read at start up
+- Plugins: AutoHotkey functions (scripts) defined in separate files
 
 ## Templates
 
@@ -81,7 +81,7 @@ Some ideas for further development you may wish to consider:
 - Include images
 - Exclude certain programs
 - Introduce various paste methods, also for specific programs 
-  for example send each character indivually
+  for example send each character individually
 - More (default) plugins:
     - Improved title case (various scripts are available which could replace the current basic one)
 	- Strip HTML
