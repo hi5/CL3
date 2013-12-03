@@ -78,7 +78,7 @@ Catch
 
 If (Error = 1)
 	{
-	 FileCopy, res\history.bak, history.xml, 1
+	 FileCopy, res\history.bak.txt, history.xml, 1
 	 History:=[]
 	 XA_Load("History.xml") ; the name of the variable containing the array is returned 
 	}
