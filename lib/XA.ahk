@@ -166,5 +166,23 @@ XA_XMLEncode(Text) {
 	 StringReplace, Text, Text, >, &gt;, All
 	 StringReplace, Text, Text, ", &quot;, All
 	 StringReplace, Text, Text, ', &apos;, All
-	 Return Text
+	 Return XA_CleanInvalidChars(Text)                  ; additional fix see below for reference 
+	}	
+
+XA_CleanInvalidChars(text, replace="") {
+		re := "[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]"
+		Return RegExReplace(text, re, replace)
+
+		/*
+			Source: http://stackoverflow.com/questions/730133/invalid-characters-in-xml
+			public static string CleanInvalidXmlChars(string text) 
+			{ 
+		    // From xml spec valid chars: 
+		    // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]     
+		    // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
+		    string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]"; 
+		    return Regex.Replace(text, re, ""); 
+			}
+		*/	
+		
 	}	

@@ -5,8 +5,8 @@
 	<Invalid_Name id="2" ahk="True">Text 2</Invalid_Name>
 	<Invalid_Name id="3" ahk="True">Text 3</Invalid_Name>
 	<Invalid_Name id="4" ahk="True">Text 4</Invalid_Name>
-	<Invalid_Name id="5" ahk="True">Text 4</Invalid_Name>
-	<Invalid_Name id="6" ahk="True">Text 4</Invalid_Name>
+	<Invalid_Name id="5" ahk="True">Text 5</Invalid_Name>
+	<Invalid_Name id="6" ahk="True">Text 6</Invalid_Name>
 	<Invalid_Name id="7" ahk="True">Text 7</Invalid_Name>
 	<Invalid_Name id="8" ahk="True">Text 8</Invalid_Name>
 	<Invalid_Name id="9" ahk="True">Text 9</Invalid_Name>

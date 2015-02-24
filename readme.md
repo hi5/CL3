@@ -1,4 +1,4 @@
-﻿# CL3 - clipboard caching AutoHotkey script
+﻿# CL3 <sup>v1.2</sup> - clipboard caching AutoHotkey script
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -19,6 +19,8 @@ CL3 gets its name from CLCL CLone = CL3
 
 - Captures text only
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
+- Search history (v1.2+)
+- 10 Slots with options to save/load several sets (v1.2+)
 - Remove (yank) entries from history
 - No duplicate entries in clipboard (automatically removed)
 - Templates: simply text files which are read at start up
@@ -63,6 +65,21 @@ Default plugins included with CL3:
 3. Upper (convert to upper case)
 4. Title (convert to title case, basic)
 
+### Search plugins
+
+As of v1.2 you can now search the CL3 history, hotkey <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>h</kbd>
+simply start typing, press enter will paste the first result or you can use the <kbd>UP</kbd> & <kbd>DOWN</kbd>
+keys to navigate the result list. See [screenshot](#screenshots).
+
+### Slots plugins
+
+Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F12</kbd> to open the Slots GUI and define your 10 texts
+for quick pasting. See [screenshot](#screenshots).
+
+To facility quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>+<kbd>1</kbd> .. <kbd>RCtrl</kbd>+<kbd>0</kbd>
+hotkeys. By default the 10 predefined texts are stored in _slots.xml_ but you can save and load as many slot-files
+as you like via the buttons available when the Slots gui is open. The last set used is always stored in _slots.xml_
+
 ## Yank (delete) entry
 
 If you select the yank option in the menu you will be presented with a 
@@ -76,7 +93,7 @@ None really, but feel free to fork and extend the script and send a pull request
 Some ideas for further development you may wish to consider:
 
 - Extending the number of menu entries in the secondary menu ("more history")
-- Allow the user to search the extensive history 
+- <strike>Allow the user to search the extensive history</strike> _v1.2+_
 - Include rich text formats
 - Include images
 - Exclude certain programs
@@ -93,11 +110,24 @@ Some ideas for further development you may wish to consider:
 The [WinClip class](http://www.autohotkey.com/board/topic/74670-class-winclip-direct-clipboard-manipulations/)
 by Deo may be of interest to develop some of these ideas.
 
-# Screenshot
+# Screenshots
 
 ![CL3 menu](https://raw.github.com/hi5/CL3/master/img/cl3.png)
+
+![CL3 slots](https://raw.github.com/hi5/CL3/master/img/slots.png)
+
+![CL3 search](https://raw.github.com/hi5/CL3/master/img/search.png)
 
 # Credits
 
 - Icons from Iconic <https://github.com/somerandomdude/Iconic>
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
+
+# Changelog
+
+**v1.2**
+
+* Menu: show icons of the program where text was copied from
+* New standard Plugins:
+	- Search history
+	- Slots

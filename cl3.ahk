@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.0
+Version     : 1.2
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -27,7 +27,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.0"
+version:="v1.2"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -54,8 +54,6 @@ Menu, tray, Add, &Suspend Hotkeys,    TrayMenuHandler
 Menu, tray, Add, &Pause Script, 	  TrayMenuHandler
 Menu, tray, Add, 
 Menu, tray, Add, Exit, 				  SaveSettings
-
-#Include %A_ScriptDir%\plugins\plugins.ahk
 
 Menu, ClipMenu, Add, TempText, MenuHandler
 Menu, SubMenu1, Add, TempText, MenuHandler
@@ -99,7 +97,10 @@ Loop, parse, templatefilelist, |
 
 ScriptClip:=0
 
+#Include %A_ScriptDir%\plugins\plugins.ahk
+
 ~^c::
+WinGet, IconExe, ProcessPath , A
 Sleep 100
 ClipText:=Clipboard
 Return
@@ -118,17 +119,23 @@ Menu, SubMenu2, Delete
 Menu, SubMenu3, Delete
 Menu, SubMenu4, Delete
 
-Loop, % History.MaxIndex()
+for k, v in History
 	{
-	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(History[A_Index],1,500))
+	 text:=v.text
+	 icon:=v.icon
+ 	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500))
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 If (A_Index = 1)
 		Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
 	 Else
-	 	Menu, ClipMenu, Icon, %key%, res\%iconA%, , 16
+		Try 	
+	 		Menu, ClipMenu, Icon, %key%, % icon
+	 	Catch
+	 		Menu, ClipMenu, Icon, %key%, res\%iconA%, , 16
+	 		 	
 	 If (A_Index = 18)
 		Break
-	} 
+	}
 Return
 
 BuildMenuPluginTemplate:
@@ -163,20 +170,36 @@ Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 Loop 18
 	Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
 
-Loop, % History.MaxIndex()
-	{
-	 If (A_Index < 19)
-		Continue
-	 If (A_Index < 45)
-		 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(History[A_Index],1,500))
-	 Else	 
-		 key:=% "  " DispMenuText(SubStr(History[A_Index],1,500))
-	 Menu, SubMenu4, Add, %key%, MenuHandler
- 	 Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
-	 If (A_Index > 43)
-		Break
-	} 
 
+; More history... (alt-z)
+
+If (History.MaxIndex() > 20)
+	{
+	 for k, v in History
+		{
+		 text:=v.text
+		 icon:=v.icon
+	 	 If (A_Index < 19)
+			Continue
+	 	 If (A_Index < 45)
+			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500))
+		 Else	 
+			 key:=% "  " DispMenuText(SubStr(text,1,500))
+		 Menu, SubMenu4, Add, %key%, MenuHandler
+		 Try
+			Menu, SubMenu4, Icon, %key%, % icon
+		 Catch
+ 			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
+	 	 If (A_Index > 43)
+			Break
+		} 
+	}
+Else
+	{
+	 Menu, SubMenu4, Add, No entries ..., MenuHandler
+	 Menu, SubMenu4, Icon, No entries ..., res\%iconA%, , 16
+	}
+		
 Menu, ClipMenu, Add, &y. Yank entry, :Submenu3
 Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
 Menu, ClipMenu, Add, &z. More history, :Submenu4
@@ -189,18 +212,19 @@ Return
 DispMenuText(TextIn)
 	{
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
-	 StringReplace,	TextOut, TextIn, `r`n, ...%A_Space% , All
-	 StringReplace,	TextOut, TextOut, `n, ...%A_Space%, All
-	 StringReplace,	TextOut, TextOut, `t, %A_Space%, All
+	 TextOut:=RegExReplace(TextOut, "\s+", " ")
+	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All	
-	 If StrLen(TextOut) > 30
-		TextOut:=SubStr(TextOut,1,30) "..."
-	 Return TextOut
+	 If StrLen(TextOut) > 60
+	 	{
+		 TextOut:=SubStr(TextOut,1,40) " … " SubStr(RTrim(TextOut,".`n"),-10) Chr(171)
+		} 
+	 Return LTRIM(TextOut," `t")
 	}
 
 PasteIt()
 	{
-	 Sleep 150
+	 Sleep 50
 	 Send ^v
 	}
 
@@ -227,7 +251,7 @@ else
 ; debug	
 ; MsgBox % "A_ThisMenu-" A_ThisMenu " : A_ThisMenuItem-" A_ThisMenuItemPos " : MenuItemPost-" MenuItemPos
 	
-ClipText:=History[MenuItemPos]
+ClipText:=History[MenuItemPos].text
 Gosub, ClipboardHandler
 Return
 
@@ -235,7 +259,13 @@ SpecialMenuHandler:
 SpecialFunc:=(SubStr(A_ThisMenuItem,4))
 StringReplace, SpecialFunc, SpecialFunc, %A_Space%,,All
 If IsFunc(SpecialFunc)
-	ClipText:=%SpecialFunc%(History[1])
+	ClipText:=%SpecialFunc%(History[1].text)
+Else
+	if (SpecialFunc = "Slots")
+		Gosub, ^#F12
+Else
+	if (SpecialFunc = "Search")	
+		Gosub, ^#h	
 Gosub, ClipboardHandler
 Return
 
@@ -246,31 +276,44 @@ Return
 
 ClipBoardHandler:
 ScriptClip:=1
-History.Insert(1,ClipText)
+If (ClipText <> Clipboard)
+	History.Insert(1,{"text":ClipText,"icon": IconExe})
 Clipboard:=ClipText
 PasteIt()
 ScriptClip:=0
 Return
 
 OnClipboardChange:
-if (ScriptClip = 1)         ; no need for adding to history at startup or script actions
-	Return
-if (ClipText = Clipboard) or (Clipboard = "")  ; avoid duplicate or empty entries
+WinGet, IconExe, ProcessPath , A
+If ((History.MaxIndex() = 0) or (History.MaxIndex() = ""))
+	History.Insert(1,{"text":"Text","icon": IconExe})
+if (Clipboard = "") ; avoid empty or duplicate entries
 	Return 
+
 ClipText=%Clipboard%
-Loop, % History.MaxIndex()  ; check if already in clipboard history and move to top entry
+History.Insert(1,{"text":ClipText,"icon": IconExe})
+; check for duplicate entries
+newhistory:=[]
+for k, v in History
 	{
-	 Check:=A_Index
-	 if (ClipText = History[A_Index])
+	 check:=v.text
+	 icon:=v.icon
+	 new:=true
+	 for p, q in newhistory
 		{
-		 History.Remove(Check)
-		 ; break
+		 if (check = q.text)
+			new:=false
 		}
-	 if (A_Index > MaxHistory)	
-	 	break
-	} 
-History.Insert(1,ClipText)
+	 if new
+		newhistory.insert({"text":check,"icon":icon})
+	}
+
+History:=newhistory
+
 ClipText:=""
+newhistory:=[]
+check:=""
+new:=""
 Return
 
 ; If the tray icon is double click we do not actually want to do anything
@@ -308,10 +351,11 @@ Else If (A_ThisMenuItem = "&Pause Script")
 Else If (Trim(A_ThisMenuItem) = "Exit")
 	ExitApp
 
-Return	
+Return
 
 SaveSettings:
 While (History.MaxIndex() > MaxHistory)
 	History.remove(History.MaxIndex())
 XA_Save("History", "History.xml") ; put variable name in quotes
+XA_Save("Slots", "Slots.xml") ; put variable name in quotes
 ExitApp
