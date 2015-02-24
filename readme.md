@@ -67,13 +67,13 @@ Default plugins included with CL3:
 
 ### Search plugins
 
-As of v1.2 you can now search the CL3 history, hotkey <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>h</kbd>
+As of v1.2 you can now search the CL3 history, hotkey <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>
 simply start typing, press enter will paste the first result or you can use the <kbd>UP</kbd> & <kbd>DOWN</kbd>
 keys to navigate the result list. See [screenshot](#screenshots).
 
 ### Slots plugins
 
-Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F12</kbd> to open the Slots GUI and define your 10 texts
+Press <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd> to open the Slots GUI and define your 10 texts
 for quick pasting. See [screenshot](#screenshots).
 
 To facility quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>+<kbd>1</kbd> .. <kbd>RCtrl</kbd>+<kbd>0</kbd>
