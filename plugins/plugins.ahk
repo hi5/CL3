@@ -29,4 +29,5 @@ Slots.ahk
 
 ; -[ treated as special in menu (gosub hotkey not func) ]-
 #include %A_ScriptDir%\plugins\Slots.ahk
+	Gosub, SlotsInit
 #include %A_ScriptDir%\plugins\Search.ahk

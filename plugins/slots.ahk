@@ -10,15 +10,17 @@ Hotkeys: RCTRL-[1-0]
 
 */
 
-Try
+SlotsInit:
+; for first run only, make sure the slots object will have content (alebeit empty)
+IfExist, %A_ScriptDir%\slots.xml
 	{
 	 XA_Load(A_ScriptDir "\slots.xml") ; the name of the variable containing the array is returned 
 	}
-Catch
+else
 	{
 	 Slots:=[]
 	 Loop, 10
-	 	Slots[A_Index-1]:="Slot" A_Index-1 "a"
+	 	Slots[A_Index-1]:=""
 	}
 
 x:=10
