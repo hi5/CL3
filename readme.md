@@ -11,7 +11,7 @@ basic very features.
 You can call the clipboard history menu by its default hotkey <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>
 If you prefer another hotkey simply change it in the main script, look for the
 line "__; show clipboard history menu__" and change **!^v** to something of your preference.
-More on they hotkey syntax here <http://l.autohotkey.net/docs/Hotkeys.htm#Symbols>
+More on they hotkey syntax here <http://ahkscript.org/docs/Hotkeys.htm#Symbols>
 
 CL3 gets its name from CLCL CLone = CL3
 
