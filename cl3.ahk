@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.2
+Version     : 1.3
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -15,6 +15,8 @@ Features:
 - No duplicate entries in clipboard (automatically removed)
 - Templates: simply textfiles which are read at start up
 - Plugins: AutoHotkey functions (scripts) defined in seperate files
+  v1.2: Search and Slots for quick pasting
+  v1.3: Cycle through clipboard history, paste current clipboard as plain text
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -27,7 +29,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.2"
+version:="v1.3"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -112,6 +114,64 @@ Gosub, BuildMenuPluginTemplate
 Menu, ClipMenu, Show
 Return
 
+; paste as plain text
+^+v::
+Clipboard:=Clipboard
+PasteIt()
+Return
+
+; Cycle through clipboard history
+#v::
+ClipCycleCounter:=1
+ClipCycleFirst:=1
+While GetKeyState("Lwin","D")
+	{
+	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
+	 Sleep 100
+	 KeyWait, v
+	}
+ToolTip
+If (ClipCycleCounter > 0) ; If zero we've cancelled it
+	{
+	 ClipText:=History[ClipCycleCounter].text
+	 Gosub, ClipboardHandler
+	}
+Return
+#v up::
+If (ClipCycleFirst = 0)
+	ClipCycleCounter++
+ClipCycleFirst:=0	
+Return
+
+#c::
+ClipCycleBackCounter:=1
+If (ClipCycleCounter=1) or (ClipCycleCounter=0)
+	Return
+ClipCycleCounter--
+If (ClipCycleCounter < 1)
+	ClipCycleCounter:=1
+While GetKeyState("Lwin","D")
+	{
+	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
+	 Sleep 100
+	 KeyWait, c
+	}
+ToolTip
+Return
+#c up::
+If (ClipCycleBackCounter=0)
+	ClipCycleCounter--
+If (ClipCycleCounter < 1)
+	ClipCycleCounter:=1
+ClipCycleBackCounter:=0
+Return
+
+; Cancel Cycle pasting
+#x up::
+ToolTip
+ClipCycleCounter:=0
+Return
+
 BuildMenuHistory:
 Menu, ClipMenu, Delete
 Menu, SubMenu1, Delete
@@ -126,7 +186,7 @@ for k, v in History
  	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500))
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 If (A_Index = 1)
-		Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
+	 	 Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
 	 Else
 		Try 	
 	 		Menu, ClipMenu, Icon, %key%, % icon
@@ -162,6 +222,8 @@ If (templatefilelist <> "")
 		 Menu, Submenu2, Add, %MenuText%, TemplateMenuHandler
 		 Menu, Submenu2, Icon, %MenuText%, res\%iconT%,,16
 		}
+	 Menu, Submenu2, Add, &0. Open templates folder, TemplateMenuHandler
+	 Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
 	}	
 Else
 	Menu, Submenu2, Add, "No templates", TemplateMenuHandler
@@ -222,6 +284,14 @@ DispMenuText(TextIn)
 	 Return LTRIM(TextOut," `t")
 	}
 
+DispToolTipText(TextIn)
+	{
+	 TextOut:=RegExReplace(TextIn,"^\s*")
+	 TextOut:=SubStr(TextOut,1,750)
+	 StringReplace,TextOut,TextOut,`;,``;,All
+	 Return TextOut
+	}
+
 PasteIt()
 	{
 	 Sleep 50
@@ -270,6 +340,13 @@ Gosub, ClipboardHandler
 Return
 
 TemplateMenuHandler:
+If (A_ThisMenuItem = "&0. Open templates folder")
+	{
+;	 Run, %A_ScriptDir%\templates\ ; use this line if you wish to use Explorer - don't forget to comment the line below
+	 Run, c:\totalcmd\TOTALCMD.EXE /o %A_ScriptDir%\templates\
+	 Return 
+	}
+
 ClipText:=Templates[A_ThisMenuItemPos]
 Gosub, ClipboardHandler
 Return
