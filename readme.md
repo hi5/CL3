@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.3</sup> - clipboard caching AutoHotkey script
+﻿# CL3 <sup>v1.31</sup> - clipboard caching AutoHotkey script
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -33,14 +33,15 @@ to paste that in your current application.
 
 ## Templates
 
-Any text file placed in the templates\ directory will be read at
-start up and added to the Templates sub-menu (<kbd>Alt</kbd>+<kbd>t</kbd>)
+Any text file placed in the templates\ directory will be read at start up and
+added to the Templates sub-menu - press <kbd>t</kbd> to quickly access them
+when the menu is active.
 
 File names act as name of the menu entry and are sorted alphabetically
 before being added to the menu. You can influence the order of the menu
 entries by naming your files in the order you wish them to appear.
 
-**Note**: there is one default entry in the Templates menu: "0. Open templates folder"
+**Note**: there is one default entry in the Templates menu: "_0. Open templates folder_"
 which will open the templates folder in Total Commander - if you don't use TC
 you can replace it with the standard file explorer (see the TemplateMenuHandler label)
 
@@ -145,6 +146,10 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
 
 # Changelog
+
+**v1.31**
+
+* Minor refinement for first time press #+c (don't show tooltip) and readme
 
 **v1.3**
 

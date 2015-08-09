@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.3
+Version     : 1.31
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -29,7 +29,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.3"
+version:="v1.31"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -128,13 +128,14 @@ While GetKeyState("Lwin","D")
 	{
 	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
 	 Sleep 100
-	 KeyWait, v
+	 KeyWait, v ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
 ToolTip
 If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	{
 	 ClipText:=History[ClipCycleCounter].text
 	 Gosub, ClipboardHandler
+	 ClipCycleCounter:=1
 	}
 Return
 #v up::
@@ -154,7 +155,7 @@ While GetKeyState("Lwin","D")
 	{
 	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
 	 Sleep 100
-	 KeyWait, c
+	 KeyWait, c ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
 ToolTip
 Return
