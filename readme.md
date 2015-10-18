@@ -1,8 +1,23 @@
-﻿# CL3 <sup>v1.31</sup> - clipboard caching AutoHotkey script
+﻿# CL3 <sup>v1.4</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
 written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
+
+### Shortcuts
+
+|Key                                         |Action |
+|--------------------------------------------|--------|
+|<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>        | Open the Clipboard history menu. |
+|<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
+|<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle backwards press, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. |
+
+
+## About CL3
 
 It is not meant to compete with the many clipboard caching utilities
 that are (freely) available, but merely as minimal program with some
@@ -90,10 +105,20 @@ To facility quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>+<
 hotkeys. By default the 10 predefined texts are stored in _slots.xml_ but you can save and load as many slot-files
 as you like via the buttons available when the Slots gui is open. The last set used is always stored in _slots.xml_
 
+### Dump History plugin [v1.32+]
+
+You can the current clipboard history to a plain text file via the Special, Dump History menu option.  
+The text file will be placed in the CL3 script folder.
+
+### AutoReplace [v1.4+]
+
+You can use the AutoReplace plugin to modify the text in the clipboard using a find/replace rule before adding
+it to the history. You can use StringReplace or a Regular Expression. Settings are stored in AutoReplace.xml
+
 ## Yank (delete) entry
 
 If you select the yank option in the menu you will be presented with a 
-simple a to r menu to indicate which of the most recent items you wish to
+simple **a** to **r** menu to indicate which of the most recent items you wish to
 delete.
 
 ## Cycle through clipboard history [v1.3+]
@@ -146,6 +171,14 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
 
 # Changelog
+
+**v1.4**
+
+* Added "AutoReplace" plugin to perform find/replace on clipboard text before adding it to history
+
+**v1.32**
+
+* Added "Dump History" plugin to export History XML to plain text file
 
 **v1.31**
 

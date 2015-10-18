@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.31
+Version     : 1.4
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -17,6 +17,7 @@ Features:
 - Plugins: AutoHotkey functions (scripts) defined in seperate files
   v1.2: Search and Slots for quick pasting
   v1.3: Cycle through clipboard history, paste current clipboard as plain text
+  v1.4: AutoReplace define find/replace rules to modify clipboard before adding it the clipboard
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -29,7 +30,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.31"
+version:="v1.4"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -329,6 +330,11 @@ Return
 SpecialMenuHandler:
 SpecialFunc:=(SubStr(A_ThisMenuItem,4))
 StringReplace, SpecialFunc, SpecialFunc, %A_Space%,,All
+If (SpecialFunc = "AutoReplace")	
+	{
+	 Gosub, AutoReplace
+	 Return
+	}
 If IsFunc(SpecialFunc)
 	ClipText:=%SpecialFunc%(History[1].text)
 Else
@@ -336,7 +342,10 @@ Else
 		Gosub, ^#F12
 Else
 	if (SpecialFunc = "Search")	
-		Gosub, ^#h	
+		Gosub, ^#h
+Else
+	If (SpecialFunc = "DumpHistory")
+		Return
 Gosub, ClipboardHandler
 Return
 
@@ -368,6 +377,7 @@ If ((History.MaxIndex() = 0) or (History.MaxIndex() = ""))
 if (Clipboard = "") ; avoid empty or duplicate entries
 	Return 
 
+Clipboard:=AutoReplace(Clipboard)
 ClipText=%Clipboard%
 History.Insert(1,{"text":ClipText,"icon": IconExe})
 ; check for duplicate entries

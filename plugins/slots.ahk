@@ -11,6 +11,7 @@ Hotkeys: RCTRL-[1-0]
 */
 
 SlotsInit:
+Gui, Slots:Destroy
 ; for first run only, make sure the slots object will have content (alebeit empty)
 IfExist, %A_ScriptDir%\slots.xml
 	{
@@ -31,22 +32,23 @@ Loop, 10
 	 Index++
 	 If (Index = 10)
 	 	Index:=0
-	 Gui, Add, Text, x%x% y%y% ,Slot #%Index% [RCtrl + %Index%]
-	 Gui, Add, Edit, w290 h60 vSlot%Index%, % Slots[Index]
+	 Gui, Slots:Add, Text, x%x% y%y% ,Slot #%Index% [RCtrl + %Index%]
+	 Gui, Slots:Add, Edit, w290 h60 vSlot%Index%, % Slots[Index]
 	 y+=80
 	 if (A_Index = 5)
 	 	y:=10
 	 if (A_Index = 5)
 	 	x:=310
 	}
-Gui, Add, Button, x10 gSlotsSave, &Save Slots (slots.xml)
-Gui, Add, Button, xp130 gSlotsSaveAs, Save &As (name.xml)
-Gui, Add, Button, xp130 gLoadSlots, &Load (name.xml)
-Gui, Add, Button, xp253 gSlotsClose, &Close window
+Gui, Slots:Add, Button, x10 gSlotsSave, &Save Slots (slots.xml)
+Gui, Slots:Add, Button, xp130 gSlotsSaveAs, Save &As (name.xml)
+Gui, Slots:Add, Button, xp130 gLoadSlots, &Load (name.xml)
+Gui, Slots:Add, Button, xp253 gSlotsClose, &Close window
 Return
 
 ^#F12::
-Gui, Show, ,CL3Slots
+Gosub, SlotsInit
+Gui, Slots:Show
 Return
 
 >^1::
@@ -64,13 +66,13 @@ Send ^v
 Return
 
 ~Esc::
-GuiClose:
+SlotsGuiClose:
 SlotsClose:
-Gui, Cancel
+Gui, Slots:Cancel
 Return
 
 SlotsSaveAs:
-Gui, Submit, Hide
+Gui, Slots:Submit, Hide
 InputBox, SaveAsName, Name for XML, Save slots as
 Index:=0
 Loop, 10
@@ -108,7 +110,7 @@ Catch
 Index:=0	
 Loop, 10
 	{
-	 GuiControl,, Edit%Index%, % Slots[Index]
+	 GuiControl,Slots:, Edit%Index%, % Slots[Index]
 	 Index++
 	}
 Return
