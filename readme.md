@@ -12,7 +12,7 @@ written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
 |<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
-|<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle backwards press, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. |
 
