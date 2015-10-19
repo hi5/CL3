@@ -11,17 +11,15 @@ Hotkeys: RCTRL-[1-0]
 */
 
 SlotsInit:
-Gui, Slots:Destroy
-; for first run only, make sure the slots object will have content (alebeit empty)
-IfExist, %A_ScriptDir%\slots.xml
+Try
 	{
 	 XA_Load(A_ScriptDir "\slots.xml") ; the name of the variable containing the array is returned 
 	}
-else
+Catch
 	{
 	 Slots:=[]
 	 Loop, 10
-	 	Slots[A_Index-1]:=""
+	 	Slots[A_Index-1]:="Slot" A_Index-1 "a"
 	}
 
 x:=10
@@ -47,8 +45,7 @@ Gui, Slots:Add, Button, xp253 gSlotsClose, &Close window
 Return
 
 ^#F12::
-Gosub, SlotsInit
-Gui, Slots:Show
+Gui, Slots:Show, ,CL3Slots
 Return
 
 >^1::
@@ -116,7 +113,7 @@ Loop, 10
 Return
 
 SlotsSave:
-Gui, Submit, Hide
+Gui, Slots:Submit, Hide
 Index:=0
 Loop, 10
 	{

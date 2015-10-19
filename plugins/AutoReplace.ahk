@@ -7,6 +7,21 @@ CL3 version       : 1.4
 */
 
 AutoReplaceInit:
+If !IsObject(AutoReplace)
+	{
+	 IfExist, %A_ScriptDir%\AutoReplace.xml
+		{
+		 XA_Load(A_ScriptDir "\AutoReplace.xml") ; the name of the variable containing the array is returned 
+		}
+	 else
+		{
+		 AutoReplace:=[]
+		}
+	}
+			
+;Return
+
+AutoReplaceGuiInit:
 Gui, AutoReplace:Destroy
 Gui, AutoReplace:Add, ListBox,w200 h170 gAutoReplaceList AltSubmit vRules, 
 Gui, AutoReplace:Add, Text, xp+220 yp+5 w30, Name:
@@ -21,14 +36,8 @@ Gui, AutoReplace:Add, Button, xp+65 yp gAutoReplaceDelete w55, *Delete*
 Gui, AutoReplace:Add, Button, xp+65 yp gAutoReplaceCancel w60, Cancel
 Gui, AutoReplace:Add, Button, xp+65 yp gAutoReplaceSave w60, Save
 
-IfExist, %A_ScriptDir%\AutoReplace.xml
-	{
-	 XA_Load(A_ScriptDir "\AutoReplace.xml") ; the name of the variable containing the array is returned 
-	}
-else
-	{
-	 AutoReplace:=[]
-	}
+;If !IsObject(AutoReplace)
+;	Gosub, AutoReplaceInit
 Gosub, AutoReplaceUpdateListbox
 Return
 
@@ -45,7 +54,9 @@ Return
 AutoReplaceUpdateListbox:
 Rules:=""
 for k, v in AutoReplace
-	 Rules .= v.name "|"
+	Rules .= v.name "|"
+If (Rules = "")
+	Rules:="First rule"
 GuiControl, AutoReplace:,Rules, % "|" Rules
 AutoReplaceUpdate(1)
 Return
@@ -82,7 +93,9 @@ Return
 
 AutoReplaceSave:
 Gui, AutoReplace:Submit, Hide
-If (Rules = "") or (Find = "")
+If (Rules = "")
+	Rules:=1
+If (Find = "")
 	Return
 name:=name ? name : "Unnamed rule"	
 AutoReplace[Rules,"name"]:=name

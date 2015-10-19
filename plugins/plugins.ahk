@@ -23,6 +23,8 @@ DumpHistory.ahk
 AutoReplace.ahk
 )
 
+Gosub, SlotsInit
+
 #include %A_ScriptDir%\plugins\LowerReplaceSpace.ahk
 #include %A_ScriptDir%\plugins\Lower.ahk
 #include %A_ScriptDir%\plugins\Title.ahk

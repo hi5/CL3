@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.4</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.41</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -113,7 +113,9 @@ The text file will be placed in the CL3 script folder.
 ### AutoReplace [v1.4+]
 
 You can use the AutoReplace plugin to modify the text in the clipboard using a find/replace rule before adding
-it to the history. You can use StringReplace or a Regular Expression. Settings are stored in AutoReplace.xml
+it to the history. You can use StringReplace or a Regular Expression. Settings are stored in _AutoReplace.xml_
+**Note: very experimental plugin. The plugin interface (GUI) needs to refined, entire process should be improved.
+A Listview would be more logical and flexible. But for now it does the job, albeit crudely.**
 
 ## Yank (delete) entry
 
@@ -171,6 +173,10 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
 
 # Changelog
+
+**v1.41**
+
+* Bugfix for Slots (stopped working correctly with v1.4 commit 4a982583)
 
 **v1.4**
 
