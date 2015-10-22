@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.41</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.42</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -173,6 +173,12 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
 
 # Changelog
+
+**v1.42**
+
+* Further refinement of "AutoReplace" plugin
+  - You can turn it on/off via the Tray menu, the checkmark indicates if it is Active
+  - Should now retain formatted clipboard better when no replacements where made
 
 **v1.41**
 

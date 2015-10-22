@@ -1,7 +1,7 @@
 ﻿/*
 
 Plugin            : AutoReplace()
-Version           : 1.0
+Version           : 1.1
 CL3 version       : 1.4
 
 */
@@ -18,6 +18,11 @@ If !IsObject(AutoReplace)
 		 AutoReplace:=[]
 		}
 	}
+
+If !AutoReplace.Settings.HasKey("Active")
+	AutoReplace["Settings","Active"]:=1
+
+Gosub, AutoReplaceMenu
 			
 ;Return
 
@@ -109,13 +114,30 @@ AutoReplaceCancel:
 Gui, AutoReplace:Hide
 Return
 
-AutoReplace(text)
+AutoReplace()
 	{
 	 global AutoReplace
+	 if !AutoReplace.Settings.Active ; bypass AutoReplace
+	 	Return
+	 ClipStore:=ClipboardAll ; store all formats
+	 ClipStoreText:=Clipboard ; store text
 	 for k, v in AutoReplace
+	 {
 		if (v.type = "0") or (v.type = "")
-			StringReplace, text, text, % v.find, % v.replace, All
+			{
+			 Clipboard:=StrReplace(Clipboard, v.find, v.replace)
+			}
 		else if (v.type = "1")	
-			text:=RegExReplace(text, v.find, v.replace)
-	 Return text		
+			Clipboard:=RegExReplace(Clipboard, v.find, v.replace)
+	 }
+	 if (Clipboard = ClipStoreText) ; if we haven't actually modified the text make sure we restore all formats
+	 	Clipboard:=ClipStore
+	 ClipStore:=""	
 	}
+
+AutoReplaceMenu:
+If AutoReplace.Settings.Active
+	Menu, tray, Check, &AutoReplace Active
+Else
+	Menu, tray, UnCheck, &AutoReplace Active
+Return	

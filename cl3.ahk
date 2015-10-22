@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.41
+Version     : 1.42
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -30,7 +30,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.41"
+version:="v1.42"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -49,6 +49,8 @@ Menu, tray, Tip , %name% %version%
 Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%, DoubleTrayClick
 Menu, tray, Default, %name% %version%
+Menu, tray, Add, 
+Menu, tray, Add, &AutoReplace Active, TrayMenuHandler
 Menu, tray, Add, 
 Menu, tray, Add, &Reload this script, TrayMenuHandler
 Menu, tray, Add, &Edit this script,   TrayMenuHandler
@@ -377,8 +379,9 @@ If ((History.MaxIndex() = 0) or (History.MaxIndex() = ""))
 if (Clipboard = "") ; avoid empty or duplicate entries
 	Return 
 
-Clipboard:=AutoReplace(Clipboard)
+AutoReplace()
 ClipText=%Clipboard%
+;MsgBox % ClipText
 History.Insert(1,{"text":ClipText,"icon": IconExe})
 ; check for duplicate entries
 newhistory:=[]
@@ -433,6 +436,16 @@ Else If (A_ThisMenuItem = "&Pause Script")
 	 Pause
 	 Return
 	}
+Else If (A_ThisMenuItem = "&AutoReplace Active")
+	{
+	 If AutoReplace.Settings.Active
+		AutoReplace.Settings.Active:=0
+	 else
+	 	AutoReplace.Settings.Active:=1
+	 XA_Save("AutoReplace", A_ScriptDir "\AutoReplace.xml")
+	 Gosub, AutoReplaceMenu
+	}
+
 
 ; Settings menu
 
@@ -447,3 +460,4 @@ While (History.MaxIndex() > MaxHistory)
 XA_Save("History", "History.xml") ; put variable name in quotes
 XA_Save("Slots", "Slots.xml") ; put variable name in quotes
 ExitApp
+
