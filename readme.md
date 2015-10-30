@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.42</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.43</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -6,7 +6,7 @@ written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
 
 ### Shortcuts
 
-|Key                                         |Action |
+|Key                                         |Action |
 |--------------------------------------------|--------|
 |<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>        | Open the Clipboard history menu. |
 |<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
@@ -173,6 +173,11 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
 
 # Changelog
+
+**v1.43**
+
+* Further refinement of "AutoReplace" plugin
+  - You can now enter a list of programs (CSV list of exe's) which will bypass AutoReplace. Excel.exe is a good candidate to avoid "the picture is too large and will be truncated" clipboard warning message
 
 **v1.42**
 
