@@ -2,24 +2,31 @@
 
 Plugin            : Slots
 Purpose           : Load & Save 10 quick paste texts
-Version           : 1.0
+Version           : 1.1
 CL3 version       : 1.2
 
 10 Slots
 Hotkeys: RCTRL-[1-0] 
 
+History:
+- 1.1 Bug fix for not correctly updatin control (Edit0 vs Slot0) and moved XML to ClipData, improved firsttime init
+
 */
 
 SlotsInit:
-Try
+
+If !IsObject(Slots)
 	{
-	 XA_Load(A_ScriptDir "\slots.xml") ; the name of the variable containing the array is returned 
-	}
-Catch
-	{
-	 Slots:=[]
-	 Loop, 10
-	 	Slots[A_Index-1]:="Slot" A_Index-1 "a"
+	 IfExist, %A_ScriptDir%\ClipData\Slots\Slots.xml
+		{
+		 XA_Load(A_ScriptDir "\ClipData\Slots\Slots.xml") ; the name of the variable containing the array is returned 
+		}
+	 else
+		{
+		 Slots:=[]
+		 Loop, 10
+			Slots[A_Index-1]:="Slot" A_Index-1 "a"
+		}
 	}
 
 x:=10
@@ -68,9 +75,27 @@ SlotsClose:
 Gui, Slots:Cancel
 Return
 
+SlotsSave:
+Gui, Slots:Submit, Hide
+Index:=0
+Loop, 10
+	{
+	 Slots[Index]:=Slot%Index%
+	 Index++
+	}
+XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml") ; put variable name in quotes
+Return
+
 SlotsSaveAs:
+SaveAsName:=""
 Gui, Slots:Submit, Hide
 InputBox, SaveAsName, Name for XML, Save slots as
+If (SaveAsName = "")
+	{
+	 MsgBox, Enter filename!`nSlots not saved.
+	 Gui, Slots:Show
+	 Return
+	}
 Index:=0
 Loop, 10
 	{
@@ -78,15 +103,17 @@ Loop, 10
 	 Index++
 	}
 StringReplace, SaveAsName, SaveAsName, .xml,,All
-XA_Save("Slots", A_ScriptDir "\" SaveAsName ".xml") ; put variable name in quotes
+XA_Save("Slots", A_ScriptDir "\ClipData\Slots\" SaveAsName ".xml") ; put variable name in quotes
 Return
 
 LoadSlots:
 Menu, SlotsMenu, Add
 Menu, SlotsMenu, Delete
-Loop, %A_ScriptDir%\*.xml
+Menu, SlotsMenu, Add, Slots.xml, MenuHandlerSlots
+Menu, SlotsMenu, Add
+Loop, %A_ScriptDir%\ClipData\Slots\*.xml
 	{
-	 If (A_LoopFileName = "history.xml")
+	 If (A_LoopFileName = "slots.xml")
 	 	Continue
 	 Menu, SlotsMenu, Add, %A_LoopFileName%, MenuHandlerSlots
 	}
@@ -96,29 +123,19 @@ Return
 MenuHandlerSlots:
 Try
 	{
-	 XA_Load(A_ScriptDir "\" A_ThisMenuItem) ; the name of the variable containing the array is returned
+	 Slots:=[]
+	 XA_Load(A_ScriptDir "\ClipData\Slots\" A_ThisMenuItem) ; the name of the variable containing the array is returned
 	}
 Catch
 	{
 	 Slots:=[]
 	 Loop, 10
-	 	 	Slots[Index-1]:="Slot" A_Index-1 "a"
+		Slots[Index-1]:="Slot" A_Index-1 "a"
 	}
 Index:=0	
 Loop, 10
 	{
-	 GuiControl,Slots:, Edit%Index%, % Slots[Index]
+	 GuiControl,Slots:, Slot%Index%, % Slots[Index]
 	 Index++
 	}
-Return
-
-SlotsSave:
-Gui, Slots:Submit, Hide
-Index:=0
-Loop, 10
-	{
-	 Slots[Index]:=Slot%Index%
-	 Index++
-	}
-XA_Save("Slots", "Slots.xml") ; put variable name in quotes
 Return

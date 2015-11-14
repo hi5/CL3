@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.43</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.5</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -12,6 +12,7 @@ written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
 |<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>      | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
 |<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle backwards press, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. |
@@ -40,7 +41,8 @@ to paste that in your current application.
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
 - Search history (v1.2+)
 - 10 Slots with options to save/load several sets (v1.2+)
-- Cycle through clipboard - forwards and backwards - with tooltip preview
+- Cycle through clipboard - forwards and backwards - with tooltip preview (v1.3+)
+- ClipChain with preview GUI, paste items in predefined order, save/load several sets (v1.5+)
 - Remove (yank) entries from history
 - No duplicate entries in clipboard (automatically removed)
 - Templates: simply text files which are read at start up
@@ -117,6 +119,13 @@ it to the history. You can use StringReplace or a Regular Expression. Settings a
 **Note: very experimental plugin. The plugin interface (GUI) needs to refined, entire process should be improved.
 A Listview would be more logical and flexible. But for now it does the job, albeit crudely.**
 
+### ClipChain [v1.5+]
+
+The CL3 ClipChain plugin allows you to cycle through a predefined clipboard history.  
+With each paste it advances to the next item in the chain. The item to be pasted next is indicated in the listview with a ```>>```.  
+When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)  
+The most recently used chain is stored in _clipchain.xml_.
+
 ## Yank (delete) entry
 
 If you select the yank option in the menu you will be presented with a 
@@ -167,12 +176,21 @@ by Deo may be of interest to develop some of these ideas.
 
 ![CL3 search](https://raw.github.com/hi5/CL3/master/img/search.png)
 
+![CL3 ClipChain](https://raw.github.com/hi5/CL3/master/img/clipchain.png)
+
 # Credits
 
 - Icons from Iconic <https://github.com/somerandomdude/Iconic>
 - [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
+- [Class LV_Rows](http://www.autohotkey.com/board/topic/94364-class-lv-rows-copy-cut-paste-and-drag-listviews/) by [Pulover](https://github.com/Pulover/) - as of v1.5 (for ClipChain)
 
 # Changelog
+
+**v1.5**
+
+* Added [ClipChain plugin](https://github.com/hi5/CL3/wiki/ClipChain)
+* Moved all xml data files to their own separate folder ClipData\* (History, Slots, ClipChain, AutoReplace)   
+  Note: to upgrade, close CL3, run the Migrate.ahk script to move all XML files to their own folder. You only need to do this once.
 
 **v1.43**
 

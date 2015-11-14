@@ -9,9 +9,9 @@ CL3 version       : 1.4
 AutoReplaceInit:
 If !IsObject(AutoReplace)
 	{
-	 IfExist, %A_ScriptDir%\AutoReplace.xml
+	 IfExist, %A_ScriptDir%\ClipData\AutoReplace\AutoReplace.xml
 		{
-		 XA_Load(A_ScriptDir "\AutoReplace.xml") ; the name of the variable containing the array is returned 
+		 XA_Load(A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml") ; the name of the variable containing the array is returned 
 		}
 	 else
 		{
@@ -57,7 +57,7 @@ MsgBox, 52, Delete, Delete %Name%?
 IfMsgBox, No
 	Return
 AutoReplace.RemoveAt(Rules)
-XA_Save("AutoReplace", A_ScriptDir "\AutoReplace.xml")
+XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 Gosub, AutoReplaceUpdateListbox
 Return
 
@@ -115,7 +115,7 @@ AutoReplace[Rules,"type"]:=type
 AutoReplace[Rules,"find"]:=find
 AutoReplace[Rules,"replace"]:=replace
 AutoReplace.Settings.Bypass:=Bypass
-XA_Save("AutoReplace", A_ScriptDir "\AutoReplace.xml")
+XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 Return
 
 AutoReplaceCancel:

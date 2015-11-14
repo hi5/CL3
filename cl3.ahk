@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.43
+Version     : 1.5
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -18,6 +18,7 @@ Features:
   v1.2: Search and Slots for quick pasting
   v1.3: Cycle through clipboard history, paste current clipboard as plain text
   v1.4: AutoReplace define find/replace rules to modify clipboard before adding it the clipboard
+  v1.5: ClipChain cycle through a predefined clipboard history
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -30,7 +31,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.43"
+version:="v1.5"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -46,9 +47,9 @@ iconZ:="icon-z.ico"
 ; tray menu
 Menu, Tray, Icon, res\cl3.ico
 Menu, tray, Tip , %name% %version%
-Menu, tray, NoStandard
-Menu, tray, Add, %name% %version%, DoubleTrayClick
-Menu, tray, Default, %name% %version%
+;Menu, tray, NoStandard
+;Menu, tray, Add, %name% %version%, DoubleTrayClick
+;Menu, tray, Default, %name% %version%
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active, TrayMenuHandler
 Menu, tray, Add, 
@@ -67,12 +68,12 @@ Menu, SubMenu3, Add, TempText, MenuHandler
 Menu, SubMenu4, Add, TempText, MenuHandler
 
 ; load clipboard history and templates
-IfNotExist, History.xml
+IfNotExist, %A_ScriptDir%\ClipData\History\History.xml
 	Error:=1
 
 Try
 	{
-	 XA_Load("History.xml") ; the name of the variable containing the array is returned 
+	 XA_Load( A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned 
 	}
 Catch
 	{
@@ -81,9 +82,9 @@ Catch
 
 If (Error = 1)
 	{
-	 FileCopy, res\history.bak.txt, history.xml, 1
+	 FileCopy, res\history.bak.txt, %A_ScriptDir%\ClipData\History\History.xml, 1
 	 History:=[]
-	 XA_Load("History.xml") ; the name of the variable containing the array is returned 
+	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned 
 	}
 
 OnExit, SaveSettings
@@ -346,6 +347,9 @@ Else
 	if (SpecialFunc = "Search")	
 		Gosub, ^#h
 Else
+	if (SpecialFunc = "ClipChain")
+		Gosub, ^#F11
+Else
 	If (SpecialFunc = "DumpHistory")
 		Return
 Gosub, ClipboardHandler
@@ -376,7 +380,11 @@ OnClipboardChange:
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = ""))
 	History.Insert(1,{"text":"Text","icon": IconExe})
-if (Clipboard = "") ; avoid empty or duplicate entries
+
+If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
+	ScriptClipClipChain:=0
+
+if (Clipboard = "") or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return 
 
 AutoReplace()
@@ -442,7 +450,7 @@ Else If (A_ThisMenuItem = "&AutoReplace Active")
 		AutoReplace.Settings.Active:=0
 	 else
 	 	AutoReplace.Settings.Active:=1
-	 XA_Save("AutoReplace", A_ScriptDir "\AutoReplace.xml")
+	 XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 	 Gosub, AutoReplaceMenu
 	}
 
@@ -457,7 +465,8 @@ Return
 SaveSettings:
 While (History.MaxIndex() > MaxHistory)
 	History.remove(History.MaxIndex())
-XA_Save("History", "History.xml") ; put variable name in quotes
-XA_Save("Slots", "Slots.xml") ; put variable name in quotes
+XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable name in quotes
+XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml") ; put variable name in quotes
+XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml") ; put variable name in quotes
 ExitApp
 

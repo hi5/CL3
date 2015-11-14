@@ -19,11 +19,13 @@ Upper.ahk
 Send.ahk
 Search.ahk
 Slots.ahk
+ClipChain.ahk
 DumpHistory.ahk
 AutoReplace.ahk
 )
 
 Gosub, SlotsInit
+Gosub, ClipChainInit
 
 #include %A_ScriptDir%\plugins\LowerReplaceSpace.ahk
 #include %A_ScriptDir%\plugins\Lower.ahk
@@ -34,4 +36,4 @@ Gosub, SlotsInit
 #include %A_ScriptDir%\plugins\Slots.ahk
 #include %A_ScriptDir%\plugins\Search.ahk
 #include %A_ScriptDir%\plugins\DumpHistory.ahk
-	
+#include %A_ScriptDir%\plugins\ClipChain.ahk	
