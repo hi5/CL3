@@ -2,30 +2,55 @@
 Plugins for CL3
 
 To add a plugin:
+Make a file named "MyPlugins.ahk" with the following content below
+(between the lines)
 
+PluginScriptFunction.ahk: function you made that modifies
+the content of the clipboard before it will be pasted.
+MyPlugins.ahk will not be part of CL3 so will never be overwritten
+by updates.
+
+To add each plugins:
 1. Create a script and place it in the plugins\ directory
-2. edit plugins\plugins.ahk and add the name of script TWICE
+2. edit plugins\Myplugins.ahk and add the name of script TWICE
    in the "join list" at the top and in the #include section below it as well.
-   The order in which they are listed is used for the menu entries
+   The order in which they are listed is used for the menu entries.
+
+; -----------------------------
+MyPluginlistFunc=
+(join|
+PluginScriptFunction.ahk
+)
+
+#include %A_ScriptDir%\plugins\PluginScriptFunction.ahk
+; etc
+; -----------------------------
 
 */
 
-pluginlist=
+pluginlistFunc=
 (join|
-LowerReplaceSpace.ahk
-Lower.ahk
-Title.ahk
-Upper.ahk
-Send.ahk
+AutoReplace.ahk
+ClipChain.ahk
+Compact.ahk
+DumpHistory.ahk
 Search.ahk
 Slots.ahk
-ClipChain.ahk
-DumpHistory.ahk
-AutoReplace.ahk
+)
+
+pluginlistClip=
+(join|
+Lower.ahk
+LowerReplaceSpace.ahk
+Upper.ahk
+Send.ahk
+Title.ahk
 )
 
 Gosub, SlotsInit
 Gosub, ClipChainInit
+
+#include *i %A_ScriptDir%\plugins\MyPlugins.ahk
 
 #include %A_ScriptDir%\plugins\LowerReplaceSpace.ahk
 #include %A_ScriptDir%\plugins\Lower.ahk
@@ -37,3 +62,4 @@ Gosub, ClipChainInit
 #include %A_ScriptDir%\plugins\Search.ahk
 #include %A_ScriptDir%\plugins\DumpHistory.ahk
 #include %A_ScriptDir%\plugins\ClipChain.ahk	
+#include %A_ScriptDir%\plugins\Compact.ahk	

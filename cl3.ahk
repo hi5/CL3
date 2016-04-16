@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.5
+Version     : 1.61
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -19,6 +19,7 @@ Features:
   v1.3: Cycle through clipboard history, paste current clipboard as plain text
   v1.4: AutoReplace define find/replace rules to modify clipboard before adding it the clipboard
   v1.5: ClipChain cycle through a predefined clipboard history
+  v1.6: Compact (reduce size of History) and delete from search search results
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -31,7 +32,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.5"
+version:="v1.61"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -48,8 +49,8 @@ iconZ:="icon-z.ico"
 Menu, Tray, Icon, res\cl3.ico
 Menu, tray, Tip , %name% %version%
 ;Menu, tray, NoStandard
-;Menu, tray, Add, %name% %version%, DoubleTrayClick
-;Menu, tray, Default, %name% %version%
+Menu, tray, Add, %name% %version%, DoubleTrayClick
+Menu, tray, Default, %name% %version%
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active, TrayMenuHandler
 Menu, tray, Add, 
@@ -120,7 +121,7 @@ Return
 
 ; paste as plain text
 ^+v::
-Clipboard:=Clipboard
+Clipboard:=Trim(Clipboard,"`n`r`t ")
 PasteIt()
 Return
 
@@ -206,10 +207,18 @@ Return
 BuildMenuPluginTemplate:
 
 Menu, ClipMenu, Add
+pluginlist:=pluginlistClip "|#" MyPluginlistFunc "|#" pluginlistFunc
 loop, parse, pluginlist, |
 	{
+	 if (SubStr(A_LoopField,1,1) = "#")
+	 	{
+		 If (StrLen(A_LoopField) = 1)
+		 	continue
+		 Menu, Submenu1, Add
+	 	}
 	 key:=% "&" Chr(96+A_Index) ". " ; %
 	 StringTrimRight,MenuText,A_LoopField,4
+	 MenuText:=Trim(MenuText,"#")
 	 MenuText:=key RegExReplace(MenuText, "m)([A-Z]+)" , " $1")
 	 Menu, Submenu1, Add, %MenuText%, SpecialMenuHandler
 	 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
@@ -352,14 +361,19 @@ Else
 Else
 	If (SpecialFunc = "DumpHistory")
 		Return
+Else
+	If (SpecialFunc = "Compact")
+		Gosub, Compact
 Gosub, ClipboardHandler
 Return
 
 TemplateMenuHandler:
 If (A_ThisMenuItem = "&0. Open templates folder")
 	{
-;	 Run, %A_ScriptDir%\templates\ ; use this line if you wish to use Explorer - don't forget to comment the line below
-	 Run, c:\totalcmd\TOTALCMD.EXE /o %A_ScriptDir%\templates\
+	 IfWinExist, ahk_exe TOTALCMD.EXE
+	 	Run, c:\totalcmd\TOTALCMD.EXE /o %A_ScriptDir%\templates\
+	 else	
+	 	Run, %A_ScriptDir%\templates\ 
 	 Return 
 	}
 
@@ -401,10 +415,10 @@ for k, v in History
 	 for p, q in newhistory
 		{
 		 if (check = q.text)
-			new:=false
+			 new:=false
 		}
 	 if new
-		newhistory.insert({"text":check,"icon":icon})
+		newhistory.push({"text":check,"icon":icon})
 	}
 
 History:=newhistory

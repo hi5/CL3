@@ -1,11 +1,14 @@
 /*
 
 Plugin            : Search history
-Version           : 1.0
+Version           : 1.1
 CL3 version       : 1.2
 
 Searchable listbox 
 Combined with Endless scrolling in a listbox http://www.autohotkey.com/forum/topic31618.html
+
+History:
+- 1.1 Added option to yank (delete) entry directly from the listbox using ctrl-del (highlight item first)
 
 */
 
@@ -61,6 +64,20 @@ id:=""
 Return
 
 #IfWinActive, CL3Search
+^Del::
+Gui, Search:Submit, NoHide
+if (Choice = "")
+	{
+	 ControlFocus, ListBox1, A
+	 ControlSend, ListBox1, {down}, A
+	}
+Gui, Search:Submit, Destroy	
+id:=Ltrim(SubStr(Choice,2,InStr(Choice,"]")-2),"0")
+History.Remove(id)
+id:=""
+Gosub, ^#h
+Return
+
 Up::
 SendMessage, 0x188, 0, 0, ListBox1, %GUITitle%  ; 0x188 is LB_GETCURSEL (for a ListBox).
 PreviousPos:=ErrorLevel+1

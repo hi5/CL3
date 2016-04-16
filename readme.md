@@ -1,8 +1,10 @@
-﻿# CL3 <sup>v1.5</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.61</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
 written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
+
+Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
 
 ### Shortcuts
 
@@ -26,8 +28,8 @@ basic very features.
 
 You can call the clipboard history menu by its default hotkey <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>
 If you prefer another hotkey simply change it in the main script, look for the
-line "__; show clipboard history menu__" and change **!^v** to something of your preference.
-More on they hotkey syntax here <http://ahkscript.org/docs/Hotkeys.htm#Symbols>
+line "__; show clipboard history menu__" and change **! ^ v** to something of your preference.
+More on they hotkey syntax here <https://autohotkey.com/docs/Hotkeys.htm#Symbols>
 
 CL3 gets its name from CLCL CLone = CL3
 
@@ -52,15 +54,15 @@ to paste that in your current application.
 
 Any text file placed in the templates\ directory will be read at start up and
 added to the Templates sub-menu - press <kbd>t</kbd> to quickly access them
-when the menu is active.
+while the menu is active.
 
 File names act as name of the menu entry and are sorted alphabetically
 before being added to the menu. You can influence the order of the menu
 entries by naming your files in the order you wish them to appear.
 
 **Note**: there is one default entry in the Templates menu: "_0. Open templates folder_"
-which will open the templates folder in Total Commander - if you don't use TC
-you can replace it with the standard file explorer (see the TemplateMenuHandler label)
+which will open the templates folder in Total Commander - if it is running - or 
+the standard file explorer (see the TemplateMenuHandler label)
 
 **Example**
 
@@ -78,25 +80,23 @@ clipboard content and changes it before it is being pasted.
 
 **Adding plugins**
 
-To add a plugin:
+As of v1.6 a new method of adding plugins is recommended, see comments in [plugins.ahk](plugins/plugins.ahk) for instructions
 
-1. Create a script and place it in the plugins\ directory
-2. edit plugins\plugins.ahk and add the name of script TWICE
-   in the "join list" at the top and in the #include section below it as well.
-   The order in which they are listed is used for the menu entries
-
-Default plugins included with CL3:
+Default plugins included with CL3 ([v1.0]):
 
 1. Lower Replace Space (convert to lower case, replace any spaces with an underscore)
 2. Lower (convert to lower case)
 3. Upper (convert to upper case)
 4. Title (convert to title case, basic)
+5. see other updates for more
 
 ### Search plugin [v1.2+]
 
 As of v1.2 you can now search the CL3 history, hotkey <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>
 simply start typing, press enter will paste the first result or you can use the <kbd>UP</kbd> & <kbd>DOWN</kbd>
 keys to navigate the result list. See [screenshot](#screenshots).
+
+As of [v1.6] you delete items directly via the history search Gui, just press <kbd>Ctrl</kbd>+<kbd>Del</kbd> on the highlighted entry in the list.
 
 ### Slots plugin [v1.2+]
 
@@ -109,7 +109,7 @@ as you like via the buttons available when the Slots gui is open. The last set u
 
 ### Dump History plugin [v1.32+]
 
-You can the current clipboard history to a plain text file via the Special, Dump History menu option.  
+You can export the current clipboard history to a plain text file via the Special, Dump History menu option.  
 The text file will be placed in the CL3 script folder.
 
 ### AutoReplace [v1.4+]
@@ -125,6 +125,14 @@ The CL3 ClipChain plugin allows you to cycle through a predefined clipboard hist
 With each paste it advances to the next item in the chain. The item to be pasted next is indicated in the listview with a ```>>```.  
 When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)  
 The most recently used chain is stored in _clipchain.xml_.
+
+### Compact [v1.6+]
+
+If you have a lot of entries in the history or one or more very large (kb) entries. CL3 can become
+a bit sluggish. You can use the Compact plugin to:
+
+- remove entries over certain size (user specified)
+- keep only the most recent specified number of entries (e.g. 100 -> keep 1..100 most recent, remove all older from history)
 
 ## Yank (delete) entry
 
@@ -186,6 +194,16 @@ by Deo may be of interest to develop some of these ideas.
 
 # Changelog
 
+**v1.61**
+
+* Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update (only in clipchain.ahk)
+    
+**v1.6**
+
+* Compact (reduce size of History) accessible via menu, specials - [#1](https://github.com/hi5/CL3/issues/1)
+* Delete from search search results (press <kbd>ctrl</kbd>+<kbd>del</kbd>) [#2](https://github.com/hi5/CL3/issues/2)
+* Revised method of adding user plugins (see "Adding plugins")
+
 **v1.5**
 
 * Added [ClipChain plugin](https://github.com/hi5/CL3/wiki/ClipChain)
@@ -201,7 +219,7 @@ by Deo may be of interest to develop some of these ideas.
 
 * Further refinement of "AutoReplace" plugin
   - You can turn it on/off via the Tray menu, the checkmark indicates if it is Active
-  - Should now retain formatted clipboard better when no replacements where made
+  - Should now retain formatted clipboard better when no replacements were made
 
 **v1.41**
 
@@ -217,12 +235,12 @@ by Deo may be of interest to develop some of these ideas.
 
 **v1.31**
 
-* Minor refinement for first time press #+c (don't show tooltip) and readme
+* Minor refinement for first time press <kbd>#</kbd>+<kbd>c</kbd> (don't show tooltip) and readme
 
 **v1.3**
 
-* Ctrl+Shift+v: paste current clipboard as plain (unformatted) text
-* #+v and #+c: cycle through clipboard history - #+x to cancel
+* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>: paste current clipboard as plain (unformatted) text
+* <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd>: cycle through clipboard history - <kbd>#</kbd>+<kbd>x</kbd> to cancel
 
 **v1.2**
 

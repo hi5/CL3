@@ -2,8 +2,12 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.0
+Version           : 1.2
 CL3 version       : 1.5
+
+History:
+- 1.2 Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update
+- 1.1 Added minor fix for "non-empty" empty lines?
 
 */
 
@@ -128,15 +132,22 @@ Loop, parse, ClipChainNewOrder, CSV
 ClipChainData:=[]
 ClipChainData:=ClipChainDataNew
 ClipChainDataNew:=[]
-Loop, % LV_GetCount()
-	LV_Modify(A_Index,,,,A_Index)
+Gosub, ClipChainUpdateIDX
 Gosub, ClipChainUpdateIndicator	
 Return
 
+ClipChainUpdateIDX:
+Loop, % LV_GetCount()
+	LV_Modify(A_Index,"Col3",A_Index)
+Return	
+
 ClipChainEdit: ; falls through to Insert
+ClipChainGuiTitle:="CL3ClipChain Edit text"
 ClipChainInsEdit:=1
 
 ClipChainInsert:
+If (ClipChainGuiTitle = "")
+	ClipChainGuiTitle:="CL3ClipChain Insert text"
 ClipChainInsertCounter:=1
 ClipChainPauseStore:=ClipChainPause
 ClipChainPause:=1
@@ -170,20 +181,20 @@ If (ClipChainInsEdit = 1)
 	 ClipChainData[ClipChainDataIndex]:=ClipChainIns
 	 If (ClipChainInsertCounter = 0)
 	 	LV_Add(1,,,,1)
-	 LV_Modify(ClipChainDataIndex,,,ClipChainHelper(ClipChainIns)) 
+	 LV_Modify(ClipChainDataIndex,"Col2",ClipChainHelper(ClipChainIns)) 
 	}
 else
 	{
 	 ClipChainData.InsertAt(ClipChainDataIndex+ClipChainInsertCounter,ClipChainIns)
 	 LV_Insert(ClipChainDataIndex+1, , , ClipChainHelper(ClipChainIns))
 	}
-Loop, % LV_GetCount()
-	LV_Modify(A_Index,,,,A_Index)
+Gosub, ClipChainUpdateIDX
 ClipChainInsEdit:=0	
 
 ClipChainPause:=ClipChainPauseStore
 ClipChainPauseStore:=""
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
+ClipChainGuiTitle:=""
 Gosub, ClipChainSet
 Return
 
@@ -194,7 +205,7 @@ Gui, ClipChainInsertGui:Add, Text, x5 y5, Insert text into chain after %ClipChai
 Gui, ClipChainInsertGui:Add, Edit, xp yp+20 w500 h300 vClipChainIns, %ClipChainIns%
 Gui, ClipChainInsertGui:Add, Button, gClipChainInsertGuiOK w100, OK
 Gui, ClipChainInsertGui:Add, Button, xp+120 gClipChainInsertGuiCancel w100, Cancel
-Gui, ClipChainInsertGui:Show, , CL3ClipChain Insert text
+Gui, ClipChainInsertGui:Show, , %ClipChainGuiTitle%
 	While (ClipChainInsertActive = 0)
 		{
 		 Sleep 20 
@@ -213,8 +224,7 @@ for k, v in ClipChainData
 	if (v = ClipChainData[ClipChainDataIndex])
 		LV_Delete(A_Index)
 ClipChainData.RemoveAt(ClipChainDataIndex)
-Loop, % LV_GetCount()
-	LV_Modify(A_Index,,,,A_Index)
+Gosub, ClipChainUpdateIDX
 Gosub, ClipChainSet
 Return
 
@@ -241,7 +251,8 @@ Gosub, ClipChainUpdateIndicator
 Return
 
 ClipChainLoad:
-StringReplace,ClipChainData,Clipboard,`r`n`r`n, % Chr(7), All
+ClipChainData:=RegExReplace(Clipboard,"m)^\s+$") ; v1.1 remove white space from empty lines
+StringReplace,ClipChainData,ClipChainData,`r`n`r`n, % Chr(7), All
 ClipChainData:=StrSplit(ClipChainData,Chr(7))
 
 ClipChainListview:
@@ -249,7 +260,7 @@ Gui, ClipChain:Default
 LV_Delete()
 for k,v in ClipChainData
 	LV_Add("", "", ClipChainHelper(v), A_Index)
-LV_Modify(1, , "||")
+LV_Modify(1,"Col1", "||")
 Return
 
 ClipChainHelper(in) {
@@ -262,16 +273,16 @@ ClipChainHelper(in) {
 ClipChainUpdateIndicator:
 Gui, ClipChain:Default
 Loop, % ClipChainData.MaxIndex()
-	LV_Modify(A_Index, , " ")
+	LV_Modify(A_Index,"Col1"," ")
 
 If (ClipChainIndex > ClipChainData.MaxIndex()) or (ClipChainIndex <= 1)
 	{
-	 LV_Modify(1, , "||")
+	 LV_Modify(1,"Col1","||")
 	 LV_Modify(1, "Vis")
 	 return
 	}
 	
-LV_Modify(ClipChainIndex, , ">>")
+LV_Modify(ClipChainIndex,"Col1",">>")
 LV_Modify(ClipChainIndex, "Vis")
 
 Return
