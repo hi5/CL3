@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.2
+Version           : 1.3
 CL3 version       : 1.5
 
 History:
+- 1.3 Added DoubleClick to paste and progress ClipChain
 - 1.2 Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update
 - 1.1 Added minor fix for "non-empty" empty lines?
 
@@ -83,6 +84,23 @@ GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 Gosub, ClipChainCheckboxes
 ClipChainLvHandle := New LV_Rows(HLV)
 Return
+
+#IfWinExist CL3ClipChain ahk_class AutoHotkeyGUI
+~LButton::
+If ClipChainPause
+	Return
+If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
+	{ ; check if you doubleclicked on the listview if so move away focus from listview otherwise we couldn't set the new active item by double clicking in the LV
+	 ControlGetFocus, CL3ClipChainListview, CL3ClipChain ahk_class AutoHotkeyGUI
+	 If (CL3ClipChainListview = "SysListView321")
+	 	{
+	 	 ControlFocus, Button12, CL3ClipChain ahk_class AutoHotkeyGUI
+	 	 Return
+	 	}
+	 Gosub, ClipChainPasteDoubleClick
+	}
+Return
+#IfWinActive
 
 ^#F11::
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
@@ -303,7 +321,14 @@ XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
 Return
 
 #If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)
+
+~LButton::
+If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
+ Gosub, ClipChainPasteDoubleClick
+Return
+
 $^v::
+ClipChainPasteDoubleClick:
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
 If (ClipChainIndex > ClipChainData.MaxIndex())

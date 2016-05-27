@@ -36,6 +36,7 @@ Compact.ahk
 DumpHistory.ahk
 Search.ahk
 Slots.ahk
+Fifo.ahk
 )
 
 pluginlistClip=
@@ -49,6 +50,7 @@ Title.ahk
 
 Gosub, SlotsInit
 Gosub, ClipChainInit
+Gosub, FifoInit
 
 #include *i %A_ScriptDir%\plugins\MyPlugins.ahk
 
@@ -63,3 +65,4 @@ Gosub, ClipChainInit
 #include %A_ScriptDir%\plugins\DumpHistory.ahk
 #include %A_ScriptDir%\plugins\ClipChain.ahk	
 #include %A_ScriptDir%\plugins\Compact.ahk	
+#include %A_ScriptDir%\plugins\Fifo.ahk

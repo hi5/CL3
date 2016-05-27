@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.61
+Version     : 1.7
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -20,6 +20,7 @@ Features:
   v1.4: AutoReplace define find/replace rules to modify clipboard before adding it the clipboard
   v1.5: ClipChain cycle through a predefined clipboard history
   v1.6: Compact (reduce size of History) and delete from search search results
+  v1.7: FIFO Paste back in the order in which the entries were added to the clipboard history
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -32,7 +33,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.61"
+version:="v1.7"
 ScriptClip:=1
 Templates:=[]
 Error:=0
@@ -47,12 +48,13 @@ iconZ:="icon-z.ico"
 
 ; tray menu
 Menu, Tray, Icon, res\cl3.ico
-Menu, tray, Tip , %name% %version%
-;Menu, tray, NoStandard
+Menu, tray, Tip , %name% %version% 
+Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%, DoubleTrayClick
 Menu, tray, Default, %name% %version%
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active, TrayMenuHandler
+Menu, tray, Add, &FIFO Active, TrayMenuHandler
 Menu, tray, Add, 
 Menu, tray, Add, &Reload this script, TrayMenuHandler
 Menu, tray, Add, &Edit this script,   TrayMenuHandler
@@ -104,6 +106,7 @@ Loop, parse, templatefilelist, |
 
 ScriptClip:=0
 
+
 #Include %A_ScriptDir%\plugins\plugins.ahk
 
 ~^c::
@@ -114,6 +117,8 @@ Return
 
 ; show clipboard history menu
 !^v::
+Gosub, FifoInit
+BuildMenuFromFifo:
 Gosub, BuildMenuHistory
 Gosub, BuildMenuPluginTemplate
 Menu, ClipMenu, Show
@@ -180,10 +185,14 @@ Return
 
 BuildMenuHistory:
 Menu, ClipMenu, Delete
-Menu, SubMenu1, Delete
-Menu, SubMenu2, Delete
-Menu, SubMenu3, Delete
-Menu, SubMenu4, Delete
+Try
+	Menu, SubMenu1, Delete
+Try
+	Menu, SubMenu2, Delete
+Try
+	Menu, SubMenu3, Delete
+Try
+	Menu, SubMenu4, Delete
 
 for k, v in History
 	{
@@ -207,22 +216,25 @@ Return
 BuildMenuPluginTemplate:
 
 Menu, ClipMenu, Add
-pluginlist:=pluginlistClip "|#" MyPluginlistFunc "|#" pluginlistFunc
-loop, parse, pluginlist, |
+
+If !FIFOACTIVE
 	{
-	 if (SubStr(A_LoopField,1,1) = "#")
-	 	{
-		 If (StrLen(A_LoopField) = 1)
-		 	continue
-		 Menu, Submenu1, Add
-	 	}
-	 key:=% "&" Chr(96+A_Index) ". " ; %
-	 StringTrimRight,MenuText,A_LoopField,4
-	 MenuText:=Trim(MenuText,"#")
-	 MenuText:=key RegExReplace(MenuText, "m)([A-Z]+)" , " $1")
-	 Menu, Submenu1, Add, %MenuText%, SpecialMenuHandler
-	 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
-	}
+	 pluginlist:=pluginlistClip "|#" MyPluginlistFunc "|#" pluginlistFunc
+	 loop, parse, pluginlist, |
+		{
+		 if (SubStr(A_LoopField,1,1) = "#")
+		 	{
+			 If (StrLen(A_LoopField) = 1)
+			 	continue
+			 Menu, Submenu1, Add
+		 	}
+		 key:=% "&" Chr(96+A_Index) ". " ; %
+		 StringTrimRight,MenuText,A_LoopField,4
+		 MenuText:=Trim(MenuText,"#")
+		 MenuText:=key RegExReplace(MenuText, "m)([A-Z]+)" , " $1")
+		 Menu, Submenu1, Add, %MenuText%, SpecialMenuHandler
+		 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+		}
 Menu, ClipMenu, Add, &s. Special, :Submenu1
 Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
 
@@ -245,7 +257,7 @@ Menu, ClipMenu, Add, &t. Templates, :Submenu2
 Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 Loop 18
 	Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
-
+}
 
 ; More history... (alt-z)
 
@@ -275,9 +287,12 @@ Else
 	 Menu, SubMenu4, Add, No entries ..., MenuHandler
 	 Menu, SubMenu4, Icon, No entries ..., res\%iconA%, , 16
 	}
-		
-Menu, ClipMenu, Add, &y. Yank entry, :Submenu3
-Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
+
+If !FIFOACTIVE
+	{
+	 Menu, ClipMenu, Add, &y. Yank entry, :Submenu3
+	 Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
+	}
 Menu, ClipMenu, Add, &z. More history, :Submenu4
 Menu, ClipMenu, Icon, &z. More history, res\%iconZ%,,16
 Menu, ClipMenu, Add
@@ -316,13 +331,25 @@ PasteIt()
 
 MenuHandler:
 If (Trim(A_ThisMenuItem) = "E&xit (Close menu)")
-	Return
+	{
+	 If !FIFOACTIVE:=0
+		Return
+	 FIFOACTIVE:=0
+	 Gosub, FifoInit
+	 Gosub, FifoActiveMenu
+	 Return
+	}
 
 ; Yank entry (e.g. delete from history)
 If (RegExMatch(Trim(A_ThisMenuItem),"^&[a-r]\.$"))
 	{
 	 YankItemNo:=Asc(SubStr(Trim(A_ThisMenuItem),2,1))-96
 	 History.Remove(YankItemNo)
+	 If FIFOACTIVE
+	 	{
+		 Gosub, FifoInit
+		 Gosub, FifoActiveMenu
+		}
 	 Return
 	}
 
@@ -334,7 +361,15 @@ else
 
 ; debug	
 ; MsgBox % "A_ThisMenu-" A_ThisMenu " : A_ThisMenuItem-" A_ThisMenuItemPos " : MenuItemPost-" MenuItemPos
-	
+
+If FIFOACTIVE
+	{
+	 FIFOID:=MenuItemPos
+	 Gosub, FifoActiveMenu
+	 TrayTip, FIFO, FIFO Paste Mode Activated, 2, 1
+	 Return
+	}
+
 ClipText:=History[MenuItemPos].text
 Gosub, ClipboardHandler
 Return
@@ -364,6 +399,9 @@ Else
 Else
 	If (SpecialFunc = "Compact")
 		Gosub, Compact
+Else
+	If (SpecialFunc = "Fifo")
+		Gosub, ^#F10
 Gosub, ClipboardHandler
 Return
 
@@ -391,6 +429,8 @@ ScriptClip:=0
 Return
 
 OnClipboardChange:
+;If (ScriptClip = 1) ; 
+;	Return
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = ""))
 	History.Insert(1,{"text":"Text","icon": IconExe})
@@ -415,7 +455,9 @@ for k, v in History
 	 for p, q in newhistory
 		{
 		 if (check = q.text)
+			{
 			 new:=false
+			}
 		}
 	 if new
 		newhistory.push({"text":check,"icon":icon})
@@ -467,6 +509,10 @@ Else If (A_ThisMenuItem = "&AutoReplace Active")
 	 XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 	 Gosub, AutoReplaceMenu
 	}
+Else If (A_ThisMenuItem = "&FIFO Active")
+	{
+	 Gosub, AutoReplaceMenu
+	}
 
 
 ; Settings menu
@@ -483,4 +529,3 @@ XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable n
 XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml") ; put variable name in quotes
 XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml") ; put variable name in quotes
 ExitApp
-

@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.61</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.7</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -15,10 +15,10 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>      | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>      | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO   |
 |<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle backwards press, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. |
-
 
 ## About CL3
 
@@ -134,6 +134,32 @@ a bit sluggish. You can use the Compact plugin to:
 - remove entries over certain size (user specified)
 - keep only the most recent specified number of entries (e.g. 100 -> keep 1..100 most recent, remove all older from history)
 
+### FIFO [v1.7+]
+
+[FIFO](https://github.com/hi5/CL3/issues/3) (first in first out) will allow you to paste entries back in
+the order in which the entries were added to the clipboard history.
+
+Press <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> to bring up the clipboard history menu (sans plugins
+and templates) and select the entry you want FIFO to start with, nothing is pasted yet.  
+You can **stop** FIFO by:
+
+* Bringing up the regular Clipboard history <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>
+* Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> (special FIFO shortcut)
+* Press <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> and choose "Exit (close menu)" (or press <kbd>ESC</kbd>)
+
+You add ```1```, ```2```, ```3```, ```4``` to the clipboard history. The history menu would look like this:
+
+```
+a. 4
+b. 3
+c. 2
+d. 1
+```
+
+If you start FIFO at 'D' pressing <kbd>Ctrl</kbd>+<kbd>v</kbd> four times will paste 1, 2, 3, 4.  
+After pasting the last (here fourth) item, FIFO stops.  
+TrayTips will appear at the start and stop of a FIFO cycle.
+
 ## Yank (delete) entry
 
 If you select the yank option in the menu you will be presented with a 
@@ -193,6 +219,14 @@ by Deo may be of interest to develop some of these ideas.
 - [Class LV_Rows](http://www.autohotkey.com/board/topic/94364-class-lv-rows-copy-cut-paste-and-drag-listviews/) by [Pulover](https://github.com/Pulover/) - as of v1.5 (for ClipChain)
 
 # Changelog
+
+**v1.7**
+
+* Added FIFO plugin (first in first out) [#3](https://github.com/hi5/CL3/issues/3)
+
+**v1.62**
+
+* Added DoubleClick to paste and progress in ClipChain
 
 **v1.61**
 
