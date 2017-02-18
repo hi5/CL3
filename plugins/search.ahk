@@ -1,13 +1,14 @@
 /*
 
 Plugin            : Search history
-Version           : 1.1
+Version           : 1.2
 CL3 version       : 1.2
 
 Searchable listbox 
 Combined with Endless scrolling in a listbox http://www.autohotkey.com/forum/topic31618.html
 
 History:
+- 1.2 Added option to Edit entry and update history (shortcut: f4)
 - 1.1 Added option to yank (delete) entry directly from the listbox using ctrl-del (highlight item first)
 
 */
@@ -27,8 +28,9 @@ for k, v in History
 
 Gui, Search:Destroy
 Gui, Search:Add, Text, x5 y8 w45 h15, &Filter:
-Gui, Search:Add, Edit, gGetText vGetText x50 y5 w440 h20 +Left,
-Gui, Search:Add, ListBox, x5 y30 w585 h270 vChoice, %StartList%
+Gui, Search:Add, Edit, gGetText vGetText x50 y5 w300 h20 +Left,
+Gui, Search:Add, Text, x355 y8, [ctrl+del] = yank (Remove) entry. [F4] = edit entry.
+Gui, Search:Add, ListBox, x5 y30 w585 h270 vChoice Choose%ChooseID%, %StartList%
 Gui, Search:Add, Button, default hidden gSearchChoice, OK ; so we can easily press enter
 Gui, Search:Show, h300 w595, %GUITitle%
 Return
@@ -49,32 +51,63 @@ UpdatedStartList=
 Return
 
 SearchChoice:
+Gosub, SearchGetID
+Gui, Search:Submit, Destroy
+Sleep 100
+Gosub, ClipboardHandler
+id:="",ChooseID:=""
+Return
+
+SearchGetID:
+id:=""
 Gui, Search:Submit, NoHide
 if (Choice = "")
 	{
-	 ControlFocus, ListBox1, A
-	 ControlSend, ListBox1, {down}, A
+	 ControlGet, Choice, list, , ListBox1, A
 	}
-Gui, Search:Submit, Destroy
 id:=Ltrim(SubStr(Choice,2,InStr(Choice,"]")-2),"0")
+if (id = "")
+	id:=1
 ClipText:=History[id].text
-Sleep 100
-Gosub, ClipboardHandler
+Choice:=""
+Return
+
+SearchEditOK:
+Gui, SearchEdit:Submit, Destroy
+History[id,"text"]:=ClipText
+If (id = 1)
+	Clipboard:=ClipText
+ClipText:=""
+ChooseID:=ID
 id:=""
+Gosub, ^#h
+Return
+
+SearchEditCancel:
+Gui, SearchEdit:Destroy
+ChooseID:=""
+Gosub, ^#h
 Return
 
 #IfWinActive, CL3Search
+F4::
+Gosub, SearchGetID
+
+Gui, Search:Destroy
+
+Gui, SearchEdit:Destroy
+Gui, SearchEdit:Add, Text, x5 y8 w100 h15, Edit this entry:
+Gui, SearchEdit:Add, Edit, vClipText x5 y25 w600 h300, %ClipText%
+Gui, SearchEdit:Add, Button, gSearchEditOK w100, OK
+Gui, SearchEdit:Add, Button, xp+110 yp gSearchEditCancel w100, Cancel
+Gui, SearchEdit:Show, w610 h360, CL3 Edit Entry [ID: %ID%]
+Return
+
 ^Del::
-Gui, Search:Submit, NoHide
-if (Choice = "")
-	{
-	 ControlFocus, ListBox1, A
-	 ControlSend, ListBox1, {down}, A
-	}
+Gosub, SearchGetID
 Gui, Search:Submit, Destroy	
-id:=Ltrim(SubStr(Choice,2,InStr(Choice,"]")-2),"0")
 History.Remove(id)
-id:=""
+id:="",ClipText:="",ChooseID:=""
 Gosub, ^#h
 Return
 
@@ -109,4 +142,5 @@ Return
 SearchGuiClose:
 SearchGuiEscape:
 Gui, Search:Destroy
+ChooseID:=""
 Return

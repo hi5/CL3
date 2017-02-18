@@ -52,7 +52,10 @@ Gui, Slots:Add, Button, xp253 gSlotsClose, &Close window
 Return
 
 ^#F12::
-Gui, Slots:Show, ,CL3Slots
+If !WinExist("CL3Slots ahk_class AutoHotkeyGUI")
+	Gui, Slots:Show, ,CL3Slots
+else
+	Gui, Slots:Hide
 Return
 
 >^1::

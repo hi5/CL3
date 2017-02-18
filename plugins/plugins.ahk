@@ -42,10 +42,10 @@ Fifo.ahk
 pluginlistClip=
 (join|
 Lower.ahk
+Title.ahk
+Send.ahk
 LowerReplaceSpace.ahk
 Upper.ahk
-Send.ahk
-Title.ahk
 )
 
 Gosub, SlotsInit

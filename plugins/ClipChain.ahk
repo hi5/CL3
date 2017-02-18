@@ -23,7 +23,7 @@ If (ClipChainX = "") or (ClipChainX = "ERROR")
 	ClipChainX:=100
 If (ClipChainY = "") or (ClipChainY = "ERROR")
 	ClipChainy:=100
-	
+
 If !IsObject(ClipChainData)
 	{
 	 IfExist, %A_ScriptDir%\ClipData\ClipChain\ClipChain.xml
@@ -270,9 +270,12 @@ Return
 
 ClipChainLoad:
 ClipChainData:=RegExReplace(Clipboard,"m)^\s+$") ; v1.1 remove white space from empty lines
+If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first entry, could mess up a filepath...
+	ClipChainData:=SubStr(ClipChainData,2)
 StringReplace,ClipChainData,ClipChainData,`r`n`r`n, % Chr(7), All
+#Include *i %A_ScriptDir%\plugins\ClipChainPRIVATERULES.ahk
 ClipChainData:=StrSplit(ClipChainData,Chr(7))
-
+ 
 ClipChainListview:
 Gui, ClipChain:Default
 LV_Delete()
@@ -299,7 +302,7 @@ If (ClipChainIndex > ClipChainData.MaxIndex()) or (ClipChainIndex <= 1)
 	 LV_Modify(1, "Vis")
 	 return
 	}
-	
+
 LV_Modify(ClipChainIndex,"Col1",">>")
 LV_Modify(ClipChainIndex, "Vis")
 
@@ -324,7 +327,7 @@ Return
 
 ~LButton::
 If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
- Gosub, ClipChainPasteDoubleClick
+	Gosub, ClipChainPasteDoubleClick
 Return
 
 $^v::

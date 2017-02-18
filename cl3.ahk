@@ -1,7 +1,7 @@
 ﻿/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.7
+Version     : 1.8
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -21,6 +21,7 @@ Features:
   v1.5: ClipChain cycle through a predefined clipboard history
   v1.6: Compact (reduce size of History) and delete from search search results
   v1.7: FIFO Paste back in the order in which the entries were added to the clipboard history
+  v1.8: Edit entries in History (via search). Cycle through plugins
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -33,10 +34,15 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 MaxHistory:=150
 name:="CL3 "
-version:="v1.7"
+version:="v1.8"
 ScriptClip:=1
+CycleFormat:=0
 Templates:=[]
+Global CyclePlugins ; v1.72+
 Error:=0
+CoordMode, Menu, Window
+ListLines, Off
+PasteTime:=A_TickCount
 
 iconA:="icon-a.ico"
 iconC:="icon-c.ico"
@@ -50,19 +56,19 @@ iconZ:="icon-z.ico"
 Menu, Tray, Icon, res\cl3.ico
 Menu, tray, Tip , %name% %version% 
 Menu, tray, NoStandard
-Menu, tray, Add, %name% %version%, DoubleTrayClick
+Menu, tray, Add, %name% %version%,    DoubleTrayClick
 Menu, tray, Default, %name% %version%
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active, TrayMenuHandler
-Menu, tray, Add, &FIFO Active, TrayMenuHandler
+Menu, tray, Add, &FIFO Active,        TrayMenuHandler
 Menu, tray, Add, 
 Menu, tray, Add, &Reload this script, TrayMenuHandler
 Menu, tray, Add, &Edit this script,   TrayMenuHandler
 Menu, tray, Add, 
 Menu, tray, Add, &Suspend Hotkeys,    TrayMenuHandler
-Menu, tray, Add, &Pause Script, 	  TrayMenuHandler
+Menu, tray, Add, &Pause Script,       TrayMenuHandler
 Menu, tray, Add, 
-Menu, tray, Add, Exit, 				  SaveSettings
+Menu, tray, Add, Exit,                SaveSettings
 
 Menu, ClipMenu, Add, TempText, MenuHandler
 Menu, SubMenu1, Add, TempText, MenuHandler
@@ -89,6 +95,8 @@ If (Error = 1)
 	 History:=[]
 	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned 
 	}
+
+Settings()
 
 OnExit, SaveSettings
 
@@ -121,11 +129,24 @@ Gosub, FifoInit
 BuildMenuFromFifo:
 Gosub, BuildMenuHistory
 Gosub, BuildMenuPluginTemplate
-Menu, ClipMenu, Show
+MenuX:=A_CaretX+10
+MenuY:=A_CaretY+10
+If (MenuX = "") and (MenuY = "")  ; X & Y not found so take Window coordinates 
+	{                               ; so we're at least in the vicinity and not 
+	 WinGetPos, MenuX, MenuY, , , A ; far away if mouse isn't near current window
+	 MenuX+=15
+	 MenuY+=150
+	}
+If (A_CaretX <> 0)
+	Menu, ClipMenu, Show, %MenuX%, %MenuY%
+Else
+	Menu, ClipMenu, Show
 Return
 
 ; paste as plain text
 ^+v::
+If (Clipboard = "") ; probably image format in Clipboard
+	Clipboard:=History[1].text
 Clipboard:=Trim(Clipboard,"`n`r`t ")
 PasteIt()
 Return
@@ -183,6 +204,35 @@ ToolTip
 ClipCycleCounter:=0
 Return
 
+; use #f to cycle through formats (defined in settings.ini / [plugins])
+; #If ClipCycleCounter
+#f::
+CycleFormat:=0
+If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
+	ClipCycleCounter:=1
+While GetKeyState("Lwin","D")
+	{
+	 ToolTip, % "Plugin: " CyclePlugins[CycleFormat] "`n——————————————————————`n" DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
+	 ; ToolTip, % CycleFormat, %A_CaretX%, %A_CaretY%
+	 Sleep 100
+	 KeyWait, f ; This prevents the keyboard's auto-repeat feature from interfering.
+	}
+ToolTip
+If (ClipCycleCounter > 0) ; If zero we've cancelled it
+	{
+	 ClipText:=DispToolTipText(History[ClipCycleCounter].text,CycleFormat)
+	 Gosub, ClipboardHandler
+	 ClipCycleCounter:=0
+	}
+Return
+
+#f up::
+if (CycleFormat > CyclePlugins.MaxIndex())
+	CycleFormat:=0
+CycleFormat++
+Sleep 100
+Return	
+
 BuildMenuHistory:
 Menu, ClipMenu, Delete
 Try
@@ -200,6 +250,8 @@ for k, v in History
 	 icon:=v.icon
  	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500))
 	 Menu, ClipMenu, Add, %key%, MenuHandler
+	 if (k = 1)
+	 	Menu, ClipMenu, Default, %key%
 	 If (A_Index = 1)
 	 	 Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
 	 Else
@@ -313,18 +365,27 @@ DispMenuText(TextIn)
 	 Return LTRIM(TextOut," `t")
 	}
 
-DispToolTipText(TextIn)
+DispToolTipText(TextIn,Format=0)
 	{
 	 TextOut:=RegExReplace(TextIn,"^\s*")
 	 TextOut:=SubStr(TextOut,1,750)
 	 StringReplace,TextOut,TextOut,`;,``;,All
+	 FormatFunc:=StrReplace(CyclePlugins[Format]," ")
+	 If IsFunc(FormatFunc)
+	 	TextOut:=%FormatFunc%(TextOut)
 	 Return TextOut
 	}
 
 PasteIt()
 	{
+	 global StartTime,PasteTime
+	 StartTime:=A_TickCount
+	 If ((StartTime - PasteTime) < 75) ; to prevent double paste after using #f/#v in combination
+	 	Return
+	 #Include *i %A_ScriptDir%\plugins\PastePrivateRules.ahk
 	 Sleep 50
 	 Send ^v
+	 PasteTime := A_TickCount
 	}
 
 ; various menu handlers
@@ -429,6 +490,13 @@ ScriptClip:=0
 Return
 
 OnClipboardChange:
+; The built-in variable A_EventInfo contains:
+; 0 if the clipboard is now empty;
+; 1 if it contains something that can be expressed as text (this includes files copied from an Explorer window);
+; 2 if it contains something entirely non-text such as a picture.
+If (A_EventInfo <> 1)
+	Return
+
 ;If (ScriptClip = 1) ; 
 ;	Return
 WinGet, IconExe, ProcessPath , A

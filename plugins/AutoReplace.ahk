@@ -1,8 +1,11 @@
 ﻿/*
 
 Plugin            : AutoReplace()
-Version           : 1.1
+Version           : 1.2
 CL3 version       : 1.4
+
+History:
+- 1.2 Added 'Try' as a fix for rare issue
 
 */
 
@@ -135,10 +138,18 @@ AutoReplace()
 	 {
 		if (v.type = "0") or (v.type = "")
 			{
-			 Clipboard:=StrReplace(Clipboard, v.find, v.replace)
+			 Try
+			 	{
+				 Clipboard:=StrReplace(Clipboard, v.find, v.replace)
+			 	}
 			}
 		else if (v.type = "1")	
-			Clipboard:=RegExReplace(Clipboard, v.find, v.replace)
+			{
+			 Try
+			 	{
+				 Clipboard:=RegExReplace(Clipboard, v.find, v.replace)
+			 	}
+			}
 	 }
 	 if (Clipboard = ClipStoreText) ; if we haven't actually modified the text make sure we restore all formats
 	 	Clipboard:=ClipStore

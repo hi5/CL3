@@ -1,4 +1,4 @@
-﻿# CL3 <sup>v1.7</sup> - Clipboard caching utility
+﻿# CL3 <sup>v1.8</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
@@ -12,13 +12,14 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 |--------------------------------------------|--------|
 |<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>        | Open the Clipboard history menu. |
 |<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. (Also delete and edit entries) |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>      | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>      | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO   |
 |<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
-|<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle backwards press, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
-|<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. |
+|<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle forward, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>f</kbd>, hold <kbd>LWin</kbd> | To cycle through plugins repeatedly tap <kbd>f</kbd>. Release <kbd>LWin</kbd> to paste. You can use this in combination with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd> |
+|<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. (also for plugins <kbd>#</kbd>+<kbd>f</kbd>) |
 
 ## About CL3
 
@@ -43,8 +44,9 @@ to paste that in your current application.
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
 - Search history (v1.2+)
 - 10 Slots with options to save/load several sets (v1.2+)
-- Cycle through clipboard - forwards and backwards - with tooltip preview (v1.3+)
-- ClipChain with preview GUI, paste items in predefined order, save/load several sets (v1.5+)
+- Cycle through clipboard - forwards and backwards - with tooltip preview (v1.3+). Cycle through plugins (v1.8+)
+- ClipChain with preview GUI, paste items in predefined order, save/load several sets (v1.5+) [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)
+- Supports FIFO (first in first out) pasting (v1.7) [#3](https://github.com/hi5/CL3/issues/3)
 - Remove (yank) entries from history
 - No duplicate entries in clipboard (automatically removed)
 - Templates: simply text files which are read at start up
@@ -96,14 +98,17 @@ As of v1.2 you can now search the CL3 history, hotkey <kbd>Ctrl</kbd>+<kbd>Win</
 simply start typing, press enter will paste the first result or you can use the <kbd>UP</kbd> & <kbd>DOWN</kbd>
 keys to navigate the result list. See [screenshot](#screenshots).
 
-As of [v1.6] you delete items directly via the history search Gui, just press <kbd>Ctrl</kbd>+<kbd>Del</kbd> on the highlighted entry in the list.
+As of [v1.6] you delete entries directly via the history search Gui, just press <kbd>Ctrl</kbd>+<kbd>Del</kbd> on the highlighted entry in the list.
+
+As of [v1.8] you edit entries directly via the history search Gui, just press <kbd>F4</kbd> on the highlighted entry in the list to edit.
+After editing the entry should stay highlighted so you could paste it directly by pressing enter or the OK button.
 
 ### Slots plugin [v1.2+]
 
 Press <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd> to open the Slots GUI and define your 10 texts
 for quick pasting. See [screenshot](#screenshots).
 
-To facility quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>+<kbd>1</kbd> .. <kbd>RCtrl</kbd>+<kbd>0</kbd>
+To facilitate quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>+<kbd>1</kbd> .. <kbd>RCtrl</kbd>+<kbd>0</kbd>
 hotkeys. By default the 10 predefined texts are stored in _slots.xml_ but you can save and load as many slot-files
 as you like via the buttons available when the Slots gui is open. The last set used is always stored in _slots.xml_
 
@@ -169,14 +174,22 @@ delete.
 ## Cycle through clipboard history [v1.3+]
 
 If you press <kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> and repeatedly tap <kbd>v</kbd> you can cycle through
-the clipboard history - a tooltip with the text to paste will be shown, if you release <kbd>LWin</kbd> the text will be
-pasted.
+backwards through the clipboard history - a tooltip with the text to paste will be shown, if you release <kbd>LWin</kbd>
+the text will be pasted.
 
-To cycle backwards press <kbd>LWin</kbd>+<kbd>c</kbd>.  
+To cycle forwards press <kbd>LWin</kbd>+<kbd>c</kbd>.  
 **Caveat:** if you press <kbd>LWin</kbd>+<kbd>c</kbd> before <kbd>LWin</kbd>+<kbd>v</kbd> nothing will be pasted upon release 
 of the <kbd>LWin</kbd> key.
 
 To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
+
+## Cycle through plugins [v1.8+]
+
+Press <kbd>#</kbd>+<kbd>f</kbd> to cycle through pre-defined plugins, it shows a preview in the tooltip. You can combine
+this with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd>. To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
+
+In settings.ini you can define and set the order of the plugins you cycle through. The plugins have to be of a
+similar format to Lower and Upper for example (e.g. just calling a function to alter the current item).
 
 ## Future plans
 
@@ -219,6 +232,16 @@ by Deo may be of interest to develop some of these ideas.
 - [Class LV_Rows](http://www.autohotkey.com/board/topic/94364-class-lv-rows-copy-cut-paste-and-drag-listviews/) by [Pulover](https://github.com/Pulover/) - as of v1.5 (for ClipChain)
 
 # Changelog
+
+**v1.8**
+
+* Search plugin: Added option to Edit entry and update history (shortcut: f4)
+* Cycle through plugins (tooltip): <kbd>#</kbd>+<kbd>f</kbd> - can be used in combination with <kbd>#</kbd>+<kbd>v</kbd> / <kbd>#</kbd>+<kbd>c</kbd>
+* AutoReplace plugin: added Try
+
+**v1.71**
+
+* Use A_CaretX and A_CaretY to see if you can popup the menu near caret, fall back to Mouse coordinates (prior behaviour)
 
 **v1.7**
 
