@@ -1,7 +1,7 @@
-﻿/*
+/*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.8
+Version     : 1.92
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -22,6 +22,7 @@ Features:
   v1.6: Compact (reduce size of History) and delete from search search results
   v1.7: FIFO Paste back in the order in which the entries were added to the clipboard history
   v1.8: Edit entries in History (via search). Cycle through plugins
+  v1.9: Folder structure for Templates\
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -32,15 +33,16 @@ See readme.md for more info and documentation on plugins and templates.
 SetBatchlines, -1
 SendMode, Input
 SetWorkingDir, %A_ScriptDir%
+AutoTrim, off
 MaxHistory:=150
 name:="CL3 "
-version:="v1.8"
+version:="v1.92"
 ScriptClip:=1
 CycleFormat:=0
-Templates:=[]
+Templates:={}
 Global CyclePlugins ; v1.72+
 Error:=0
-CoordMode, Menu, Window
+CoordMode, Menu, Screen
 ListLines, Off
 PasteTime:=A_TickCount
 
@@ -100,20 +102,27 @@ Settings()
 
 OnExit, SaveSettings
 
+; get templates in root folder first
 Loop, templates\*.txt
 	templatefilelist .= A_LoopFileName "|"
 templatefilelist:=Trim(templatefilelist,"|")
-
 Sort, templatefilelist, D|
 
 Loop, parse, templatefilelist, |
 	{
- 	 FileRead, a, templates\%A_LoopField%
- 	 Templates[A_Index]:=a
+	 FileRead, a, templates\%A_LoopField%
+	 Templates["submenu2",A_Index]:=a
+	 a:=""
 	}
 
-ScriptClip:=0
+; now check for folders for possible sub-submenus
+Loop, Files, templates\*.*, D
+	templatesfolderlist .= A_LoopFileName "|"
+templatesfolderlist:=Trim(templatesfolderlist,"|")
+Sort, templatesfolderlist, D|
+StringUpper, templatesfolderlist, templatesfolderlist
 
+ScriptClip:=0
 
 #Include %A_ScriptDir%\plugins\plugins.ahk
 
@@ -129,39 +138,55 @@ Gosub, FifoInit
 BuildMenuFromFifo:
 Gosub, BuildMenuHistory
 Gosub, BuildMenuPluginTemplate
-MenuX:=A_CaretX+10
-MenuY:=A_CaretY+10
-If (MenuX = "") and (MenuY = "")  ; X & Y not found so take Window coordinates 
-	{                               ; so we're at least in the vicinity and not 
-	 WinGetPos, MenuX, MenuY, , , A ; far away if mouse isn't near current window
-	 MenuX+=15
-	 MenuY+=150
-	}
-If (A_CaretX <> 0)
+WinGetPos, MenuX, MenuY, , , A
+MenuX+=A_CaretX
+MenuX+=20
+MenuY+=A_CaretY
+MenuY+=10
+If (A_CaretX <> "")
 	Menu, ClipMenu, Show, %MenuX%, %MenuY%
 Else
+ {
+;	TrayTip, TrayMenu, CL3Coords2, 2 ; debug
 	Menu, ClipMenu, Show
+ }
 Return
 
-; paste as plain text
+; 1x paste as plain text
+; 2x paste unwrapped
 ^+v::
 If (Clipboard = "") ; probably image format in Clipboard
 	Clipboard:=History[1].text
-Clipboard:=Trim(Clipboard,"`n`r`t ")
+; 1x paste as plain text
+If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
+	{
+	 Clipboard:=PasteUnwrapped(Clipboard)
+	}
+; 2x paste unwrapped
+else
+	{
+	 Clipboard:=Trim(Clipboard,"`n`r`t ")
+	}
+PasteIt()
+Return
+
+^v:: ; v1.91
 PasteIt()
 Return
 
 ; Cycle through clipboard history
 #v::
+PreviousClipCycleCounter:=0 ; 13/10/2017 test
 ClipCycleCounter:=1
 ClipCycleFirst:=1
 While GetKeyState("Lwin","D")
 	{
-	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
+	 If !(PreviousClipCycleCounter = ClipCycleCounter)
+		ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
 	 Sleep 100
 	 KeyWait, v ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
-ToolTip
+ToolTip	
 If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	{
 	 ClipText:=History[ClipCycleCounter].text
@@ -170,9 +195,10 @@ If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	}
 Return
 #v up::
+PreviousClipCycleCounter:=ClipCycleCounter
 If (ClipCycleFirst = 0)
 	ClipCycleCounter++
-ClipCycleFirst:=0	
+ClipCycleFirst:=0
 Return
 
 #c::
@@ -184,13 +210,15 @@ If (ClipCycleCounter < 1)
 	ClipCycleCounter:=1
 While GetKeyState("Lwin","D")
 	{
-	 ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
+	 If !(PreviousClipCycleCounter = ClipCycleCounter)
+		ToolTip, % Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text), %A_CaretX%, %A_CaretY%
 	 Sleep 100
 	 KeyWait, c ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
 ToolTip
 Return
 #c up::
+PreviousClipCycleCounter:=""
 If (ClipCycleBackCounter=0)
 	ClipCycleCounter--
 If (ClipCycleCounter < 1)
@@ -212,7 +240,7 @@ If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
 	ClipCycleCounter:=1
 While GetKeyState("Lwin","D")
 	{
-	 ToolTip, % "Plugin: " CyclePlugins[CycleFormat] "`n——————————————————————`n" DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
+	 ToolTip, % "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) "`n——————————————————————`n" DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
 	 ; ToolTip, % CycleFormat, %A_CaretX%, %A_CaretY%
 	 Sleep 100
 	 KeyWait, f ; This prevents the keyboard's auto-repeat feature from interfering.
@@ -248,18 +276,20 @@ for k, v in History
 	{
 	 text:=v.text
 	 icon:=v.icon
+	 if (icon = "")
+		icon:="res\" iconA
  	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500))
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 if (k = 1)
-	 	Menu, ClipMenu, Default, %key%
+		Menu, ClipMenu, Default, %key%
 	 If (A_Index = 1)
-	 	 Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
+		 Menu, ClipMenu, Icon, %key%, res\%iconC%, , 16
 	 Else
 		Try 	
-	 		Menu, ClipMenu, Icon, %key%, % icon
-	 	Catch
-	 		Menu, ClipMenu, Icon, %key%, res\%iconA%, , 16
-	 		 	
+			Menu, ClipMenu, Icon, %key%, % icon
+		Catch
+			Menu, ClipMenu, Icon, %key%, res\%iconA%, , 16
+
 	 If (A_Index = 18)
 		Break
 	}
@@ -275,11 +305,11 @@ If !FIFOACTIVE
 	 loop, parse, pluginlist, |
 		{
 		 if (SubStr(A_LoopField,1,1) = "#")
-		 	{
+			{
 			 If (StrLen(A_LoopField) = 1)
-			 	continue
+				continue
 			 Menu, Submenu1, Add
-		 	}
+			}
 		 key:=% "&" Chr(96+A_Index) ". " ; %
 		 StringTrimRight,MenuText,A_LoopField,4
 		 MenuText:=Trim(MenuText,"#")
@@ -292,7 +322,7 @@ Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
 
 If (templatefilelist <> "")
 	{
-	 Loop, parse, templatefilelist, |
+	 Loop, Parse, templatefilelist, |
 		{
 		 key:=% "&" Chr(96+A_Index) ". " ; %
 		 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
@@ -302,7 +332,42 @@ If (templatefilelist <> "")
 		}
 	 Menu, Submenu2, Add, &0. Open templates folder, TemplateMenuHandler
 	 Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
-	}	
+
+	If (templatesfolderlist <> "")
+		{
+		 Loop, Parse, templatesfolderlist, |
+		 {
+
+			templatefolder:=A_LoopField
+			Loop, files, templates\%A_LoopField%\*.txt
+				{
+				 templatefolderFiles .= A_LoopFileName "|"
+				 Sort, templatefolderFiles, D|
+				}
+			templatefolderFiles:=Trim(templatefolderFiles,"|")
+			Loop, parse, templatefolderFiles, |
+				{
+				 FileRead, a, templates\%templatefolder%\%A_LoopField%
+				 Templates[templatefolder,A_Index]:=a
+				 key:=% "&" Chr(96+A_Index) ". " ; %
+				 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
+				 Menu, %templatefolder%, Add, %MenuText%, TemplateMenuHandler
+				 Menu, %templatefolder%, Icon, %MenuText%, res\%iconT%,,16
+				 a:=""
+				}
+			templatefolderFiles:=""
+		 }
+
+		 Loop, parse, templatesfolderlist, |
+			{
+			 Menu, SubMenu2, Add, &%A_LoopField%, :%A_LoopField%
+			 try
+				Menu, SubMenu2, Icon, &%A_LoopField%, templates\%A_LoopField%\favicon.ico,,16
+			 catch
+				Menu, SubMenu2, Icon, &%A_LoopField%, res\%iconT%,,16
+			}
+		}
+	}
 Else
 	Menu, Submenu2, Add, "No templates", TemplateMenuHandler
 Menu, ClipMenu, Add, &t. Templates, :Submenu2
@@ -319,9 +384,9 @@ If (History.MaxIndex() > 20)
 		{
 		 text:=v.text
 		 icon:=v.icon
-	 	 If (A_Index < 19)
+		 If (A_Index < 19)
 			Continue
-	 	 If (A_Index < 45)
+		 If (A_Index < 45)
 			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500))
 		 Else	 
 			 key:=% "  " DispMenuText(SubStr(text,1,500))
@@ -330,7 +395,7 @@ If (History.MaxIndex() > 20)
 			Menu, SubMenu4, Icon, %key%, % icon
 		 Catch
  			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
-	 	 If (A_Index > 43)
+		 If (A_Index > 43)
 			Break
 		} 
 	}
@@ -359,7 +424,7 @@ DispMenuText(TextIn)
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All	
 	 If StrLen(TextOut) > 60
-	 	{
+		{
 		 TextOut:=SubStr(TextOut,1,40) " … " SubStr(RTrim(TextOut,".`n"),-10) Chr(171)
 		} 
 	 Return LTRIM(TextOut," `t")
@@ -372,7 +437,7 @@ DispToolTipText(TextIn,Format=0)
 	 StringReplace,TextOut,TextOut,`;,``;,All
 	 FormatFunc:=StrReplace(CyclePlugins[Format]," ")
 	 If IsFunc(FormatFunc)
-	 	TextOut:=%FormatFunc%(TextOut)
+		TextOut:=%FormatFunc%(TextOut)
 	 Return TextOut
 	}
 
@@ -381,12 +446,13 @@ PasteIt()
 	 global StartTime,PasteTime
 	 StartTime:=A_TickCount
 	 If ((StartTime - PasteTime) < 75) ; to prevent double paste after using #f/#v in combination
-	 	Return
+		Return
 	 #Include *i %A_ScriptDir%\plugins\PastePrivateRules.ahk
 	 Sleep 50
 	 Send ^v
 	 PasteTime := A_TickCount
 	}
+
 
 ; various menu handlers
 
@@ -407,7 +473,7 @@ If (RegExMatch(Trim(A_ThisMenuItem),"^&[a-r]\.$"))
 	 YankItemNo:=Asc(SubStr(Trim(A_ThisMenuItem),2,1))-96
 	 History.Remove(YankItemNo)
 	 If FIFOACTIVE
-	 	{
+		{
 		 Gosub, FifoInit
 		 Gosub, FifoActiveMenu
 		}
@@ -470,13 +536,13 @@ TemplateMenuHandler:
 If (A_ThisMenuItem = "&0. Open templates folder")
 	{
 	 IfWinExist, ahk_exe TOTALCMD.EXE
-	 	Run, c:\totalcmd\TOTALCMD.EXE /o %A_ScriptDir%\templates\
+		Run, c:\totalcmd\TOTALCMD.EXE /O /T %A_ScriptDir%\templates\
 	 else	
-	 	Run, %A_ScriptDir%\templates\ 
+		Run, %A_ScriptDir%\templates\ 
 	 Return 
 	}
 
-ClipText:=Templates[A_ThisMenuItemPos]
+ClipText:=Templates[A_ThisMenu,A_ThisMenuItemPos]
 Gosub, ClipboardHandler
 Return
 
@@ -573,7 +639,7 @@ Else If (A_ThisMenuItem = "&AutoReplace Active")
 	 If AutoReplace.Settings.Active
 		AutoReplace.Settings.Active:=0
 	 else
-	 	AutoReplace.Settings.Active:=1
+		AutoReplace.Settings.Active:=1
 	 XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 	 Gosub, AutoReplaceMenu
 	}
