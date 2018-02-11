@@ -249,7 +249,8 @@ LV_GetText(ClipChainDataIndex, LVCGIndex, 3)
 for k, v in ClipChainData
 	if (v = ClipChainData[ClipChainDataIndex])
 		LV_Delete(A_Index)
-ClipChainData.RemoveAt(ClipChainDataIndex)
+If (ClipChainData.Length() <> 0)
+	ClipChainData.RemoveAt(ClipChainDataIndex)
 Gosub, ClipChainUpdateIDX
 Gosub, ClipChainSet
 Return
