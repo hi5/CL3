@@ -198,6 +198,8 @@ this with <kbd>LWin</kbd>+<kbd>v</kbd> and <kbd>LWin</kbd>+<kbd>c</kbd>. To canc
 In settings.ini you can define and set the order of the plugins you cycle through. The plugins have to be of a
 similar format to Lower and Upper for example (e.g. just calling a function to alter the current item).
 
+See [Wiki](https://github.com/hi5/CL3/wiki/CyclePlugins)
+
 ## Future plans
 
 None really, but feel free to fork and extend the script and send a pull request.
