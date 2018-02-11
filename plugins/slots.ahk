@@ -9,6 +9,7 @@ CL3 version       : 1.2
 Hotkeys: RCTRL-[1-0] 
 
 History:
+- 1.2 Added hotkey for QEDL() Ctrl+E (not public)
 - 1.1 Bug fix for not correctly updatin control (Edit0 vs Slot0) and moved XML to ClipData, improved firsttime init
 
 */
@@ -32,23 +33,24 @@ If !IsObject(Slots)
 x:=10
 y:=10
 Index:=0
+Gui, Slots:font,% dpi("s8")
 Loop, 10
 	{
 	 Index++
 	 If (Index = 10)
-	 	Index:=0
-	 Gui, Slots:Add, Text, x%x% y%y% ,Slot #%Index% [RCtrl + %Index%]
-	 Gui, Slots:Add, Edit, w290 h60 vSlot%Index%, % Slots[Index]
+		Index:=0
+	 Gui, Slots:Add, Text, % dpi("x" x " y" y),Slot #%Index% [RCtrl + %Index%]
+	 Gui, Slots:Add, Edit, % dpi("w290 h60 vSlot" Index), % Slots[Index]
 	 y+=80
 	 if (A_Index = 5)
-	 	y:=10
+		y:=10
 	 if (A_Index = 5)
-	 	x:=310
+		x:=310
 	}
-Gui, Slots:Add, Button, x10 gSlotsSave, &Save Slots (slots.xml)
-Gui, Slots:Add, Button, xp130 gSlotsSaveAs, Save &As (name.xml)
-Gui, Slots:Add, Button, xp130 gLoadSlots, &Load (name.xml)
-Gui, Slots:Add, Button, xp253 gSlotsClose, &Close window
+Gui, Slots:Add, Button, % dpi("x10 gSlotsSave"), &Save Slots (slots.xml)
+Gui, Slots:Add, Button, % dpi("xp130 gSlotsSaveAs"), Save &As (name.xml)
+Gui, Slots:Add, Button, % dpi("xp130 gLoadSlots"), &Load (name.xml)
+Gui, Slots:Add, Button, % dpi("xp253 gSlotsClose"), &Close window
 Return
 
 ^#F12::
@@ -142,3 +144,6 @@ Loop, 10
 	 Index++
 	}
 Return
+
+; not public
+#include *i %A_ScriptDir%\plugins\MyQEDLG-Slots.ahk
