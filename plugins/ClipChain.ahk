@@ -110,7 +110,10 @@ Return
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 	Gui, ClipChain:Show, % dpi("w185 NA x") ClipChainX " y" ClipChainY, CL3ClipChain
 else
-	Gui, ClipChain:Hide
+ 	{
+	 Gosub, ClipChainSaveWindowPosition
+	 Gui, ClipChain:Hide
+ 	}
 Gosub, ClipChainCheckboxes	
 Return
 
@@ -320,16 +323,20 @@ Return
 ClipChainGuiEscape:
 ClipChainGuiClose:
 ScriptClipClipChain:=0
-WinGetPos, ClipChainX, ClipChainY, , , CL3ClipChain ahk_class AutoHotkeyGUI
+Gosub, ClipChainSaveWindowPosition
 Gosub, ClipChainSet
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, Hide
+XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
+Return
+
+ClipChainSaveWindowPosition:
+WinGetPos, ClipChainX, ClipChainY, , , CL3ClipChain ahk_class AutoHotkeyGUI
 IniWrite, %ClipChainX%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainX
 IniWrite, %ClipChainY%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainY
 IniWrite, %ClipChainNoHistory%   , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainNoHistory
 IniWrite, %ClipChainTrans%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainTrans
 IniWrite, %ClipChainPause%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause
-XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
 Return
 
 #If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)
