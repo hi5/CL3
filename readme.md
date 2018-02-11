@@ -198,14 +198,6 @@ this with <kbd>LWin</kbd>+<kbd>v</kbd> and <kbd>LWin</kbd>+<kbd>c</kbd>. To canc
 In settings.ini you can define and set the order of the plugins you cycle through. The plugins have to be of a
 similar format to Lower and Upper for example (e.g. just calling a function to alter the current item).
 
-## Paste most recent text if you have an Image in the clipboard [v1.9.1+]
-
-When you copy and image to the clipboard you can't paste text into a text only application (text editor)
-while one would expect to be able to do so. Before pasting CL3 checks if the active window is in a
-a CSV list programs (exe) or window titles (for example a Save As dialog). If this is the case CL3
-will replace the image clipboard contents with the most recent text entry in the CL3 text only clipboard
-history. You can set the programs and windows in "settings.ini" via TextOnlyAppsExe and TextOnlyAppsTitle. 
-
 ## Future plans
 
 None really, but feel free to fork and extend the script and send a pull request.
