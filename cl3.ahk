@@ -425,7 +425,7 @@ DispMenuText(TextIn)
 	 StringReplace, TextOut, TextOut, &, &&, All	
 	 If StrLen(TextOut) > 60
 		{
-		 TextOut:=SubStr(TextOut,1,40) " … " SubStr(RTrim(TextOut,".`n"),-10) Chr(171)
+		 TextOut:=SubStr(TextOut,1,40) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) Chr(171) ; 8230 ...
 		} 
 	 Return LTRIM(TextOut," `t")
 	}
