@@ -62,17 +62,17 @@ Gosub, ClipChainListview
 
 Gui, ClipChain:font,% dpi("s8")
 Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+355 w181 h50"), Chain(s)
-Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26 gClipChainMoveUp    "), ▲
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown"), ▼
+Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26 gClipChainMoveUp    "), % Chr(0x25B2) ; ▲
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown"), % Chr(0x25BC) ; ▼
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert  "), Ins
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings"
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit    "), ✎ ; % Chr(33)  ; Edit (pencil) 
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit    "), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil) 
 Gui, ClipChain:font
 Gui, ClipChain:font, % dpi("s12 bold")
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel     "), X ; Del (X)
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel     "), % Chr(0x1f5d1) ; trashcan ; X ; Del (X)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings " 
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu   "), 📂 ; % Chr(49)   ; Load (folder)
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu    "), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s8")
 Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h80"), Options
