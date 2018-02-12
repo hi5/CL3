@@ -1,4 +1,4 @@
-﻿/*
+/*
 Plugins for CL3
 
 To add a plugin:
@@ -45,6 +45,7 @@ Lower.ahk
 Title.ahk
 Send.ahk
 LowerReplaceSpace.ahk
+PasteUnwrapped.ahk
 Upper.ahk
 )
 
@@ -66,3 +67,4 @@ Gosub, FifoInit
 #include %A_ScriptDir%\plugins\ClipChain.ahk	
 #include %A_ScriptDir%\plugins\Compact.ahk	
 #include %A_ScriptDir%\plugins\Fifo.ahk
+#include %A_ScriptDir%\plugins\PasteUnwrapped.ahk
