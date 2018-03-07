@@ -45,7 +45,6 @@ Error:=0
 CoordMode, Menu, Screen
 ListLines, Off
 PasteTime:=A_TickCount
-CyclePluginsToolTipLine := "`n" StrReplace( Format( "{:020}", "" ), 0, Chr(0x2014) ) "`n"
 
 iconA:="icon-a.ico"
 iconC:="icon-c.ico"
@@ -241,7 +240,7 @@ If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
 	ClipCycleCounter:=1
 While GetKeyState("Lwin","D")
 	{
-	 ToolTip, % "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) CyclePluginsToolTipLine DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
+	 ToolTip, % "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) "`n——————————————————————`n" DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
 	 ; ToolTip, % CycleFormat, %A_CaretX%, %A_CaretY%
 	 Sleep 100
 	 KeyWait, f ; This prevents the keyboard's auto-repeat feature from interfering.
@@ -646,7 +645,7 @@ Else If (A_ThisMenuItem = "&AutoReplace Active")
 	}
 Else If (A_ThisMenuItem = "&FIFO Active")
 	{
-	 Gosub, AutoReplaceMenu
+	 Gosub, FifoActiveMenu
 	}
 
 
