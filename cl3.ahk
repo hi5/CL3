@@ -45,6 +45,7 @@ Error:=0
 CoordMode, Menu, Screen
 ListLines, Off
 PasteTime:=A_TickCount
+CyclePluginsToolTipLine := "`n" StrReplace( Format( "{:020}", "" ), 0, Chr(0x2014) ) "`n"
 
 iconA:="icon-a.ico"
 iconC:="icon-c.ico"
@@ -240,7 +241,7 @@ If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
 	ClipCycleCounter:=1
 While GetKeyState("Lwin","D")
 	{
-	 ToolTip, % "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) "`n——————————————————————`n" DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
+	 ToolTip, % "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) CyclePluginsToolTipLine DispToolTipText(History[ClipCycleCounter].text,CycleFormat), %A_CaretX%, %A_CaretY%
 	 ; ToolTip, % CycleFormat, %A_CaretX%, %A_CaretY%
 	 Sleep 100
 	 KeyWait, f ; This prevents the keyboard's auto-repeat feature from interfering.
@@ -426,7 +427,7 @@ DispMenuText(TextIn)
 	 If StrLen(TextOut) > 60
 		{
 		 TextOut:=SubStr(TextOut,1,40) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) Chr(171) ; 8230 ...
-		} 
+		}
 	 Return LTRIM(TextOut," `t")
 	}
 
