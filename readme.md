@@ -1,8 +1,10 @@
-﻿# CL3 <sup>v1.8</sup> - Clipboard caching utility
+# CL3 <sup>v1.92</sup> - Clipboard caching utility
 
 CL3 is a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
-written in AutoHotkey (Source: <https://github.com/hi5/CL3>)
+written in AutoHotkey (Source: <https://github.com/hi5/CL3>)  
+
+Intended for AutoHotkey Unicode (64-bit version of AutoHotkey is automatically Unicode).
 
 Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
 
@@ -61,6 +63,11 @@ while the menu is active.
 File names act as name of the menu entry and are sorted alphabetically
 before being added to the menu. You can influence the order of the menu
 entries by naming your files in the order you wish them to appear.
+
+As of v1.9+ Templates now support sub-folders. A Sub-folder will be added as a
+sub-menu entry and its text files processed as described above. If a "favicon.ico"
+is present in a sub-folder it will be used in the Templates Menu, otherwise it
+will use the default Templace icon (res\icon-t.ico)
 
 **Note**: there is one default entry in the Templates menu: "_0. Open templates folder_"
 which will open the templates folder in Total Commander - if it is running - or 
@@ -185,11 +192,13 @@ To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
 
 ## Cycle through plugins [v1.8+]
 
-Press <kbd>#</kbd>+<kbd>f</kbd> to cycle through pre-defined plugins, it shows a preview in the tooltip. You can combine
-this with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd>. To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
+Press <kbd>LWin</kbd>+<kbd>f</kbd> to cycle through pre-defined plugins, it shows a preview in the tooltip. You can combine
+this with <kbd>LWin</kbd>+<kbd>v</kbd> and <kbd>LWin</kbd>+<kbd>c</kbd>. To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
 
 In settings.ini you can define and set the order of the plugins you cycle through. The plugins have to be of a
 similar format to Lower and Upper for example (e.g. just calling a function to alter the current item).
+
+See [Wiki](https://github.com/hi5/CL3/wiki/CyclePlugins)
 
 ## Future plans
 
@@ -207,7 +216,7 @@ Some ideas for further development you may wish to consider:
 - More (default) plugins:
 	- Improved title case (various scripts are available which could replace the current basic one)
 	- Strip HTML
-	- Find, Replace in clipboard
+	- <strike>Find, Replace in clipboard</strike> possible via editor
 	- Reformat text, for example email reply format, wrap text etc
 	- Plain text and/or Markdown to HTML conversion
 	- ...
@@ -228,14 +237,34 @@ by Deo may be of interest to develop some of these ideas.
 # Credits
 
 - Icons from Iconic <https://github.com/somerandomdude/Iconic>
-- [XA Save / Load Arrays to/from XML Functions - trueski](http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/) - using a 'fixed' version as forum post is messed up
+- [XA Save / Load Arrays to/from XML Functions](https://github.com/hi5/XA)
 - [Class LV_Rows](http://www.autohotkey.com/board/topic/94364-class-lv-rows-copy-cut-paste-and-drag-listviews/) by [Pulover](https://github.com/Pulover/) - as of v1.5 (for ClipChain)
+- [Edit Library](https://autohotkey.com/boards/viewtopic.php?f=6&t=5063) by [jballi](https://autohotkey.com/boards/memberlist.php?mode=viewprofile&u=58) - QEDlg() code also by jballi (for search/edit plugin)
 
 # Changelog
 
+**v1.92**
+
+* Make it so that we can push public updates without accidentally releasing QEDlg()
+
+**v1.91**
+
+* Merge History items via search menu (select multiple, press <kbd>F5</kbd>)
+* Fix for Cycle + Plugins hotkeys <kbd>#</kbd>+<kbd>v</kbd> / <kbd>#</kbd>+<kbd>c</kbd> / <kbd>#</kbd>+<kbd>f</kbd>
+
+**v1.9**
+
+* Folder structure for Templates\
+* Adding dpi() for GUIs (Search, ClipChain, Slots) - https://github.com/hi5/dpi
+
+**v1.81**
+
+* Search.ahk Updated rudimentary editor with QEDlg(), a pop-up editor by jballi (see plugins/search.ahk and _functions/)
+* CL3.ahk - "AutoTrim, off" to fix AutoTrim issues with Clipboard history :)
+
 **v1.8**
 
-* Search plugin: Added option to Edit entry and update history (shortcut: f4)
+* Search plugin: Added option to Edit entry and update history (shortcut: <kbd>F4</kbd>)
 * Cycle through plugins (tooltip): <kbd>#</kbd>+<kbd>f</kbd> - can be used in combination with <kbd>#</kbd>+<kbd>v</kbd> / <kbd>#</kbd>+<kbd>c</kbd>
 * AutoReplace plugin: added Try
 
@@ -254,7 +283,7 @@ by Deo may be of interest to develop some of these ideas.
 **v1.61**
 
 * Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update (only in clipchain.ahk)
-    
+
 **v1.6**
 
 * Compact (reduce size of History) accessible via menu, specials - [#1](https://github.com/hi5/CL3/issues/1)

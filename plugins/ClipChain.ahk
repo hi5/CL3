@@ -1,11 +1,12 @@
-﻿/*
+/*
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.3
+Version           : 1.4
 CL3 version       : 1.5
 
 History:
+- 1.4 Added QEDL() for edit and insert (not public)
 - 1.3 Added DoubleClick to paste and progress ClipChain
 - 1.2 Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update
 - 1.1 Added minor fix for "non-empty" empty lines?
@@ -49,33 +50,36 @@ Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Add, Clear ClipChain, ClipChainClear
 
 Gui, ClipChain:Default
+Gui, ClipChain:Font, % dpi("s8")
 Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate it while you click on the Gui
-Gui, ClipChain:Add, Listview, x0 y0 w185 h350 NoSortHdr grid vLVCGIndex gClipChainClicked hwndHLV,?|ClipChain|IDX
-LV_ModifyCol(1,25)
-LV_ModifyCol(2,160)
-LV_ModifyCol(3,0)
+Gui, ClipChain:Add, Listview, % dpi("x0 y0 w185 h350 NoSortHdr grid vLVCGIndex gClipChainClicked hwndHLV"),?|ClipChain|IDX
+LV_ModifyCol(1,dpi()*25)
+LV_ModifyCol(2,dpi()*160)
+LV_ModifyCol(3,*0)
 ;LV_ModifyCol(2,100) ; debug
 ;LV_ModifyCol(3,30)  ; debug
 Gosub, ClipChainListview
 
-Gui, ClipChain:Add, GroupBox, x2 yp+355 w181 h50, Chain(s)
-Gui, ClipChain:Add, Button, xp+8  yp+18 w26 h26 gClipChainMoveUp    , ▲
-Gui, ClipChain:Add, Button, xp+28 yp    w26 h26   gClipChainMoveDown, ▼
-Gui, ClipChain:Add, Button, xp+28 yp    w26 h26   gClipChainInsert  , Ins
-Gui, ClipChain:font,s11, Wingdings
-Gui, ClipChain:Add, Button, xp+28 yp    w26 h26   gClipChainEdit    , % Chr(33)  ; Edit (pencil)
+Gui, ClipChain:font,% dpi("s8")
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+355 w181 h50"), Chain(s)
+Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26 gClipChainMoveUp    "), % Chr(0x25B2) ; ▲
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown"), % Chr(0x25BC) ; ▼
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert  "), Ins
+Gui, ClipChain:font,% dpi("s11") ; " Wingdings"
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit    "), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil) 
 Gui, ClipChain:font
-Gui, ClipChain:font, s12 bold
-Gui, ClipChain:Add, Button, xp+28 yp    w26 h26   gClipChainDel     , X ; Del (X)
+Gui, ClipChain:font, % dpi("s12 bold")
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel     "), % Chr(0x1f5d1) ; trashcan ; X ; Del (X)
 Gui, ClipChain:font
-Gui, ClipChain:font,s11, Wingdings
-Gui, ClipChain:Add, Button, xp+28 yp    w26 h26   gClipChainMenu   , % Chr(49)   ; Load (folder)
+Gui, ClipChain:font,% dpi("s11") ; " Wingdings " 
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu    "), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
 Gui, ClipChain:font
-Gui, ClipChain:Add, GroupBox, x2 yp+40 w181 h80, Options
-Gui, ClipChain:Add, Checkbox, xp+10 yp+18 w75 h24 vClipChainNoHistory gClipChainCheckboxes, No History
-Gui, ClipChain:Add, Checkbox, xp+80 yp    w85 h24 vClipChainTrans     gClipChainCheckboxes, Transparent
-Gui, ClipChain:Add, Checkbox, xp-80 yp+30 w75 h24 vClipChainPause     gClipChainCheckboxes, Pause
-Gui, ClipChain:Add, Button  , xp+80 yp    w85 h24 gClipChainGuiClose, Close ClipChain
+Gui, ClipChain:font,% dpi("s8")
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h80"), Options
+Gui, ClipChain:Add, Checkbox, % dpi("xp+10 yp+18 w75 h24 vClipChainNoHistory gClipChainCheckboxes"), No History
+Gui, ClipChain:Add, Checkbox, % dpi("xp+80 yp    w85 h24 vClipChainTrans     gClipChainCheckboxes"), Transparent
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainPause     gClipChainCheckboxes"), Pause
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 gClipChainGuiClose"), Close ClipChain
 
 GuiControl, ClipChain:, ClipChainNoHistory  , %ClipChainNoHistory%
 GuiControl, ClipChain:, ClipChainTrans      , %ClipChainTrans%
@@ -104,9 +108,12 @@ Return
 
 ^#F11::
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
-	Gui, ClipChain:Show, w185 NA x%ClipChainX% y%ClipChainY%, CL3ClipChain
+	Gui, ClipChain:Show, % dpi("w185 NA x") ClipChainX " y" ClipChainY, CL3ClipChain
 else
-	Gui, ClipChain:Hide
+ 	{
+	 Gosub, ClipChainSaveWindowPosition
+	 Gui, ClipChain:Hide
+ 	}
 Gosub, ClipChainCheckboxes	
 Return
 
@@ -218,6 +225,10 @@ Return
 
 ClipChainInsertGui:
 ClipChainInsertActive:=0
+
+; not public
+#include *i %A_ScriptDir%\plugins\MyQEDLG-ClipChain.ahk
+
 Gui, ClipChainInsertGui:Destroy
 Gui, ClipChainInsertGui:Add, Text, x5 y5, Insert text into chain after %ClipChainDataIndex% item:
 Gui, ClipChainInsertGui:Add, Edit, xp yp+20 w500 h300 vClipChainIns, %ClipChainIns%
@@ -241,7 +252,8 @@ LV_GetText(ClipChainDataIndex, LVCGIndex, 3)
 for k, v in ClipChainData
 	if (v = ClipChainData[ClipChainDataIndex])
 		LV_Delete(A_Index)
-ClipChainData.RemoveAt(ClipChainDataIndex)
+If (ClipChainData.Length() <> 0)
+	ClipChainData.RemoveAt(ClipChainDataIndex)
 Gosub, ClipChainUpdateIDX
 Gosub, ClipChainSet
 Return
@@ -311,16 +323,20 @@ Return
 ClipChainGuiEscape:
 ClipChainGuiClose:
 ScriptClipClipChain:=0
-WinGetPos, ClipChainX, ClipChainY, , , CL3ClipChain ahk_class AutoHotkeyGUI
+Gosub, ClipChainSaveWindowPosition
 Gosub, ClipChainSet
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, Hide
+XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
+Return
+
+ClipChainSaveWindowPosition:
+WinGetPos, ClipChainX, ClipChainY, , , CL3ClipChain ahk_class AutoHotkeyGUI
 IniWrite, %ClipChainX%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainX
 IniWrite, %ClipChainY%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainY
 IniWrite, %ClipChainNoHistory%   , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainNoHistory
 IniWrite, %ClipChainTrans%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainTrans
 IniWrite, %ClipChainPause%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause
-XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
 Return
 
 #If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)

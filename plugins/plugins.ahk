@@ -1,4 +1,4 @@
-﻿/*
+/*
 Plugins for CL3
 
 To add a plugin:
@@ -10,7 +10,7 @@ the content of the clipboard before it will be pasted.
 MyPlugins.ahk will not be part of CL3 so will never be overwritten
 by updates.
 
-To add each plugins:
+To add each plugin:
 1. Create a script and place it in the plugins\ directory
 2. edit plugins\Myplugins.ahk and add the name of script TWICE
    in the "join list" at the top and in the #include section below it as well.
@@ -45,12 +45,14 @@ Lower.ahk
 Title.ahk
 Send.ahk
 LowerReplaceSpace.ahk
+PasteUnwrapped.ahk
 Upper.ahk
 )
 
 Gosub, SlotsInit
 Gosub, ClipChainInit
 Gosub, FifoInit
+Gosub, AutoReplaceInit
 
 #include *i %A_ScriptDir%\plugins\MyPlugins.ahk
 
@@ -66,3 +68,6 @@ Gosub, FifoInit
 #include %A_ScriptDir%\plugins\ClipChain.ahk	
 #include %A_ScriptDir%\plugins\Compact.ahk	
 #include %A_ScriptDir%\plugins\Fifo.ahk
+#include %A_ScriptDir%\plugins\PasteUnwrapped.ahk
+
+
