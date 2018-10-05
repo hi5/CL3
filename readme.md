@@ -1,8 +1,8 @@
-# CL3 <sup>v1.92</sup> - Clipboard caching utility
+# CL3 <sup>v1.93</sup> - Clipboard caching utility
 
-CL3 is a lightweight clone of the CLCL clipboard caching utility
-which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>
-written in AutoHotkey (Source: <https://github.com/hi5/CL3>)  
+CL3 started as a lightweight clone of the CLCL clipboard caching utility
+which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
+But some unique [features](#features) have been added making it more versatile "text only" Clipboard manager.
 
 Intended for AutoHotkey Unicode (64-bit version of AutoHotkey is automatically Unicode).
 
@@ -10,8 +10,8 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 
 ### Shortcuts
 
-|Key                                         |Action |
-|--------------------------------------------|--------|
+|Key                                                |Action  |
+|---------------------------------------------------|--------|
 |<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>        | Open the Clipboard history menu. |
 |<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. (Also delete and edit entries) |
@@ -23,16 +23,16 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 |<kbd>LWin</kbd>+<kbd>f</kbd>, hold <kbd>LWin</kbd> | To cycle through plugins repeatedly tap <kbd>f</kbd>. Release <kbd>LWin</kbd> to paste. You can use this in combination with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd> |
 |<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. (also for plugins <kbd>#</kbd>+<kbd>f</kbd>) |
 
+Note: as of v1.93 you can define these Shortcuts via Settings.ini or use the Tray menu, Settings option
+
 ## About CL3
 
-It is not meant to compete with the many clipboard caching utilities
-that are (freely) available, but merely as minimal program with some
-basic very features.
+It is not meant to compete with the many clipboard caching utilities that are (freely) available,
+but merely as minimal program focussing on text only.
 
 You can call the clipboard history menu by its default hotkey <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>
-If you prefer another hotkey simply change it in the main script, look for the
-line "__; show clipboard history menu__" and change **! ^ v** to something of your preference.
-More on they hotkey syntax here <https://autohotkey.com/docs/Hotkeys.htm#Symbols>
+If you prefer another hotkey you can change this and the other hotkeys via the Settings menu. Use the
+AutoHotkey syntax - more info about they syntax here <https://autohotkey.com/docs/Hotkeys.htm#Symbols>
 
 CL3 gets its name from CLCL CLone = CL3
 
@@ -40,7 +40,7 @@ As of v1.3: Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd> to paste the cur
 plain (unformatted) text - this can be useful if you have selected rich / formatted text but don't want
 to paste that in your current application.
 
-**Features**
+### Features
 
 - Captures text only
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
@@ -207,7 +207,7 @@ None really, but feel free to fork and extend the script and send a pull request
 Some ideas for further development you may wish to consider:
 
 - Extending the number of menu entries in the secondary menu ("more history")
-- <strike>Allow the user to search the extensive history</strike> _v1.2+_
+- ~~Allow the user to search the extensive history~~ _v1.2+_
 - Include rich text formats
 - Include images
 - Exclude certain programs
@@ -216,7 +216,7 @@ Some ideas for further development you may wish to consider:
 - More (default) plugins:
 	- Improved title case (various scripts are available which could replace the current basic one)
 	- Strip HTML
-	- <strike>Find, Replace in clipboard</strike> possible via editor
+	- ~~Find, Replace in clipboard~~ possible via editor
 	- Reformat text, for example email reply format, wrap text etc
 	- Plain text and/or Markdown to HTML conversion
 	- ...
@@ -226,11 +226,11 @@ by Deo may be of interest to develop some of these ideas.
 
 # Screenshots
 
-![CL3 menu](https://raw.github.com/hi5/CL3/master/img/cl3.png)
+![CL3 Menu](https://raw.github.com/hi5/CL3/master/img/cl3.png)
 
-![CL3 slots](https://raw.github.com/hi5/CL3/master/img/slots.png)
+![CL3 Slots](https://raw.github.com/hi5/CL3/master/img/slots.png)
 
-![CL3 search](https://raw.github.com/hi5/CL3/master/img/search.png)
+![CL3 Search](https://raw.github.com/hi5/CL3/master/img/search.png)
 
 ![CL3 ClipChain](https://raw.github.com/hi5/CL3/master/img/clipchain.png)
 
@@ -242,6 +242,19 @@ by Deo may be of interest to develop some of these ideas.
 - [Edit Library](https://autohotkey.com/boards/viewtopic.php?f=6&t=5063) by [jballi](https://autohotkey.com/boards/memberlist.php?mode=viewprofile&u=58) - QEDlg() code also by jballi (for search/edit plugin)
 
 # Changelog
+
+**v1.93**
+
+* Hotkeys and some other basic settings via settings.ini, accessible via Tray menu Settings
+* Basic stats, accessible via Tray menu "Usage statistics"
+* Search Plugin: fix for first Down:: (see comment in code plugins\search.ahk)
+* Search Plugin: pressing hotkey again toggles Gui (e.g. hide, show like slots and clipchain already do)
+* Attempt to have more stable ToolTip (less/no flickering as it no longer continously updates the TT if nothing changes)  
+  (Note: using ToolTipFont https://autohotkey.com/boards/viewtopic.php?f=6&t=4777 results in error for these cycle tooltips)
+* Updated from OnClipboardChange: to OnClipboardChange() - improved efficiency by turning it on/off at various "actions" and "plugins"
+* Improved MaxHistory, not just on OnExit but now continously keep it at set entries - should help with memory consumption and overall speed
+* Added some (generic) icons to tray menu
+* Fixed issue with Cycle paste not correctly updating History
 
 **v1.92**
 

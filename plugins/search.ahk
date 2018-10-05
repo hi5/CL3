@@ -1,12 +1,13 @@
 /*
 
 Plugin            : Search history
-Version           : 1.4
+Version           : 1.5
 
 Searchable listbox 
 Combined with Endless scrolling in a listbox http://www.autohotkey.com/forum/topic31618.html
 
 History:
+- 1.5 Fix for first time {down} which jumped to second item (see comment in Down::)
 - 1.4 Merge items using F5
 - 1.3 Replaced rudimentary editor with QEDlg()
       QEDlg() - pop-up editor by jballi, source via PM at autohotkey.com Feb 28th 2017
@@ -19,13 +20,20 @@ History:
 */
 
 
-^#h::
+;^#h::
+hk_search:
+If WinExist("CL3Search ahk_class AutoHotkeyGUI")
+	{
+	 Gui, Search:Destroy
+	 Return
+	}
+
 GUITitle=CL3Search
 
 StartList:=""
 for k, v in History
 	{
-	 add:=v.text	
+	 add:=v.text
 	 stringreplace, add, add, |,,All
 	 stringreplace, add, add, `n,%A_Space%,All
 	 StartList .= "[" SubStr("00" A_Index,-2) "] " Add "|"
@@ -36,9 +44,9 @@ Gui, Search:font, % dpi("s8")
 Gui, Search:Add, Text, % dpi("x5 y8 w45 h15"), &Filter:
 Gui, Search:Add, Edit, % dpi("gGetText vGetText x50 y5 w300 h20 +Left"),
 Gui, Search:Add, Text, % dpi("x355 y8"), [ctrl+del] = yank (Remove) entry. [F4] = edit entry.
-Gui, Search:Add, ListBox, % dpi("multi x5 y30 w585 h270 vChoice Choose") ChooseID, %StartList%
+Gui, Search:Add, ListBox, % dpi("multi x5 y30 w" SearchWindowWidth-10 " h" SearchWindowHeight-30  " vChoice Choose") ChooseID, %StartList%
 Gui, Search:Add, Button, % dpi("default hidden gSearchChoice"), OK ; so we can easily press enter
-Gui, Search:Show, % dpi("h300 w595"), %GUITitle%
+Gui, Search:Show, % dpi("h" SearchWindowHeight " w" SearchWindowWidth), %GUITitle%
 Return
 
 GetText:
@@ -60,7 +68,9 @@ SearchChoice:
 Gosub, SearchGetID
 Gui, Search:Submit, Destroy
 Sleep 100
+MenuItemPos:=id ; ClipboardHandler will handle deleting it from the chosen position in History
 Gosub, ClipboardHandler
+stats.search++
 id:="",ChooseID:=""
 Return
 
@@ -81,18 +91,22 @@ Return
 SearchEditOK:
 Gui, SearchEdit:Submit, Destroy
 History[id,"text"]:=ClipText
+OnClipboardChange("FuncOnClipboardChange", 0)
 If (id = 1)
 	Clipboard:=ClipText
+OnClipboardChange("FuncOnClipboardChange", 1)
 ClipText:=""
 ChooseID:=ID
 id:=""
-Gosub, ^#h
+;Gosub, ^#h
+Gosub, hk_search
 Return
 
 SearchEditCancel:
 Gui, SearchEdit:Destroy
 ChooseID:=""
-Gosub, ^#h
+;Gosub, ^#h
+Gosub, hk_search
 Return
 
 #IfWinActive, CL3Search
@@ -123,11 +137,12 @@ Gosub, SearchGetID
 Gui, Search:Destroy
 
 Gui, SearchEdit:Destroy
-Gui, SearchEdit:Add, Text, x5 y8 w100 h15, Edit this entry:
-Gui, SearchEdit:Add, Edit, vClipText x5 y25 w600 h300, %ClipText%
-Gui, SearchEdit:Add, Button, gSearchEditOK w100, OK
-Gui, SearchEdit:Add, Button, xp+110 yp gSearchEditCancel w100, Cancel
-Gui, SearchEdit:Show, w610 h360, CL3 Edit Entry [ID: %ID%]
+Gui, SearchEdit:font, % dpi("s8")
+Gui, SearchEdit:Add, Text, % dpi("x5 y8 w100 h15"), Edit this entry:
+Gui, SearchEdit:Add, Edit, % dpi("vClipText x5 y25 w" SearchWindowWidth-10 " h" SearchWindowHeight-60), %ClipText%
+Gui, SearchEdit:Add, Button, % dpi("gSearchEditOK w100"), OK
+Gui, SearchEdit:Add, Button, % dpi("xp+110 yp gSearchEditCancel w100"), Cancel
+Gui, SearchEdit:Show, % dpi("w" SearchWindowWidth " h" SearchWindowHeight), CL3 Edit Entry ID: [ %ID% ]
 Return
 
 ^Del::
@@ -135,7 +150,8 @@ Gosub, SearchGetID
 Gui, Search:Submit, Destroy	
 History.Remove(id)
 id:="",ClipText:="",ChooseID:=""
-Gosub, ^#h
+;Gosub, ^#h
+Gosub, hk_search
 Return
 
 Up::
@@ -155,6 +171,12 @@ If (ChoicePos = PreviousPos)
 Return
 
 Down::
+SendMessage, 0x190, 0, 0, ListBox1, %GUITitle%  ; 0x190 is LB_GETSELCOUNT (for a ListBox).
+If (ErrorLevel = 0) ; v1.5 peculiar as it works in other scripts but here it seems to think it needs to jump to second item by sending one {down} so a crude fix here for the first time {down} is pressed
+	{
+	 ControlSend, ListBox1, ^{home}, %GUITitle%
+	 Return
+	}
 SendMessage, 0x188, 0, 0, ListBox1, %GUITitle%  ; 0x188 is LB_GETCURSEL (for a ListBox).
 PreviousPos:=ErrorLevel+1
 SendMessage, 0x18b, 0, 0, ListBox1, %GUITitle%  ; 0x18b is LB_GETCOUNT (for a ListBox).

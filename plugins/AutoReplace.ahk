@@ -134,6 +134,9 @@ AutoReplace()
 	 	Return
 	 ClipStore:=ClipboardAll ; store all formats
 	 ClipStoreText:=Clipboard ; store text
+
+	 OnClipboardChange("FuncOnClipboardChange", 0)
+
 	 for k, v in AutoReplace
 	 {
 		if (v.type = "0") or (v.type = "")
@@ -154,6 +157,9 @@ AutoReplace()
 	 if (Clipboard = ClipStoreText) ; if we haven't actually modified the text make sure we restore all formats
 	 	Clipboard:=ClipStore
 	 ClipStore:=""	
+
+	 OnClipboardChange("FuncOnClipboardChange", 1)
+
 	}
 
 AutoReplaceMenu:

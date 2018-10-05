@@ -23,7 +23,7 @@ IniRead, ClipChainPause      , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, S
 If (ClipChainX = "") or (ClipChainX = "ERROR")
 	ClipChainX:=100
 If (ClipChainY = "") or (ClipChainY = "ERROR")
-	ClipChainy:=100
+	ClipChainY:=100
 
 If !IsObject(ClipChainData)
 	{
@@ -51,7 +51,7 @@ Menu, ClipChainMenu, Add, Clear ClipChain, ClipChainClear
 
 Gui, ClipChain:Default
 Gui, ClipChain:Font, % dpi("s8")
-Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate it while you click on the Gui
+Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate 
 Gui, ClipChain:Add, Listview, % dpi("x0 y0 w185 h350 NoSortHdr grid vLVCGIndex gClipChainClicked hwndHLV"),?|ClipChain|IDX
 LV_ModifyCol(1,dpi()*25)
 LV_ModifyCol(2,dpi()*160)
@@ -61,25 +61,25 @@ LV_ModifyCol(3,*0)
 Gosub, ClipChainListview
 
 Gui, ClipChain:font,% dpi("s8")
-Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+355 w181 h50"), Chain(s)
-Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26 gClipChainMoveUp    "), % Chr(0x25B2) ; ▲
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown"), % Chr(0x25BC) ; ▼
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert  "), Ins
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+355 w181 h50 vGbox1"), Chain(s)
+Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26   gClipChainMoveUp   vButton1"), % Chr(0x25B2) ; ▲
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown vButton2"), % Chr(0x25BC) ; ▼
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert   vButton3"), Ins
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings"
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit    "), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil) 
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit     vButton4"), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil) 
 Gui, ClipChain:font
 Gui, ClipChain:font, % dpi("s12 bold")
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel     "), % Chr(0x1f5d1) ; trashcan ; X ; Del (X)
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel      vButton5"), % Chr(0x1f5d1) ; trashcan ; X ; Del (X)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings " 
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu    "), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu     vButton6"), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s8")
-Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h80"), Options
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h80 vGbox2"), Options
 Gui, ClipChain:Add, Checkbox, % dpi("xp+10 yp+18 w75 h24 vClipChainNoHistory gClipChainCheckboxes"), No History
 Gui, ClipChain:Add, Checkbox, % dpi("xp+80 yp    w85 h24 vClipChainTrans     gClipChainCheckboxes"), Transparent
 Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainPause     gClipChainCheckboxes"), Pause
-Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 gClipChainGuiClose"), Close ClipChain
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainGuiClose  gClipChainGuiClose"  ), Close ClipChain
 
 GuiControl, ClipChain:, ClipChainNoHistory  , %ClipChainNoHistory%
 GuiControl, ClipChain:, ClipChainTrans      , %ClipChainTrans%
@@ -106,7 +106,8 @@ If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
 Return
 #IfWinActive
 
-^#F11::
+;^#F11::
+hk_clipchain:
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 	Gui, ClipChain:Show, % dpi("w185 NA x") ClipChainX " y" ClipChainY, CL3ClipChain
 else
@@ -354,8 +355,11 @@ If (ClipChainIndex > ClipChainData.MaxIndex())
 	{
 	 ClipChainIndex:=1
 	}
+OnClipboardChange("FuncOnClipboardChange", 0)
 Clipboard:=ClipChainData[ClipChainIndex]
+OnClipboardChange("FuncOnClipboardChange", 1)
 PasteIt()
+stats.clipchain++
 ClipChainIndex++
 Gosub, ClipChainUpdateIndicator
 Return

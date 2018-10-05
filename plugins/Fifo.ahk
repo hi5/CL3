@@ -18,7 +18,8 @@ FIFOACTIVE:=0
 
 Return
 
-^#F10::
+;^#F10::
+hk_fifo:
 Gosub, FifoInit
 FIFOACTIVE:=1
 Gosub, FifoActiveMenu
@@ -31,13 +32,16 @@ Return
 ^v::
 If (FIFOID = 0) ; just in case we cancelled the FIFO selection menu
 	{
+	 OnClipboardChange("FuncOnClipboardChange", 0)
 	 Clipboard:=History[1].text
+	 OnClipboardChange("FuncOnClipboardChange", 1)
 	 PasteIt()
 	 Sleep 100
 	 Gosub, FifoInit
 	}
 Clipboard:=History[FIFOID].text
 PasteIt()
+stats.fifo++
 FIFOIDCOUNTER++
 If (FIFOID = FIFOIDCOUNTER)
 	{

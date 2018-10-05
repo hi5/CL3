@@ -33,6 +33,7 @@ If !IsObject(Slots)
 x:=10
 y:=10
 Index:=0
+
 Gui, Slots:font,% dpi("s8")
 Loop, 10
 	{
@@ -53,25 +54,30 @@ Gui, Slots:Add, Button, % dpi("xp130 gLoadSlots"), &Load (name.xml)
 Gui, Slots:Add, Button, % dpi("xp253 gSlotsClose"), &Close window
 Return
 
-^#F12::
+;^#F12::
+hk_slots:
 If !WinExist("CL3Slots ahk_class AutoHotkeyGUI")
 	Gui, Slots:Show, ,CL3Slots
 else
 	Gui, Slots:Hide
 Return
 
->^1::
->^2::
->^3::
->^4::
->^5::
->^6::
->^7::
->^8::
->^9::
->^0::
+;>^1::
+;>^2::
+;>^3::
+;>^4::
+;>^5::
+;>^6::
+;>^7::
+;>^8::
+;>^9::
+;>^0::
+hk_slotpaste:
+OnClipboardChange("FuncOnClipboardChange", 0)
 Clipboard:=Slots[SubStr(A_thisHotkey,0)]
+OnClipboardChange("FuncOnClipboardChange", 1)
 Send ^v
+stats.slots++
 Return
 
 ~Esc::
@@ -119,7 +125,7 @@ Menu, SlotsMenu, Add
 Loop, %A_ScriptDir%\ClipData\Slots\*.xml
 	{
 	 If (A_LoopFileName = "slots.xml")
-	 	Continue
+		Continue
 	 Menu, SlotsMenu, Add, %A_LoopFileName%, MenuHandlerSlots
 	}
 Menu, SlotsMenu, Show

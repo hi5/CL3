@@ -70,4 +70,3 @@ Gosub, AutoReplaceInit
 #include %A_ScriptDir%\plugins\Fifo.ahk
 #include %A_ScriptDir%\plugins\PasteUnwrapped.ahk
 
-
