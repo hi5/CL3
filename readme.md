@@ -243,6 +243,10 @@ by Deo may be of interest to develop some of these ideas.
 
 # Changelog
 
+**v1.93.1**
+
+* Fixed issue with History not being updated correctly after pasting template (clipboard content wasn't the same as history[1], now it is)
+
 **v1.93**
 
 * Hotkeys and some other basic settings via settings.ini, accessible via Tray menu Settings

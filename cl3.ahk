@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.93
+Version     : 1.93.1
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -35,7 +35,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 name:="CL3 "
-version:="v1.93"
+version:="v1.93.1"
 ScriptClip:=1
 CycleFormat:=0
 Templates:={}
@@ -45,6 +45,7 @@ CoordMode, Menu, Screen
 ListLines, Off
 PasteTime:=A_TickCount
 CyclePluginsToolTipLine := "`n" StrReplace( Format( "{:020}", "" ), 0, Chr(0x2014) ) "`n"
+TemplateClip:=0
 
 iconA:="icon-a.ico"
 iconC:="icon-c.ico"
@@ -613,20 +614,22 @@ If (A_ThisMenuItem = "&0. Open templates folder")
 	}
 
 ClipText:=Templates[A_ThisMenu,A_ThisMenuItemPos]
+TemplateClip:=1
 Gosub, ClipboardHandler
 stats.templates++
+TemplateClip:=0
 Return
 
 ClipBoardHandler:
-ScriptClip:=1
 If (ClipText <> Clipboard)
 	History.Insert(1,{"text":ClipText,"icon": IconExe})
 OnClipboardChange("FuncOnClipboardChange", 0)
-History.Remove(MenuItemPos+1)
+If !TemplateClip
+	History.Remove(MenuItemPos+1)
 Clipboard:=ClipText
 OnClipboardChange("FuncOnClipboardChange", 1)
 PasteIt()
-ScriptClip:=0,MenuItemPos:=0
+MenuItemPos:=0
 Return
 
 FuncOnClipboardChange() {
