@@ -340,11 +340,10 @@ Command(cmd)
 			 Delim:=Chr(7)
 			}
 		 burst:=StrSplit(clipboard,Delim)
-		 MsgBox % ">" delim "<" burst.count() "`n" Burst[1]
+;		 MsgBox % ">" delim "<" burst.count() "`n" Burst[1]
 
 		 Loop, % burst.count()
 			{
-				; History.Insert(1,{"text":ClipText,"icon": IconExe})
 			 If !Reverse
 				History.Insert(1,{"text": Burst[A_Index],"IconExe":""})
 			 else
