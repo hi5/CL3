@@ -19,6 +19,11 @@ Settings()
 	 IniRead, MenuWidth, %ini%, settings, MenuWidth, 40
 	 IniRead, SearchWindowWidth, %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight, %ini%, settings, SearchWindowHeight, 300
+	 IniRead, ShowLines, %ini%, settings, ShowLines, 0
+	 IniRead, ActivateApi, %ini%, settings, ActivateApi, 0
+	 IniRead, ActivateCmdr, %ini%, plugins, ActivateCmdr, 0
+	 IniRead, ActivateNotes, %ini%, plugins, ActivateNotes, 0
+	 SettingsObj:={"MaxHistory":MaxHistory,"ActivateCmdr":ActivateCmdr}
 	 XA_Load(A_ScriptDir "\stats.xml")
 	 Settings_Default()
 	}
@@ -47,11 +52,15 @@ Settings_Default()
 		, hk_slot7        :">^7"
 		, hk_slot8        :">^8"
 		, hk_slot9        :">^9"
-		, hk_slot0        :">^0" }
+		, hk_slot0        :">^0"
+		, hk_notes        :"#n"
+		, hk_cmdr         :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
 		, MenuWidth         : 40
 		, SearchWindowWidth : 595
-		, SearchWindowHeight: 300 }
+		, SearchWindowHeight: 300
+		, ActivateApi : 0
+		, ShowLines : 1 }
 
 	}
 	
@@ -68,6 +77,7 @@ Stats_Create()
 		 stats.slots:=0
 		 stats.clipchain:=0
 		 stats.search:=0
+		 stats.edit:=0
 		 stats.fifo:=0
 		 stats.templates:=0
 		 stats.copieditems:=0
@@ -92,6 +102,8 @@ Settings_Hotkeys()
 	 IniRead, hk_cycleforward , %ini%, Hotkeys, hk_cycleforward ,c
 	 IniRead, hk_cycleplugins , %ini%, Hotkeys, hk_cycleplugins ,f
 	 IniRead, hk_cyclecancel  , %ini%, Hotkeys, hk_cyclecancel  ,x
+	 IniRead, hk_notes        , %ini%, Hotkeys, hk_notes        ,#n
+	 IniRead, hk_cmdr         , %ini%, Hotkeys, hk_cmdr         ,#n
 
 	 Loop, 10
 		{
@@ -113,7 +125,14 @@ Settings_Hotkeys()
 	 Hotkey, %hk_cyclemodkey% & %hk_cycleplugins%    , hk_cycleplugins
 	 Hotkey, %hk_cyclemodkey% & %hk_cycleplugins% up , hk_cycleplugins_up
 	 Hotkey, %hk_cyclemodkey% & %hk_cyclecancel%     , hk_cyclecancel
-	}
+	 Hotkey, %hk_cmdr%                               , hk_cmdr
+	 Hotkey, %hk_notes%                              , hk_notes
+	 if !ActivateCmdr
+	 	Hotkey, %hk_cmdr%, off
+	 if !ActivateNotes
+	 	Hotkey, %hk_notes%, off
+ 	}
 
 Settings_menu:
 #Include %A_ScriptDir%\lib\SettingsGui.ahk
+

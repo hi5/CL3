@@ -1,0 +1,14 @@
+﻿; --------------------------------------------------------------------------------------
+;
+; Menu+Location of Notes files for CL3
+; Empty lines or lines starting with a semi-colon (;) are ignored
+;
+; Format:
+;
+; Menu name|path to note file (a text file)|path to icon for menu option (not required)
+;
+; See docs\notes.md for more information
+;
+; --------------------------------------------------------------------------------------
+
+Note Test|%A_ScriptDir%\NoteTestScriptDir.txt

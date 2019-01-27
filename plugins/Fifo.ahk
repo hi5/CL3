@@ -2,13 +2,24 @@
 
 Plugin            : FIFO (Reverse paste)
 Purpose           : Paste back in the order in which the entries were added to the clipboard history
-Version           : 1.0
+Version           : 1.1
 CL3 version       : 1.7
 
 History:
+- 1.1 Added FifoApi() to be able to trigger FIFO from cl3api.fifo(data)
 - 1.0 Initial version
 
 */
+
+FifoApi(data)
+	{
+	 Global FIFOID,FIFOIDCOUNTER,FIFOACTIVE
+	 FIFOID:=Data
+	 FIFOIDCOUNTER:=0
+	 FIFOACTIVE:=1
+	 if (data = 0)
+	 	FIFOACTIVE:=0
+	}
 
 FifoInit:
 
@@ -21,7 +32,6 @@ Return
 ;^#F10::
 hk_fifo:
 Gosub, FifoInit
-FIFOACTIVE:=1
 Gosub, FifoActiveMenu
 Gosub, BuildMenuFromFifo
 Return

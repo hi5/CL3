@@ -63,7 +63,28 @@ Gui Settings:Add,  Button, x5 yp+140  w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
 Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
-Gui Show, w425 h380, CL3 Settings - %version%
+Gui Settings:Add,  GroupBox, xp+110 y20 w100 h180                , Special
+Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
+Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
+Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_cmdr        , %hk_cmdr%
+Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateNotes          , notes plugin
+Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_notes       , %hk_notes%
+Gui Settings:Add,  Checkbox, xp-20 yp+30 vShowLines              , Show lines
+
+If ActivateApi
+	GuiControl,, ActivateApi, 1
+If ActivateNotes
+	GuiControl,, ActivateNotes, 1
+If ActivateCmdr
+	GuiControl,, ActivateCmdr, 1
+If ShowLines
+	GuiControl,, ShowLines, 1
+
+;Gui Settings:Add,  GroupBox, xp-8 yp+30 w100 h168                , Info
+;Gui Settings:Font, s6
+;Gui Settings:Add,  Text    , xp+8 yp+24, CL3 
+
+Gui Show, w545 h380, CL3 Settings - %version%
 Return
 
 SettingsGuiEscape:
@@ -104,6 +125,8 @@ IniWrite, %hk_cyclebackward%, %ini%, Hotkeys, hk_cyclebackward
 IniWrite, %hk_cycleforward% , %ini%, Hotkeys, hk_cycleforward
 IniWrite, %hk_cycleplugins% , %ini%, Hotkeys, hk_cycleplugins
 IniWrite, %hk_cyclecancel%  , %ini%, Hotkeys, hk_cyclecancel
+IniWrite, %hk_notes%        , %ini%, Hotkeys, hk_notes
+IniWrite, %hk_cmdr%         , %ini%, Hotkeys, hk_cmdr
 
 Loop, 9
 	IniWrite, % hk_slot%A_Index%  , %ini%, Hotkeys, hk_slot%A_Index%
@@ -113,6 +136,11 @@ IniWrite, %MaxHistory%         , %ini%, Settings, MaxHistory
 IniWrite, %MenuWidth%          , %ini%, Settings, MenuWidth
 IniWrite, %SearchWindowWidth%  , %ini%, Settings, SearchWindowWidth
 IniWrite, %SearchWindowHeight% , %ini%, Settings, SearchWindowHeight
+IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
+IniWrite, %ShowLines%          , %ini%, Settings, ShowLines
+
+IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
+IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr
 
 Sleep 100
 Reload ; if hotkey(s) have changed we'd need to deactivate/reactive all hotkeys, reloading saves us the trouble

@@ -1,4 +1,4 @@
-# CL3 <sup>v1.93.1</sup> - Clipboard caching utility
+# CL3 <sup>v1.94</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -28,7 +28,7 @@ Note: as of v1.93 you can define these Shortcuts via Settings.ini or use the Tra
 ## About CL3
 
 It is not meant to compete with the many clipboard caching utilities that are (freely) available,
-but merely as minimal program focussing on text only.
+but merely as minimal program focusing on text only.
 
 You can call the clipboard history menu by its default hotkey <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>
 If you prefer another hotkey you can change this and the other hotkeys via the Settings menu. Use the
@@ -43,7 +43,7 @@ to paste that in your current application.
 ### Features
 
 - Captures text only
-- Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file though)
+- Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file)
 - Search history (v1.2+)
 - 10 Slots with options to save/load several sets (v1.2+)
 - Cycle through clipboard - forwards and backwards - with tooltip preview (v1.3+). Cycle through plugins (v1.8+)
@@ -67,7 +67,7 @@ entries by naming your files in the order you wish them to appear.
 As of v1.9+ Templates now support sub-folders. A Sub-folder will be added as a
 sub-menu entry and its text files processed as described above. If a "favicon.ico"
 is present in a sub-folder it will be used in the Templates Menu, otherwise it
-will use the default Templace icon (res\icon-t.ico)
+will use the default Template icon (res\icon-t.ico)
 
 **Note**: there is one default entry in the Templates menu: "_0. Open templates folder_"
 which will open the templates folder in Total Commander - if it is running - or 
@@ -240,114 +240,30 @@ by Deo may be of interest to develop some of these ideas.
 - [XA Save / Load Arrays to/from XML Functions](https://github.com/hi5/XA)
 - [Class LV_Rows](http://www.autohotkey.com/board/topic/94364-class-lv-rows-copy-cut-paste-and-drag-listviews/) by [Pulover](https://github.com/Pulover/) - as of v1.5 (for ClipChain)
 - [Edit Library](https://autohotkey.com/boards/viewtopic.php?f=6&t=5063) by [jballi](https://autohotkey.com/boards/memberlist.php?mode=viewprofile&u=58) - QEDlg() code also by jballi (for search/edit plugin)
+- API: [ObjRegisterActive()](https://www.autohotkey.com/boards/viewtopic.php?t=6148) by Lexikos 
+- API: [JSON/JXON](https://github.com/cocobelgica/AutoHotkey-JSON) by cocobelgica
+- Notes: [GetActiveBrowserURL()](https://www.autohotkey.com/boards/viewtopic.php?t=3702) by Antonio Bueno
+
+# OCR-TIP
+
+If you need to "grab" text from Images, Screens, Locked PDFs etc you can use this nifty Vis2 AutoHotkey script by iseahound:
+
+- Download: https://github.com/iseahound/Vis2 
+- Forum: https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36047 (shows demo animation)
+
+I've added the following code to "plugins\myplugins.ahk" to start Vis2 when I need it:
+
+```autohotkey
+#capslock:: ; winkey-capslock
+Run %A_ScriptDir%\vis2\runocr.ahk ; path to vis2 code, see github link above
+If !stats.visocr ; for statistics if you're interested in how many times you use it, you can omit this
+	stats.visocr:=0
+stats.visocr++
+return
+```
+
+After the OCR is complete it is added to the clipboard and thus the CL3 clipboard history.
 
 # Changelog
 
-**v1.93.1**
-
-* Fixed issue with History not being updated correctly after pasting template (clipboard content wasn't the same as history[1], now it is)
-
-**v1.93**
-
-* Hotkeys and some other basic settings via settings.ini, accessible via Tray menu Settings
-* Basic stats, accessible via Tray menu "Usage statistics"
-* Search Plugin: fix for first Down:: (see comment in code plugins\search.ahk)
-* Search Plugin: pressing hotkey again toggles Gui (e.g. hide, show like slots and clipchain already do)
-* Attempt to have more stable ToolTip (less/no flickering as it no longer continously updates the TT if nothing changes)  
-  (Note: using ToolTipFont https://autohotkey.com/boards/viewtopic.php?f=6&t=4777 results in error for these cycle tooltips)
-* Updated from OnClipboardChange: to OnClipboardChange() - improved efficiency by turning it on/off at various "actions" and "plugins"
-* Improved MaxHistory, not just on OnExit but now continously keep it at set entries - should help with memory consumption and overall speed
-* Added some (generic) icons to tray menu
-* Fixed issue with Cycle paste not correctly updating History
-
-**v1.92**
-
-* Make it so that we can push public updates without accidentally releasing QEDlg()
-
-**v1.91**
-
-* Merge History items via search menu (select multiple, press <kbd>F5</kbd>)
-* Fix for Cycle + Plugins hotkeys <kbd>#</kbd>+<kbd>v</kbd> / <kbd>#</kbd>+<kbd>c</kbd> / <kbd>#</kbd>+<kbd>f</kbd>
-
-**v1.9**
-
-* Folder structure for Templates\
-* Adding dpi() for GUIs (Search, ClipChain, Slots) - https://github.com/hi5/dpi
-
-**v1.81**
-
-* Search.ahk Updated rudimentary editor with QEDlg(), a pop-up editor by jballi (see plugins/search.ahk and _functions/)
-* CL3.ahk - "AutoTrim, off" to fix AutoTrim issues with Clipboard history :)
-
-**v1.8**
-
-* Search plugin: Added option to Edit entry and update history (shortcut: <kbd>F4</kbd>)
-* Cycle through plugins (tooltip): <kbd>#</kbd>+<kbd>f</kbd> - can be used in combination with <kbd>#</kbd>+<kbd>v</kbd> / <kbd>#</kbd>+<kbd>c</kbd>
-* AutoReplace plugin: added Try
-
-**v1.71**
-
-* Use A_CaretX and A_CaretY to see if you can popup the menu near caret, fall back to Mouse coordinates (prior behaviour)
-
-**v1.7**
-
-* Added FIFO plugin (first in first out) [#3](https://github.com/hi5/CL3/issues/3)
-
-**v1.62**
-
-* Added DoubleClick to paste and progress in ClipChain
-
-**v1.61**
-
-* Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update (only in clipchain.ahk)
-
-**v1.6**
-
-* Compact (reduce size of History) accessible via menu, specials - [#1](https://github.com/hi5/CL3/issues/1)
-* Delete from search search results (press <kbd>ctrl</kbd>+<kbd>del</kbd>) [#2](https://github.com/hi5/CL3/issues/2)
-* Revised method of adding user plugins (see "Adding plugins")
-
-**v1.5**
-
-* Added [ClipChain plugin](https://github.com/hi5/CL3/wiki/ClipChain)
-* Moved all xml data files to their own separate folder ClipData\* (History, Slots, ClipChain, AutoReplace)   
-  Note: to upgrade, close CL3, run the Migrate.ahk script to move all XML files to their own folder. You only need to do this once.
-
-**v1.43**
-
-* Further refinement of "AutoReplace" plugin
-  - You can now enter a list of programs (CSV list of exe's) which will bypass AutoReplace. Excel.exe is a good candidate to avoid "the picture is too large and will be truncated" clipboard warning message
-
-**v1.42**
-
-* Further refinement of "AutoReplace" plugin
-  - You can turn it on/off via the Tray menu, the checkmark indicates if it is Active
-  - Should now retain formatted clipboard better when no replacements were made
-
-**v1.41**
-
-* Bugfix for Slots (stopped working correctly with v1.4 commit 4a982583)
-
-**v1.4**
-
-* Added "AutoReplace" plugin to perform find/replace on clipboard text before adding it to history
-
-**v1.32**
-
-* Added "Dump History" plugin to export History XML to plain text file
-
-**v1.31**
-
-* Minor refinement for first time press <kbd>#</kbd>+<kbd>c</kbd> (don't show tooltip) and readme
-
-**v1.3**
-
-* <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>: paste current clipboard as plain (unformatted) text
-* <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd>: cycle through clipboard history - <kbd>#</kbd>+<kbd>x</kbd> to cancel
-
-**v1.2**
-
-* Menu: show icons of the program where text was copied from
-* New standard Plugins:
-	- Search history
-	- Slots
+The changelog is now available in a separate file, [Changelog.md](Changelog.md)

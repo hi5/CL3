@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.93.1
+Version     : 1.94
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -23,6 +23,7 @@ Features:
   v1.7: FIFO Paste back in the order in which the entries were added to the clipboard history
   v1.8: Edit entries in History (via search). Cycle through plugins
   v1.9: Folder structure for Templates\
+  v1.9.x: sort, api, settings etc see changelog.md
 
 See readme.md for more info and documentation on plugins and templates.
 
@@ -35,11 +36,11 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 name:="CL3 "
-version:="v1.93.1"
+version:="v1.94"
 ScriptClip:=1
 CycleFormat:=0
 Templates:={}
-Global CyclePlugins ; v1.72+
+Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
 Error:=0
 CoordMode, Menu, Screen
 ListLines, Off
@@ -55,6 +56,7 @@ iconX:="icon-x.ico"
 iconY:="icon-y.ico"
 iconZ:="icon-z.ico"
 
+Settings()
 Settings_Hotkeys()
 
 ; tray menu
@@ -64,6 +66,7 @@ Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%     , DoubleTrayClick
 Menu, tray, Icon, %name% %version%    , res\cl3.ico
 Menu, tray, Default, %name% %version%
+Menu, tray, Click, 1 ; this will show the tray menu because we send {rbutton} at the DoubleTrayClick label
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active  , TrayMenuHandler
 Menu, tray, Add, &FIFO Active         , TrayMenuHandler
@@ -114,7 +117,6 @@ If (Error = 1)
 	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned
 	}
 
-Settings()
 
 OnExit, SaveSettings
 
@@ -141,6 +143,9 @@ StringUpper, templatesfolderlist, templatesfolderlist
 ScriptClip:=0
 
 OnClipboardChange("FuncOnClipboardChange")
+
+If ActivateApi
+	ObjRegisterActive(CL3API, "{01DA04FA-790F-40B6-9FB7-CE6C1D53DC38}")
 
 #Include %A_ScriptDir%\plugins\plugins.ahk
 
@@ -343,9 +348,10 @@ for k, v in History
 	{
 	 text:=v.text
 	 icon:=v.icon
+	 lines:=v.lines
 	 if (icon = "")
 		icon:="res\" iconA
- 	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500))
+ 	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500),lines)
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 if (k = 1)
 		Menu, ClipMenu, Default, %key%
@@ -380,9 +386,15 @@ If !FIFOACTIVE
 		 key:=% "&" Chr(96+A_Index) ". " ; %
 		 StringTrimRight,MenuText,A_LoopField,4
 		 MenuText:=Trim(MenuText,"#")
+		 MenuTextClean:=Trim(MenuText,"#")
 		 MenuText:=key RegExReplace(MenuText, "m)([A-Z]+)" , " $1")
 		 Menu, Submenu1, Add, %MenuText%, SpecialMenuHandler
 		 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+		 If IsObject(%MenuTextClean%Menu)
+			{
+			 Menu, Submenu1, Add, %MenuText%, :%MenuTextClean%Menu
+			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+			}
 		}
 Menu, ClipMenu, Add, &s. Special, :Submenu1
 Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
@@ -451,12 +463,13 @@ If (History.MaxIndex() > 20)
 		{
 		 text:=v.text
 		 icon:=v.icon
+		 lines:=v.lines
 		 If (A_Index < 19)
 			Continue
 		 If (A_Index < 45)
-			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500))
+			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500),lines)
 		 Else	 
-			 key:=% "  " DispMenuText(SubStr(text,1,500))
+			 key:=% "  " DispMenuText(SubStr(text,1,500),lines)
 		 Menu, SubMenu4, Add, %key%, MenuHandler
 		 Try
 			Menu, SubMenu4, Icon, %key%, % icon
@@ -484,17 +497,25 @@ Menu, ClipMenu, Add, E&xit (Close menu), MenuHandler
 Menu, ClipMenu, Icon, E&xit (Close menu), res\%iconX%,,16
 Return
 
-DispMenuText(TextIn)
+DispMenuText(TextIn,lines="1")
 	{
-	 global MenuWidth
+	 global MenuWidth,ShowLines
+	 if (lines=1)
+	 	linetext:=" line)"
+	 else	
+	 	linetext:=" lines)"
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All
 	 If StrLen(TextOut) > 60
 		{
-		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) Chr(171) ; 8230 ...
+		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) 
 		}
+	 if ShowLines
+	 	TextOut .= " " Chr(171) " (" Lines linetext ; 8230 ...	
+	 else	
+	 	TextOut .= " " Chr(171) ; 8230 ...	
 	 Return LTRIM(TextOut," `t")
 	}
 
@@ -622,7 +643,10 @@ Return
 
 ClipBoardHandler:
 If (ClipText <> Clipboard)
-	History.Insert(1,{"text":ClipText,"icon": IconExe})
+	{
+	 StrReplace(ClipText,"`n", "`n")
+	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": count+1})
+	}
 OnClipboardChange("FuncOnClipboardChange", 0)
 If !TemplateClip
 	History.Remove(MenuItemPos+1)
@@ -667,7 +691,9 @@ If (Clipboard = History[1].text)
 
 ClipText=%Clipboard%
 
-History.Insert(1,{"text":ClipText,"icon": IconExe})
+StrReplace(ClipText, "`n", "`n", Count)
+
+History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
 
 ; check for duplicate entries
 
@@ -676,6 +702,7 @@ for k, v in History
 	{
 	 check:=v.text
 	 icon:=v.icon
+	 lines:=v.lines
 	 new:=true
 	 for p, q in newhistory
 		{
@@ -685,7 +712,7 @@ for k, v in History
 			}
 		}
 	 if new
-		newhistory.push({"text":check,"icon":icon})
+		newhistory.push({"text":check,"icon":icon,"lines":lines})
 	 if (A_Index >= MaxHistory)
 		break
 	}
@@ -703,6 +730,7 @@ Return
 
 ; If the tray icon is double click we do not actually want to do anything
 DoubleTrayClick: 
+Send {rbutton}
 Return
 
 TrayMenuHandler:
@@ -777,4 +805,12 @@ XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable n
 XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml")
 XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
 XA_Save("stats", A_ScriptDir "\stats.xml")
+
+If ActivateApi
+	ObjRegisterActive(CL3API, "")
+
+Sleep 100
+
 ExitApp
+
+#include %A_ScriptDir%\lib\cl3apiclass.ahk

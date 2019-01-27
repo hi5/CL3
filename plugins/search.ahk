@@ -51,11 +51,11 @@ Return
 
 GetText:
 Gui, Search:Submit, NoHide
+re:="iUms)" GetText
+if InStr(GetText,A_Space) ; prepare regular expression to ensure search is done independent on the position of the words
+	re:="iUms)(?=.*" RegExReplace(GetText,"iUms)(.*)\s","$1)(?=.*") ")"
 Loop, Parse, StartList, |
 	{
-	 re:="iUms)" GetText
-	 if InStr(GetText,A_Space) ; prepare regular expression to ensure search is done independent on the position of the words
-		re:="iUms)(?=.*" RegExReplace(GetText,"iUms)(.*)\s","$1)(?=.*") ")"
 	 if RegExMatch(A_LoopField,re) 
 		UpdatedStartList .= A_LoopField "|"
 	}
@@ -95,10 +95,13 @@ OnClipboardChange("FuncOnClipboardChange", 0)
 If (id = 1)
 	Clipboard:=ClipText
 OnClipboardChange("FuncOnClipboardChange", 1)
+StrReplace(ClipText, "`n", "`n", Count)
+History[id,"lines"]:=Count+1
 ClipText:=""
 ChooseID:=ID
 id:=""
 ;Gosub, ^#h
+stats.edit++
 Gosub, hk_search
 Return
 
@@ -139,10 +142,14 @@ Gui, Search:Destroy
 Gui, SearchEdit:Destroy
 Gui, SearchEdit:font, % dpi("s8")
 Gui, SearchEdit:Add, Text, % dpi("x5 y8 w100 h15"), Edit this entry:
-Gui, SearchEdit:Add, Edit, % dpi("vClipText x5 y25 w" SearchWindowWidth-10 " h" SearchWindowHeight-60), %ClipText%
+Gui, SearchEdit:Add, Edit, % dpi("vClipText x5 y25 w" SearchWindowWidth-10 " h" SearchWindowHeight-80), %ClipText%
 Gui, SearchEdit:Add, Button, % dpi("gSearchEditOK w100"), OK
 Gui, SearchEdit:Add, Button, % dpi("xp+110 yp gSearchEditCancel w100"), Cancel
+Gui, SearchEdit:Add, StatusBar,,...
+Gui, SearchEdit:Default
+SB_SetParts(100,100,100)
 Gui, SearchEdit:Show, % dpi("w" SearchWindowWidth " h" SearchWindowHeight), CL3 Edit Entry ID: [ %ID% ]
+SetTimer, UpdateEditSB1, 100
 Return
 
 ^Del::
@@ -151,6 +158,7 @@ Gui, Search:Submit, Destroy
 History.Remove(id)
 id:="",ClipText:="",ChooseID:=""
 ;Gosub, ^#h
+SetTimer, UpdateEditSB1, Off
 Gosub, hk_search
 Return
 
@@ -192,8 +200,31 @@ Return
 
 SearchGuiClose:
 SearchGuiEscape:
+SetTimer, UpdateEditSB1, Off
 Gui, Search:Destroy
 ChooseID:=""
+Return
+
+UpdateEditSB1:
+IfWinNotActive, CL3 Edit Entry
+	Return
+sp:=A_Space A_Space A_Space A_Space
+
+ControlGetFocus, ActiveControl, CL3 Edit Entry
+ControlGetText, GetText, %ActiveControl%, CL3 Edit Entry
+ControlGet, CurrentLine, CurrentLine,,%ActiveControl%, CL3 Edit Entry
+ControlGet, CurrentCol , CurrentCol ,,%ActiveControl%, CL3 Edit Entry
+ControlGet, LineCount  , LineCount  ,,%ActiveControl%, CL3 Edit Entry
+Size:=StrLen(GetText)
+if (CurrentLine = oldCurrentLine) and (CurrentCol = oldCurrentCol) and (LineCount = oldLineCount)
+	return
+Gui, SearchEdit:Default
+SB_SetText("Ln " Currentline ", Col " CurrentCol, 1) ; line/col
+SB_SetText(LineCount " line(s)" , 2)     ; lines
+SB_SetText(Size " byte(s)", 3)                    ; size
+oldCurrentLine:=CurrentLine
+oldCurrentCol:=CurrentCol
+oldLineCount:=LineCount
 Return
 
 ; not public

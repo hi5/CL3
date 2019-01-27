@@ -1,0 +1,1 @@
+Folder for NoteTemplate and Note Menu - see docs\notes.md
