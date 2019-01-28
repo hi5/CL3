@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.94.2
+
+* Fix: Typo/syntax error notes.ahk plugin
+
 ### v1.94.1
 
 * Fix: Duplicate IniRead value for Settings (notes/ccmdr)

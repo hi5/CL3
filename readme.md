@@ -1,4 +1,4 @@
-# CL3 <sup>v1.94.1</sup> - Clipboard caching utility
+# CL3 <sup>v1.94.2</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.

@@ -14,7 +14,7 @@ History:
 NotesMenuSetup:
 
 NotesMenu:=[]
-IfNotIniRead, %A_ScriptDir%\ClipData\Notes\Notes.txt
+IfNotExist, %A_ScriptDir%\ClipData\Notes\Notes.txt
 	FileCopy, %A_ScriptDir%\ClipData\Notes\Notes_Example.txt, %A_ScriptDir%\ClipData\Notes\Notes.txt
 FileRead, Notes, %A_ScriptDir%\ClipData\Notes\Notes.txt
 Notes:=RegExReplace(Notes, "\R+\R", "`r`n")          ; remove empty lines
