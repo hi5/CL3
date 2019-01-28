@@ -103,7 +103,7 @@ Settings_Hotkeys()
 	 IniRead, hk_cycleplugins , %ini%, Hotkeys, hk_cycleplugins ,f
 	 IniRead, hk_cyclecancel  , %ini%, Hotkeys, hk_cyclecancel  ,x
 	 IniRead, hk_notes        , %ini%, Hotkeys, hk_notes        ,#n
-	 IniRead, hk_cmdr         , %ini%, Hotkeys, hk_cmdr         ,#n
+	 IniRead, hk_cmdr         , %ini%, Hotkeys, hk_cmdr         ,#j
 
 	 Loop, 10
 		{

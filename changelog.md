@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.94.1
+
+* Fix: Duplicate IniRead value for Settings (notes/ccmdr)
+* Fix: use Notes_Example.txt in repo to prevent overwrites in future of notes.txt
+
 ### v1.94
 
 * New: Sort plugin, also illustrating easy way to add submenu to a plugin - see plugins\sort.ahk
