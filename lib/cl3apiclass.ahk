@@ -81,12 +81,12 @@ class CL3API
 			 If !Reverse
 				{
 				 StrReplace(Data[A_Index],"`n","`n",Count)
-				 History.Insert(1,{"text": Data[A_Index],"IconExe":"","lines":count+1})
+				 History.Insert(1,{"text": Data[A_Index],"IconExe":"","lines":Count+1})
 				}
 			 else
 				{
 				 StrReplace(Data[A_Index],"`n","`n",Count)
-				 History.Insert(1,{"text": Data[Data.count()+1-A_Index],"IconExe":"","lines":count+1})
+				 History.Insert(1,{"text": Data[Data.count()+1-A_Index],"IconExe":"","lines":Count+1})
 				}
 			}
 		 return 1
@@ -129,7 +129,7 @@ class CL3API
 	 InsertAt(Idx,Data)
 		{
 		 StrReplace(Data,"`n","`n",Count)
-		 History.InsertAt(Idx,{"text":Data,"IconExe":"","lines":count+1})
+		 History.InsertAt(Idx,{"text":Data,"IconExe":"","lines":Count+1})
 		 return 1
 		}
 

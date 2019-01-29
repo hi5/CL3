@@ -178,7 +178,8 @@ Command(cmd)
 		 cmd++
 		 if cmd is number
 			{
-			 History.InsertAt(cmd,{"text": clipboard,"icon":""})
+			 StrReplace(Clipboard,"`n","`n",Count)
+			 History.InsertAt(cmd,{"text": clipboard,"icon": "","lines": Count+1})
 			 History.Remove(1)
 			 OnClipboardChange("FuncOnClipboardChange", 0)
 			 Clipboard:=History[1].text
@@ -345,9 +346,15 @@ Command(cmd)
 		 Loop, % burst.count()
 			{
 			 If !Reverse
-				History.Insert(1,{"text": Burst[A_Index],"IconExe":""})
+				{
+				 StrReplace(Burst[A_Index],"`n","`n",Count)
+				 History.Insert(1,{"text": Burst[A_Index],"IconExe": "","lines": Count+1})
+				}
 			 else
-				History.Insert(1,{"text": Burst[burst.count()+1-A_Index],"IconExe":""})
+				{
+				 StrReplace(Burst[A_Index],"`n","`n",Count)
+				 History.Insert(1,{"text": Burst[burst.count()+1-A_Index],"IconExe": "","lines": Count+1})
+				}
 			}
 		 burst:=""
 		}

@@ -129,7 +129,8 @@ Loop, parse, choice, |
 	}
 Loop, parse, Removeids, CSV
 	History.Remove(A_LoopField)
-History.Insert(1,{"text":ClipText,"icon": "res\" iconA })
+StrReplace(CliptText,"`n","`n",Count)	
+History.Insert(1,{"text":ClipText,"icon": "res\" iconA, "lines": Count+1 })
 ClipText:="",Removeids:=""
 Return
 

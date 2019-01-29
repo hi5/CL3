@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.94.3
+
+* Fix: Not correctly updating lines of first entry after pasting from menu + adding Lines to other actions (api, ccmdr)
+
 ### v1.94.2
 
 * Fix: Typo/syntax error notes.ahk plugin

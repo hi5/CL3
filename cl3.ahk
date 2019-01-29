@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.94.2
+Version     : 1.94.3
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -36,7 +36,7 @@ SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 name:="CL3 "
-version:="v1.94.2"
+version:="v1.94.3"
 ScriptClip:=1
 CycleFormat:=0
 Templates:={}
@@ -644,8 +644,8 @@ Return
 ClipBoardHandler:
 If (ClipText <> Clipboard)
 	{
-	 StrReplace(ClipText,"`n", "`n")
-	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": count+1})
+	 StrReplace(ClipText,"`n", "`n", Count)
+	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
 If !TemplateClip
@@ -670,7 +670,7 @@ If (A_EventInfo <> 1)
 ;	Return
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text
-	History.Insert(1,{"text":"Text","icon": IconExe})
+	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1})
 
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 	ScriptClipClipChain:=0
