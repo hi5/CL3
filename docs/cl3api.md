@@ -4,7 +4,7 @@ You can modify CL3's clipboard history via external scripts by using this API.
 
 Notes:
 
-- You need to Activate "API" via the Settings option first.
+- You need to Activate "API" via the Settings option first (tick the checkbox)
 - Data returned from API functions is always an object. Not all functions return data, see available functions below.
 
 ## Getting started

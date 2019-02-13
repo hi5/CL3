@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.94.3
+Version     : 1.94.4
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -35,9 +35,9 @@ SetBatchlines, -1
 SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
+StringCaseSense, On
 name:="CL3 "
-version:="v1.94.3"
-ScriptClip:=1
+version:="v1.94.4"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -47,6 +47,7 @@ ListLines, Off
 PasteTime:=A_TickCount
 CyclePluginsToolTipLine := "`n" StrReplace( Format( "{:020}", "" ), 0, Chr(0x2014) ) "`n"
 TemplateClip:=0
+;CyclePluginClip:=0
 
 iconA:="icon-a.ico"
 iconC:="icon-c.ico"
@@ -120,6 +121,9 @@ If (Error = 1)
 
 OnExit, SaveSettings
 
+If !FileExist("templates\*.txt")
+	FileCopy, res\01_Example.txt, templates\01_Example.txt, 0
+
 ; get templates in root folder first
 Loop, templates\*.txt
 	templatefilelist .= A_LoopFileName "|"
@@ -139,8 +143,6 @@ Loop, Files, templates\*.*, D
 templatesfolderlist:=Trim(templatesfolderlist,"|")
 Sort, templatesfolderlist, D|
 StringUpper, templatesfolderlist, templatesfolderlist
-
-ScriptClip:=0
 
 OnClipboardChange("FuncOnClipboardChange")
 
@@ -178,21 +180,11 @@ Else
 Return
 
 ; 1x paste as plain text
-; 2x paste unwrapped
 ;^+v::
 hk_plaintext:
 If (Clipboard = "") ; probably image format in Clipboard
 	Clipboard:=History[1].text
-; 1x paste as plain text
-If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
-	{
-	 Clipboard:=PasteUnwrapped(Clipboard)
-	}
-; 2x paste unwrapped
-else
-	{
-	 Clipboard:=Trim(Clipboard,"`n`r`t ")
-	}
+Clipboard:=Trim(Clipboard,"`n`r`t ")
 PasteIt()
 Return
 
@@ -213,7 +205,7 @@ While GetKeyState(hk_cyclemodkey,"D") and cyclebackward
 	{
 ;	 If !(PreviousClipCycleCounter = ClipCycleCounter) and (oldttext <> ttext)
 	 If (ClipCycleCounter <> 0)
-	 	ttext:=% Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text)
+		ttext:=% Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text)
 	 else
 		ttext:="[cancelled]"
 	 If (oldttext <> ttext)
@@ -228,7 +220,7 @@ ToolTip
 If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	{
 	 ClipText:=History[ClipCycleCounter].text
-	 MenuItemPos:=ClipCycleCounter ; ClipboardHandler will handle deleting it from the chosen position in History
+	 ;MenuItemPos:=ClipCycleCounter ; ClipboardHandler will handle deleting it from the chosen position in History
 	 Gosub, ClipboardHandler
 	 stats.cyclepaste++
 	 ClipCycleCounter:=1
@@ -305,7 +297,7 @@ While GetKeyState(hk_cyclemodkey,"D")
 	 If (ClipCycleCounter <> 0)
 		ttext:=% "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) CyclePluginsToolTipLine DispToolTipText(History[ClipCycleCounter].text,CycleFormat)
 	 else
-	 	ttext:="Plugin: [cancelled]" CyclePluginsToolTipLine
+		ttext:="Plugin: [cancelled]" CyclePluginsToolTipLine
 	 If (oldttext <> ttext)
 		{
 		 ToolTip, % ttext, %A_CaretX%, %A_CaretY%
@@ -319,9 +311,12 @@ ToolTip
 If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	{
 	 ClipText:=DispToolTipText(History[ClipCycleCounter].text,CycleFormat)
+;	 CyclePluginClip:=1
+;	 MenuItemPos:=ClipCycleCounter
 	 Gosub, ClipboardHandler
 	 stats.cycleplugins++
 	 ClipCycleCounter:=0
+;	 CyclePluginClip:=0
 	}
 Return
 
@@ -474,7 +469,7 @@ If (History.MaxIndex() > 20)
 		 Try
 			Menu, SubMenu4, Icon, %key%, % icon
 		 Catch
- 			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
+			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
 		 If (A_Index > 43)
 			Break
 		} 
@@ -501,21 +496,21 @@ DispMenuText(TextIn,lines="1")
 	{
 	 global MenuWidth,ShowLines
 	 if (lines=1)
-	 	linetext:=" line)"
-	 else	
-	 	linetext:=" lines)"
+		linetext:=" line)"
+	 else
+		linetext:=" lines)"
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All
 	 If StrLen(TextOut) > 60
 		{
-		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) 
+		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...	
 		}
 	 if ShowLines
-	 	TextOut .= " " Chr(171) " (" Lines linetext ; 8230 ...	
-	 else	
-	 	TextOut .= " " Chr(171) ; 8230 ...	
+		TextOut .= " " Chr(171) " (" Lines linetext ; 171 << 
+	 else
+		TextOut .= " " Chr(171) 
 	 Return LTRIM(TextOut," `t")
 	}
 
@@ -523,7 +518,7 @@ DispToolTipText(TextIn,Format=0)
 	{
 	 TextOut:=RegExReplace(TextIn,"^\s*")
 	 TextOut:=SubStr(TextOut,1,750)
-	 StringReplace,TextOut,TextOut,`;,``;,All
+	 ;StringReplace,TextOut,TextOut,`;,``;,All
 	 FormatFunc:=StrReplace(CyclePlugins[Format]," ")
 	 If IsFunc(FormatFunc)
 		TextOut:=%FormatFunc%(TextOut)
@@ -631,7 +626,7 @@ If (A_ThisMenuItem = "&0. Open templates folder")
 		Run, c:\totalcmd\TOTALCMD.EXE /O /T %A_ScriptDir%\templates\
 	 else
 		Run, %A_ScriptDir%\templates\
-	 Return 
+	 Return
 	}
 
 ClipText:=Templates[A_ThisMenu,A_ThisMenuItemPos]
@@ -645,14 +640,22 @@ ClipBoardHandler:
 If (ClipText <> Clipboard)
 	{
 	 StrReplace(ClipText,"`n", "`n", Count)
+	 If !TemplateClip
+		{
+		 If History[MenuItemPos].HasKey("Icon")
+			IconExe:=History[MenuItemPos,"Icon"]
+		 else
+			WinGet, IconExe, ProcessPath , A
+		}
+	 else
+		IconExe:="res\" iconT
 	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
-If !TemplateClip
-	History.Remove(MenuItemPos+1)
 Clipboard:=ClipText
 OnClipboardChange("FuncOnClipboardChange", 1)
 PasteIt()
+Gosub, CheckHistory
 MenuItemPos:=0
 Return
 
@@ -666,8 +669,6 @@ FuncOnClipboardChange() {
 If (A_EventInfo <> 1)
 	Return
 
-;If (ScriptClip = 1) ;
-;	Return
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text
 	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1})
@@ -676,12 +677,9 @@ If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 	ScriptClipClipChain:=0
 
 if (Clipboard = "") or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
-	Return 
+	Return
 
 AutoReplace()
-
-; MsgBox % ClipText "`n" History[1].text
-; TODO MAKES IT SLOW HERE
 
 If (Clipboard = History[1].text)
 	{
@@ -695,7 +693,16 @@ StrReplace(ClipText, "`n", "`n", Count)
 
 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
 
-; check for duplicate entries
+Gosub, CheckHistory
+
+stats.copieditems++
+
+ClipText:=""
+
+Return
+}
+
+CheckHistory: ; check for duplicate entries
 
 newhistory:=[]
 for k, v in History
@@ -706,7 +713,7 @@ for k, v in History
 	 new:=true
 	 for p, q in newhistory
 		{
-		 if (check = q.text)
+		 if (check == q.text)
 			{
 			 new:=false
 			}
@@ -719,14 +726,11 @@ for k, v in History
 
 History:=newhistory
 
-stats.copieditems++
+check:="", new:="", icon:="", lines:=""
 
-ClipText:="", check:="", new:=""
 newhistory:=[]
 
 Return
-}
-
 
 ; If the tray icon is double click we do not actually want to do anything
 DoubleTrayClick: 

@@ -46,7 +46,7 @@ for k, v in SortMenu ; here we can re-use the menu object
 			ClipText:=Sort(History[1].text,StrSplit(v,"|").2)
 		else
 			{
-			 InputBox, SortOptions, Sort options, %SortHelpText%, , 500, 150
+			 InputBox, SortOptions, Sort options, %SortHelpText%, , 500, 170
 			 if ErrorLevel
 				Return
 			 ClipText:=Sort(History[1].text,SortOptions)

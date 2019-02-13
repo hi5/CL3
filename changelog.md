@@ -1,5 +1,14 @@
 # Changelog
 
+### v1.94.4
+
+* Fix: DispToolTipText removed StringReplace ;
+* Change: Added Stringcasesense, On; also in Checkhistory as ==
+* Change: Cycle through plugins: Insert changed clip vs overwrite/replace
+* Change: (try) to keep original Icon of SOURCE of the clip vs where used LAST
+* Change: CheckHistory now as label, no longer need to .remove entries in ClipboardHandler
+* Change: move templates\01_Example.txt to res\ folder and check at startup if we have any templates, if not copy (avoids the need to remove it after each update)
+
 ### v1.94.3
 
 * Fix: Not correctly updating lines of first entry after pasting from menu + adding Lines to other actions (api, ccmdr)

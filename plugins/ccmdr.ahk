@@ -184,6 +184,7 @@ Command(cmd)
 			 OnClipboardChange("FuncOnClipboardChange", 0)
 			 Clipboard:=History[1].text
 			 OnClipboardChange("FuncOnClipboardChange", 1)
+			 Gosub, Checkhistory
 			}
 		}
 

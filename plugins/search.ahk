@@ -68,7 +68,7 @@ SearchChoice:
 Gosub, SearchGetID
 Gui, Search:Submit, Destroy
 Sleep 100
-MenuItemPos:=id ; ClipboardHandler will handle deleting it from the chosen position in History
+;MenuItemPos:=id ; ClipboardHandler will handle deleting it from the chosen position in History
 Gosub, ClipboardHandler
 stats.search++
 id:="",ChooseID:=""
@@ -102,6 +102,7 @@ ChooseID:=ID
 id:=""
 ;Gosub, ^#h
 stats.edit++
+Gosub, CheckHistory
 Gosub, hk_search
 Return
 
@@ -131,6 +132,7 @@ Loop, parse, Removeids, CSV
 	History.Remove(A_LoopField)
 StrReplace(CliptText,"`n","`n",Count)	
 History.Insert(1,{"text":ClipText,"icon": "res\" iconA, "lines": Count+1 })
+Gosub, CheckHistory
 ClipText:="",Removeids:=""
 Return
 

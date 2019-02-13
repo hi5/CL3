@@ -1,11 +1,11 @@
 ﻿# CCMDR plugin
 
-CCMDR is an optional "expert" plugin which allows for (batch) operations on Clipboard History vs the usual one-by -ne operations via standard CL3 options. Use at your own risk :)
+CCMDR is an optional "expert" plugin which allows for (batch) operations on Clipboard History vs the usual one-by-one operations via standard CL3 options. Use at your own risk :)
 
 Notes:
 
-- You need to Activate this pluging via the Settings first
-- Default hotkey: #j (can be change in settings)
+- You need to Activate this plugin via the Settings first (tick the checkbox)
+- Default hotkey: <kbd>#</kbd>+<kbd>j</kbd> (can be change in settings)
 
 General:
 
@@ -57,8 +57,8 @@ Example:
 
 ### U L T
 
-u : "Upper case" Index or Range
-l : "Lower case" Index or Range
+u : "Upper case" Index or Range  
+l : "Lower case" Index or Range  
 t : "Title case" Index or Range
 
 Examples:
@@ -72,7 +72,7 @@ s : "Store in Slot (1-10)" store Current clipboard contents in Slot 1 to 10
 
 Example:
 
-`s5` will make the current clipboard contents the 5th slot, you can paste this with rightcontrol+1 - see Slots docs
+`s5` will make the current clipboard contents the 5th slot, you can paste this with <kbd>Right Control</kbd>+<kbd>5</kbd> - see Slots docs
 
 # B
 
