@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.94.5
+
+* Fix: FIFO activation via Hotkey trigger
+
 ### v1.94.4
 
 * Fix: DispToolTipText removed StringReplace ;
