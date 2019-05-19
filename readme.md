@@ -1,4 +1,4 @@
-# CL3 <sup>v1.94.5</sup> - Clipboard caching utility
+# CL3 <sup>v1.95</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -17,7 +17,7 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. (Also delete and edit entries) |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
 |<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>      | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>      | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO   |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>      | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO.   |
 |<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle forward, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
 |<kbd>LWin</kbd>+<kbd>f</kbd>, hold <kbd>LWin</kbd> | To cycle through plugins repeatedly tap <kbd>f</kbd>. Release <kbd>LWin</kbd> to paste. You can use this in combination with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd> |
@@ -138,6 +138,12 @@ With each paste it advances to the next item in the chain. The item to be pasted
 When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)  
 The most recently used chain is stored in _clipchain.xml_.
 
+#### ClipChain Hotkey
+
+By default <kbd>Ctrl</kbd>+<kbd>v</kbd> will paste and proceed to the next item in the chain. 
+You can define another hotkey in the Settings menu. This will allow you to keep <kbd>Ctrl</kbd>+<kbd>v</kbd>
+for normal copy/paste functionality.
+
 ### Compact [v1.6+]
 
 If you have a lot of entries in the history or one or more very large (kb) entries. CL3 can become
@@ -234,6 +240,11 @@ by Deo may be of interest to develop some of these ideas.
 
 ![CL3 ClipChain](https://raw.github.com/hi5/CL3/master/img/clipchain.png)
 
+Animations:
+
+* ClipChain: https://github.com/hi5/CL3/wiki/ClipChain
+* CyclePlugins: https://github.com/hi5/CL3/wiki/CyclePlugins
+
 # Credits
 
 - Icons from Iconic <https://github.com/somerandomdude/Iconic>
@@ -266,4 +277,4 @@ After the OCR is complete it is added to the clipboard and thus the CL3 clipboar
 
 # Changelog
 
-The changelog is now available in a separate file, [Changelog.md](Changelog.md)
+The changelog is now available in a separate file, [changelog.md](changelog.md)

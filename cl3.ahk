@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.94.5
+Version     : 1.95
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -37,7 +37,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.94.5"
+version:="v1.95"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -188,8 +188,22 @@ Clipboard:=Trim(Clipboard,"`n`r`t ")
 PasteIt()
 Return
 
-^v:: ; v1.91
-PasteIt()
+$^v:: ; v1.91, $ for v1.95 (due to clipchain updates)
+hk_clipchainpaste_defaultpaste:
+If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") or ClipChainPause
+	{
+	 PasteIt()
+	 Return
+	}
+If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
+	{
+	 If (hk_clipchainpaste <> "^v") or ClipChainPause ; exception so user can use ^v as clipchain hotkey if they wish
+		PasteIt()
+	 else
+		Gosub, ClipChainPasteDoubleClick
+	}
+else
+	Gosub, ClipChainPasteDoubleClick
 Return
 
 ; Cycle through clipboard history
@@ -673,15 +687,16 @@ WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text
 	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1})
 
-If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
-	ScriptClipClipChain:=0
+; no longer used v1.95
+;If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
+;	ScriptClipClipChain:=0
 
-if (Clipboard = "") or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
+if (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return
 
 AutoReplace()
 
-If (Clipboard = History[1].text)
+If (Clipboard == History[1].text) ; v1.95
 	{
 	 ClipText:=""
 	 Return
@@ -808,6 +823,7 @@ While (History.MaxIndex() > MaxHistory)
 XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable name in quotes
 XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml")
 XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
+XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 XA_Save("stats", A_ScriptDir "\stats.xml")
 
 If ActivateApi

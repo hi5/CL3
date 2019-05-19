@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.95
+
+* Change: Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste functionality - see Clipchain HK (settings)
+* Change: AutoReplace added "excel.exe" as fixed Bypass option to prevent errors. Ensure AutoReplace is always updated/saved - https://github.com/hi5/CL3/issues/13
+* Fix: CheckHistory OnClipboardChange for first entry & clipboard now also uses == (see v1.94.4)
+
 ### v1.94.5
 
 * Fix: FIFO activation via Hotkey trigger

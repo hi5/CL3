@@ -15,14 +15,14 @@ Settings()
 		CyclePlugins.push(A_LoopField)
 	 CyclePlugins[0]:="<none>"
 	 Stats_Create()
-	 IniRead, MaxHistory, %ini%, settings, MaxHistory, 150
-	 IniRead, MenuWidth, %ini%, settings, MenuWidth, 40
-	 IniRead, SearchWindowWidth, %ini%, settings, SearchWindowWidth, 595
-	 IniRead, SearchWindowHeight, %ini%, settings, SearchWindowHeight, 300
-	 IniRead, ShowLines, %ini%, settings, ShowLines, 0
-	 IniRead, ActivateApi, %ini%, settings, ActivateApi, 0
-	 IniRead, ActivateCmdr, %ini%, plugins, ActivateCmdr, 0
-	 IniRead, ActivateNotes, %ini%, plugins, ActivateNotes, 0
+	 IniRead, MaxHistory         , %ini%, settings, MaxHistory, 150
+	 IniRead, MenuWidth          , %ini%, settings, MenuWidth, 40
+	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
+	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
+	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
+	 IniRead, ActivateApi        , %ini%, settings, ActivateApi, 0
+	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
+	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
 	 SettingsObj:={"MaxHistory":MaxHistory,"ActivateCmdr":ActivateCmdr}
 	 XA_Load(A_ScriptDir "\stats.xml")
 	 Settings_Default()
@@ -33,34 +33,35 @@ Settings_Default()
 	 global
  	 Settings_Plugins:={ Plugins : "Title`,Lower`,Upper`,LowerReplaceSpace" }
 	 Settings_Hotkeys:={ hk_menu         :"^!v"
-		, hk_plaintext    :"^+v"
-		, hk_slots        :"^#F12"
-		, hk_clipchain    :"^#F11"
-		, hk_fifo         :"^#F10"
-		, hk_search       :"^#h"
-		, hk_cyclemodkey  :"LWin"
-		, hk_cyclebackward:"v"
-		, hk_cycleforward :"c"
-		, hk_cycleplugins :"f"
-		, hk_cyclecancel  :"x" 
-		, hk_slot1        :">^1"
-		, hk_slot2        :">^2"
-		, hk_slot3        :">^3"
-		, hk_slot4        :">^4"
-		, hk_slot5        :">^5"
-		, hk_slot6        :">^6"
-		, hk_slot7        :">^7"
-		, hk_slot8        :">^8"
-		, hk_slot9        :">^9"
-		, hk_slot0        :">^0"
-		, hk_notes        :"#n"
-		, hk_cmdr         :"#j" }
+		, hk_plaintext     :"^+v"
+		, hk_slots         :"^#F12"
+		, hk_clipchain     :"^#F11"
+		, hk_clipchainpaste:"^v"
+		, hk_fifo          :"^#F10"
+		, hk_search        :"^#h"
+		, hk_cyclemodkey   :"LWin"
+		, hk_cyclebackward :"v"
+		, hk_cycleforward  :"c"
+		, hk_cycleplugins  :"f"
+		, hk_cyclecancel   :"x" 
+		, hk_slot1         :">^1"
+		, hk_slot2         :">^2"
+		, hk_slot3         :">^3"
+		, hk_slot4         :">^4"
+		, hk_slot5         :">^5"
+		, hk_slot6         :">^6"
+		, hk_slot7         :">^7"
+		, hk_slot8         :">^8"
+		, hk_slot9         :">^9"
+		, hk_slot0         :">^0"
+		, hk_notes         :"#n"
+		, hk_cmdr          :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
 		, MenuWidth         : 40
 		, SearchWindowWidth : 595
 		, SearchWindowHeight: 300
-		, ActivateApi : 0
-		, ShowLines : 1 }
+		, ActivateApi       : 0
+		, ShowLines         : 1 }
 
 	}
 	
@@ -88,22 +89,33 @@ Stats_Create()
 Settings_Hotkeys()
 	{
 	 global
-	 local ini,index
+	 local ini,index,keylist
 	 ini:=A_ScriptDir "\settings.ini"
 
-	 IniRead, hk_menu         , %ini%, Hotkeys, hk_menu         ,^!v
-	 IniRead, hk_plaintext    , %ini%, Hotkeys, hk_plaintext    ,^+v
-	 IniRead, hk_slots        , %ini%, Hotkeys, hk_slots        ,^#F12
-	 IniRead, hk_clipchain    , %ini%, Hotkeys, hk_clipchain    ,^#F11
-	 IniRead, hk_fifo         , %ini%, Hotkeys, hk_fifo         ,^#F10
-	 IniRead, hk_search       , %ini%, Hotkeys, hk_search       ,^#h
-	 IniRead, hk_cyclemodkey  , %ini%, Hotkeys, hk_cyclemodkey  ,LWin
-	 IniRead, hk_cyclebackward, %ini%, Hotkeys, hk_cyclebackward,v
-	 IniRead, hk_cycleforward , %ini%, Hotkeys, hk_cycleforward ,c
-	 IniRead, hk_cycleplugins , %ini%, Hotkeys, hk_cycleplugins ,f
-	 IniRead, hk_cyclecancel  , %ini%, Hotkeys, hk_cyclecancel  ,x
-	 IniRead, hk_notes        , %ini%, Hotkeys, hk_notes        ,#n
-	 IniRead, hk_cmdr         , %ini%, Hotkeys, hk_cmdr         ,#j
+	 Keylist:="Esc,Escape,Tab,Home,End,PgUp,PgDn,Up,Down,Left,Right,F10,F11,F12,F1,F2,F2,F3,F4,F5,F6,F7,F8,F9
+        ,AppsKey,LButton,RButton,MButton,XButton1,XButton2,WheelDown,WheelUp,WheelLeft,WheelRight
+        ,CapsLock,Enter,Backspace,BS,ScrollLock,Delete,Del,Insert,Ins,Numpad0,NumpadIns,Numpad1
+        ,NumpadEnd,Numpad2,NumpadDown,Numpad3,NumpadPgDn,Numpad4,NumpadLeft,Numpad5,NumpadClear
+        ,Numpad6,NumpadRight,Numpad7,NumpadHome,Numpad8,NumpadUp,Numpad9,NumpadPgUp,NumpadDot
+        ,NumpadDel,NumLock,NumpadDiv,NumpadMult,NumpadAdd,NumpadSub,NumpadEnter,Browser_Back
+        ,Browser_Forward,Browser_Refresh,Browser_Stop,Browser_Search,Browser_Favorites
+        ,Browser_Home,Volume_Mute,Volume_Down,Volume_Up,Media_Next,Media_Prev,Media_Stop
+        ,Media_Play_Pause,Launch_Mail,Launch_Media,Launch_App1,Launch_App2"
+
+	 IniRead, hk_menu          , %ini%, Hotkeys, hk_menu          ,^!v
+	 IniRead, hk_plaintext     , %ini%, Hotkeys, hk_plaintext     ,^+v
+	 IniRead, hk_slots         , %ini%, Hotkeys, hk_slots         ,^#F12
+	 IniRead, hk_clipchain     , %ini%, Hotkeys, hk_clipchain     ,^#F11
+	 IniRead, hk_clipchainpaste, %ini%, Hotkeys, hk_clipchainpaste,^v
+	 IniRead, hk_fifo          , %ini%, Hotkeys, hk_fifo          ,^#F10
+	 IniRead, hk_search        , %ini%, Hotkeys, hk_search        ,^#h
+	 IniRead, hk_cyclemodkey   , %ini%, Hotkeys, hk_cyclemodkey   ,LWin
+	 IniRead, hk_cyclebackward , %ini%, Hotkeys, hk_cyclebackward ,v
+	 IniRead, hk_cycleforward  , %ini%, Hotkeys, hk_cycleforward  ,c
+	 IniRead, hk_cycleplugins  , %ini%, Hotkeys, hk_cycleplugins  ,f
+	 IniRead, hk_cyclecancel   , %ini%, Hotkeys, hk_cyclecancel   ,x
+	 IniRead, hk_notes         , %ini%, Hotkeys, hk_notes         ,#n
+	 IniRead, hk_cmdr          , %ini%, Hotkeys, hk_cmdr          ,#j
 
 	 Loop, 10
 		{
@@ -112,12 +124,23 @@ Settings_Hotkeys()
 		 Hotkey, % hk_slot%index%, hk_slotpaste
 		}
 
-	 Hotkey, %hk_menu%            , hk_menu
-	 Hotkey, %hk_plaintext%       , hk_plaintext
-	 Hotkey, %hk_clipchain%       , hk_clipchain
-	 Hotkey, %hk_fifo%            , hk_fifo
-	 Hotkey, %hk_slots%           , hk_slots
-	 Hotkey, %hk_search%          , hk_search
+	 Hotkey, %hk_menu%             , hk_menu
+	 Hotkey, %hk_plaintext%        , hk_plaintext
+	 Hotkey, %hk_clipchain%        , hk_clipchain
+
+	 hk_clipchainpaste_send:=hk_clipchainpaste
+	 if (hk_clipchainpaste <> "^v")
+		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste
+	 else
+		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste_defaultpaste
+
+	 if hk_clipchainpaste_send contains %keylist%
+		Loop, parse, keylist, CSV
+			hk_clipchainpaste_send:=RegExReplace(hk_clipchainpaste_send,"i)\b" A_LoopField "\b","{" A_LoopField "}")
+
+	 Hotkey, %hk_fifo%             , hk_fifo
+	 Hotkey, %hk_slots%            , hk_slots
+	 Hotkey, %hk_search%           , hk_search
 	 Hotkey, %hk_cyclemodkey% & %hk_cyclebackward%   , hk_cyclebackward
 	 Hotkey, %hk_cyclemodkey% & %hk_cyclebackward% up, hk_cyclebackward_up
 	 Hotkey, %hk_cyclemodkey% & %hk_cycleforward%    , hk_cycleforward

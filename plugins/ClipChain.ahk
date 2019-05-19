@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.4
+Version           : 1.5
 CL3 version       : 1.5
 
 History:
+- 1.5 Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste actions - see Clipchain HK (settings)
 - 1.4 Added QEDL() for edit and insert (not public)
 - 1.3 Added DoubleClick to paste and progress ClipChain
 - 1.2 Fixed LV_Modify empty parameters because of AutoHotkey v1.1.23.03 update
@@ -98,13 +99,49 @@ If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
 	 ControlGetFocus, CL3ClipChainListview, CL3ClipChain ahk_class AutoHotkeyGUI
 	 If (CL3ClipChainListview = "SysListView321")
 	 	{
-	 	 ControlFocus, Button12, CL3ClipChain ahk_class AutoHotkeyGUI
+	 	 ControlFocus, Button12, CL3ClipChain ahk_class AutoHotkeyGUI ; Button12 is Close ClipChain
 	 	 Return
 	 	}
 	 Gosub, ClipChainPasteDoubleClick
 	}
 Return
 #IfWinActive
+
+#If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)
+
+;~LButton::
+;If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
+;	Gosub, ClipChainPasteDoubleClick
+;Return
+
+;$^v::
+ClipChainPasteDoubleClick:
+Gui, ClipChain:Default
+Gui, ClipChain:Submit, NoHide
+If (ClipChainIndex > ClipChainData.MaxIndex())
+	{
+	 ClipChainIndex:=1
+	}
+If ClipChainNoHistory
+	OnClipboardChange("FuncOnClipboardChange", 0)
+Clipboard:=ClipChainData[ClipChainIndex]
+PasteIt()
+Sleep 100
+Clipboard:=History[1].text
+If ClipChainNoHistory
+	OnClipboardChange("FuncOnClipboardChange", 1)
+stats.clipchain++
+ClipChainIndex++
+Gosub, ClipChainUpdateIndicator
+Return
+#If
+
+hk_clipchainpaste:
+If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") or ClipChainPause
+	Send %hk_clipchainpaste_send%
+else
+	Gosub, ClipChainPasteDoubleClick
+Return
 
 ;^#F11::
 hk_clipchain:
@@ -263,10 +300,11 @@ ClipChainCheckboxes:
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
 
-If ClipChainNoHistory
-	ScriptClipClipChain:=1
-else If !ClipChainNoHistory
-	ScriptClipClipChain:=0
+; no longer used v1.95
+;If ClipChainNoHistory
+;	ScriptClipClipChain:=1
+;else If !ClipChainNoHistory
+;	ScriptClipClipChain:=0
 
 If ClipChainTrans
 	WinSet, Transparent, 200, CL3ClipChain ahk_class AutoHotkeyGUI
@@ -340,30 +378,6 @@ IniWrite, %ClipChainTrans%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.in
 IniWrite, %ClipChainPause%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause
 Return
 
-#If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)
-
-~LButton::
-If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
-	Gosub, ClipChainPasteDoubleClick
-Return
-
-$^v::
-ClipChainPasteDoubleClick:
-Gui, ClipChain:Default
-Gui, ClipChain:Submit, NoHide
-If (ClipChainIndex > ClipChainData.MaxIndex())
-	{
-	 ClipChainIndex:=1
-	}
-OnClipboardChange("FuncOnClipboardChange", 0)
-Clipboard:=ClipChainData[ClipChainIndex]
-OnClipboardChange("FuncOnClipboardChange", 1)
-PasteIt()
-stats.clipchain++
-ClipChainIndex++
-Gosub, ClipChainUpdateIndicator
-Return
-#If
 
 ClipChainMoveUp:
 ClipChainLvHandle.Move(1) ; Move selected rows up.

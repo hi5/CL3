@@ -63,13 +63,15 @@ Gui Settings:Add,  Button, x5 yp+140  w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
 Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
-Gui Settings:Add,  GroupBox, xp+110 y20 w100 h180                , Special
+Gui Settings:Add,  GroupBox, xp+110 y20 w100 h240                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
 Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_cmdr        , %hk_cmdr%
 Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateNotes          , notes plugin
 Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_notes       , %hk_notes%
 Gui Settings:Add,  Checkbox, xp-20 yp+30 vShowLines              , Show lines
+Gui Settings:Add,  Text    , xp    yp+30                         , Clipchain HK:
+Gui Settings:Add,  Edit    , xp    yp+20 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
 
 If ActivateApi
 	GuiControl,, ActivateApi, 1
@@ -115,18 +117,19 @@ CyclePlugins:=Trim(StrReplace(EditCyclePlugins,"`n",","),", ")
 IniWrite, %CyclePlugins%       , %ini%, Plugins, CyclePlugins
 
 IniWrite, %hk_menu%, %ini%, Hotkeys, hk_menu
-IniWrite, %hk_plaintext%    , %ini%, Hotkeys, hk_plaintext
-IniWrite, %hk_slots%        , %ini%, Hotkeys, hk_slots
-IniWrite, %hk_clipchain%    , %ini%, Hotkeys, hk_clipchain
-IniWrite, %hk_fifo%         , %ini%, Hotkeys, hk_fifo
-IniWrite, %hk_search%       , %ini%, Hotkeys, hk_search
-IniWrite, %hk_cyclemodkey%  , %ini%, Hotkeys, hk_cyclemodkey
-IniWrite, %hk_cyclebackward%, %ini%, Hotkeys, hk_cyclebackward
-IniWrite, %hk_cycleforward% , %ini%, Hotkeys, hk_cycleforward
-IniWrite, %hk_cycleplugins% , %ini%, Hotkeys, hk_cycleplugins
-IniWrite, %hk_cyclecancel%  , %ini%, Hotkeys, hk_cyclecancel
-IniWrite, %hk_notes%        , %ini%, Hotkeys, hk_notes
-IniWrite, %hk_cmdr%         , %ini%, Hotkeys, hk_cmdr
+IniWrite, %hk_plaintext%     , %ini%, Hotkeys, hk_plaintext
+IniWrite, %hk_slots%         , %ini%, Hotkeys, hk_slots
+IniWrite, %hk_clipchain%     , %ini%, Hotkeys, hk_clipchain
+IniWrite, %hk_clipchainpaste%, %ini%, Hotkeys, hk_clipchainpaste
+IniWrite, %hk_fifo%          , %ini%, Hotkeys, hk_fifo
+IniWrite, %hk_search%        , %ini%, Hotkeys, hk_search
+IniWrite, %hk_cyclemodkey%   , %ini%, Hotkeys, hk_cyclemodkey
+IniWrite, %hk_cyclebackward% , %ini%, Hotkeys, hk_cyclebackward
+IniWrite, %hk_cycleforward%  , %ini%, Hotkeys, hk_cycleforward
+IniWrite, %hk_cycleplugins%  , %ini%, Hotkeys, hk_cycleplugins
+IniWrite, %hk_cyclecancel%   , %ini%, Hotkeys, hk_cyclecancel
+IniWrite, %hk_notes%         , %ini%, Hotkeys, hk_notes
+IniWrite, %hk_cmdr%          , %ini%, Hotkeys, hk_cmdr
 
 Loop, 9
 	IniWrite, % hk_slot%A_Index%  , %ini%, Hotkeys, hk_slot%A_Index%

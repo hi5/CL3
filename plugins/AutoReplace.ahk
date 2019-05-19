@@ -1,10 +1,11 @@
 ﻿/*
 
 Plugin            : AutoReplace()
-Version           : 1.3
+Version           : 1.4
 CL3 version       : 1.4
 
 History:
+- 1.4 Added fixed setting for Bypass (excell.exe) to avoid problems pasting content in Excel, default setting inactive
 - 1.3 Added A_Space/A_Tab/%A_Space%/%A_Tab% for space/tab Replacement
 - 1.2 Added 'Try' as a fix for rare issue
 
@@ -24,9 +25,9 @@ If !IsObject(AutoReplace)
 	}
 
 If !AutoReplace.Settings.HasKey("Active")
-	AutoReplace["Settings","Active"]:=1
+	AutoReplace["Settings","Active"]:=0           ; default setting change from active to inactive v1.95
 If !AutoReplace.Settings.HasKey("Bypass")
-	AutoReplace["Settings","Bypass"]:=""
+	AutoReplace["Settings","Bypass"]:="excel.exe" ; default fixed setting 
 
 Gosub, AutoReplaceMenu
 
@@ -109,6 +110,7 @@ Return
 
 AutoReplaceSave:
 Gui, AutoReplace:Submit, Hide
+AutoReplace.Settings.Bypass:=Bypass
 If (Rules = "")
 	Rules:=1
 If (Find = "")
@@ -118,7 +120,6 @@ AutoReplace[Rules,"name"]:=name
 AutoReplace[Rules,"type"]:=type
 AutoReplace[Rules,"find"]:=find
 AutoReplace[Rules,"replace"]:=replace
-AutoReplace.Settings.Bypass:=Bypass
 XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 Return
 
