@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.95.1
+
+* Fix: change "contains" to "in" for keylist in settings.ahk
+
 ### v1.95
 
 * Change: Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste functionality - see Clipchain HK (settings)

@@ -134,7 +134,7 @@ Settings_Hotkeys()
 	 else
 		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste_defaultpaste
 
-	 if hk_clipchainpaste_send contains %keylist%
+	 if hk_clipchainpaste_send in %keylist%
 		Loop, parse, keylist, CSV
 			hk_clipchainpaste_send:=RegExReplace(hk_clipchainpaste_send,"i)\b" A_LoopField "\b","{" A_LoopField "}")
 
