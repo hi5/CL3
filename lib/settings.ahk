@@ -92,16 +92,6 @@ Settings_Hotkeys()
 	 local ini,index,keylist
 	 ini:=A_ScriptDir "\settings.ini"
 
-	 Keylist:="Esc,Escape,Tab,Home,End,PgUp,PgDn,Up,Down,Left,Right,F10,F11,F12,F1,F2,F2,F3,F4,F5,F6,F7,F8,F9
-        ,AppsKey,LButton,RButton,MButton,XButton1,XButton2,WheelDown,WheelUp,WheelLeft,WheelRight
-        ,CapsLock,Enter,Backspace,BS,ScrollLock,Delete,Del,Insert,Ins,Numpad0,NumpadIns,Numpad1
-        ,NumpadEnd,Numpad2,NumpadDown,Numpad3,NumpadPgDn,Numpad4,NumpadLeft,Numpad5,NumpadClear
-        ,Numpad6,NumpadRight,Numpad7,NumpadHome,Numpad8,NumpadUp,Numpad9,NumpadPgUp,NumpadDot
-        ,NumpadDel,NumLock,NumpadDiv,NumpadMult,NumpadAdd,NumpadSub,NumpadEnter,Browser_Back
-        ,Browser_Forward,Browser_Refresh,Browser_Stop,Browser_Search,Browser_Favorites
-        ,Browser_Home,Volume_Mute,Volume_Down,Volume_Up,Media_Next,Media_Prev,Media_Stop
-        ,Media_Play_Pause,Launch_Mail,Launch_Media,Launch_App1,Launch_App2"
-
 	 IniRead, hk_menu          , %ini%, Hotkeys, hk_menu          ,^!v
 	 IniRead, hk_plaintext     , %ini%, Hotkeys, hk_plaintext     ,^+v
 	 IniRead, hk_slots         , %ini%, Hotkeys, hk_slots         ,^#F12
@@ -128,15 +118,12 @@ Settings_Hotkeys()
 	 Hotkey, %hk_plaintext%        , hk_plaintext
 	 Hotkey, %hk_clipchain%        , hk_clipchain
 
-	 hk_clipchainpaste_send:=hk_clipchainpaste
-	 if (hk_clipchainpaste <> "^v")
-		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste
-	 else
+	 if (hk_clipchainpaste = "^v")
 		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste_defaultpaste
 
-	 if hk_clipchainpaste_send in %keylist%
-		Loop, parse, keylist, CSV
-			hk_clipchainpaste_send:=RegExReplace(hk_clipchainpaste_send,"i)\b" A_LoopField "\b","{" A_LoopField "}")
+	 Hotkey, If, ClipChainActive()
+	 Hotkey, $%hk_clipchainpaste%, ClipChainPasteDoubleClick
+	 Hotkey, If
 
 	 Hotkey, %hk_fifo%             , hk_fifo
 	 Hotkey, %hk_slots%            , hk_slots

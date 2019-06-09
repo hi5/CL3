@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.95.2
+
+* Fix: Changed to #If for ClipChain paste hotkey
+
 ### v1.95.1
 
 * Fix: change "contains" to "in" for keylist in settings.ahk

@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.5
+Version           : 1.5.1
 CL3 version       : 1.5
 
 History:
+- 1.5.1 Fix for hotkey, using much more reliable #If
 - 1.5 Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste actions - see Clipchain HK (settings)
 - 1.4 Added QEDL() for edit and insert (not public)
 - 1.3 Added DoubleClick to paste and progress ClipChain
@@ -88,6 +89,7 @@ GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 
 Gosub, ClipChainCheckboxes
 ClipChainLvHandle := New LV_Rows(HLV)
+
 Return
 
 #IfWinExist CL3ClipChain ahk_class AutoHotkeyGUI
@@ -107,12 +109,7 @@ If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
 Return
 #IfWinActive
 
-#If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1)
-
-;~LButton::
-;If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
-;	Gosub, ClipChainPasteDoubleClick
-;Return
+#If ClipChainActive()
 
 ;$^v::
 ClipChainPasteDoubleClick:
@@ -135,13 +132,6 @@ ClipChainIndex++
 Gosub, ClipChainUpdateIndicator
 Return
 #If
-
-hk_clipchainpaste:
-If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") or ClipChainPause
-	Send %hk_clipchainpaste_send%
-else
-	Gosub, ClipChainPasteDoubleClick
-Return
 
 ;^#F11::
 hk_clipchain:
@@ -430,5 +420,14 @@ Gui, ClipChain:Default
 LV_Delete()
 Gosub, ClipChainListview
 Return
+
+; v1.5.1 for #If Hotkeys
+ClipChainActive()
+	{
+	 If (WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") and (ClipChainPause <> 1))
+		Return true
+	 Else
+		Return false
+	}
 
 #include %A_ScriptDir%\lib\class_lv_rows.ahk
