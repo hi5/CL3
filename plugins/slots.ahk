@@ -2,13 +2,13 @@
 
 Plugin            : Slots
 Purpose           : Load & Save 10 quick paste texts
-Version           : 1.1
-CL3 version       : 1.2
+Version           : 1.3
 
 10 Slots
 Hotkeys: RCTRL-[1-0] 
 
 History:
+- 1.3 Restore current clipboard from History
 - 1.2 Added hotkey for QEDL() Ctrl+E (not public)
 - 1.1 Bug fix for not correctly updatin control (Edit0 vs Slot0) and moved XML to ClipData, improved firsttime init
 
@@ -75,8 +75,10 @@ Return
 hk_slotpaste:
 OnClipboardChange("FuncOnClipboardChange", 0)
 Clipboard:=Slots[SubStr(A_thisHotkey,0)]
+PasteIt()
+Sleep 100
+Clipboard:=History[1].text
 OnClipboardChange("FuncOnClipboardChange", 1)
-Send ^v
 stats.slots++
 Return
 

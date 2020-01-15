@@ -22,6 +22,14 @@ CL3Api_Close()
 
 ## Available functions
 
+### CL3Api_State(toggle)
+
+```autohotkey
+CL3Api_State("off")         ; Stop tracking clipboard history
+
+CL3Api_State("on")          ; Activate clipboard history
+```
+
 ### CL3Api_Paste(Data)
 
 Data: A single entry or Array.

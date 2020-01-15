@@ -25,6 +25,12 @@ CL3Api_Close()
 	 cl3api:=""
 	}
 
+CL3Api_State(toggle)
+	{
+	 global cl3api
+	 cl3api.state(toggle)
+	}
+	
 CL3Api_Paste(Data,key="")
 	{
 	 global cl3api
@@ -33,7 +39,7 @@ CL3Api_Paste(Data,key="")
 	 cl3api.paste(jxon_dump(Data),key)
 	 return 1
 	}
-	 
+
 CL3Api_Upper(Data)
 	{
 	 global cl3api
@@ -143,7 +149,7 @@ CL3Api_SearchIdx(String,Results="-1")
 	 return jxon_load(cl3api.searchIdx(String,Results))
 	}
 
-CL3Api_GetSetting(setting) ; not used 
+CL3Api_GetSetting(setting) ; not used
 	{
 	 global cl3api
 	 return cl3api.GetSetting(setting)

@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.95.2
+Version     : 1.96
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -37,7 +37,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.95.2"
+version:="v1.96"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -46,6 +46,7 @@ CoordMode, Menu, Screen
 ListLines, Off
 PasteTime:=A_TickCount
 CyclePluginsToolTipLine := "`n" StrReplace( Format( "{:020}", "" ), 0, Chr(0x2014) ) "`n"
+ClipboardHistoryToggle:=0
 TemplateClip:=0
 ;CyclePluginClip:=0
 
@@ -66,7 +67,7 @@ Menu, tray, Tip , %name% %version%
 Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%     , DoubleTrayClick
 Menu, tray, Icon, %name% %version%    , res\cl3.ico
-Menu, tray, Default, %name% %version%
+Menu, tray, Default, %name% %version% 
 Menu, tray, Click, 1 ; this will show the tray menu because we send {rbutton} at the DoubleTrayClick label
 Menu, tray, Add, 
 Menu, tray, Add, &AutoReplace Active  , TrayMenuHandler
@@ -88,9 +89,10 @@ Menu, tray, Icon,&Suspend Hotkeys     , %A_AhkPath%, 3
 Menu, tray, Add, &Pause Script        , TrayMenuHandler
 Menu, tray, Icon,&Pause Script        , %A_AhkPath%, 4
 Menu, tray, Add, 
+Menu, tray, Add, &Pause clipboard history, TrayMenuHandler
+Menu, tray, Add, 
 Menu, tray, Add, Exit                 , SaveSettings
 Menu, tray, Icon, %MenuPadding%Exit   , shell32.dll, 132
-
 
 Menu, ClipMenu, Add, TempText, MenuHandler
 Menu, SubMenu1, Add, TempText, MenuHandler
@@ -117,7 +119,6 @@ If (Error = 1)
 	 History:=[]
 	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned
 	}
-
 
 OnExit, SaveSettings
 
@@ -146,16 +147,43 @@ StringUpper, templatesfolderlist, templatesfolderlist
 
 OnClipboardChange("FuncOnClipboardChange")
 
+/*
+FILE_NOTIFY_CHANGE_FILE_NAME   = 1   (0x00000001) : Notify about renaming, creating, or deleting a file.
+FILE_NOTIFY_CHANGE_DIR_NAME    = 2   (0x00000002) : Notify about creating or deleting a directory.
+FILE_NOTIFY_CHANGE_SIZE        = 8   (0x00000008) : Notify about any file-size change.
+FILE_NOTIFY_CHANGE_LAST_WRITE  = 16  (0x00000010) : Notify about any change to the last write-time of files.
+                               = 27
+*/
+WatchFolder("templates\", "UpdateTemplate", true, 27) ; just a shortcut to reload the template menu to avoid manual reload
+
 If ActivateApi
 	ObjRegisterActive(CL3API, "{01DA04FA-790F-40B6-9FB7-CE6C1D53DC38}")
 
 #Include %A_ScriptDir%\plugins\plugins.ahk
+
+UpdateTemplate(folder,Changes)                        ; WatchFolder() above
+	{
+	 Reload
+	 Sleep 1000
+	 ExitApp
+	}
 
 ~^x::
 ~^c::
 WinGet, IconExe, ProcessPath , A
 Sleep 100
 ClipText:=Clipboard
+Return
+
+hk_BypassAutoReplace:
+OnClipboardChange("FuncOnClipboardChange", 0)
+Clipboard:=ClipboardByPass
+Sleep 100
+Send ^v
+Sleep 100
+Clipboard:=""
+Clipboard:=History[1].text
+OnClipboardChange("FuncOnClipboardChange", 1)
 Return
 
 ; show clipboard history menu
@@ -691,6 +719,9 @@ If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we h
 ;If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 ;	ScriptClipClipChain:=0
 
+If (hk_BypassAutoReplace <> "") ; this allows the various formats to be stored (temporarily) so we can paste the formatted text which may have been changed by AutoReplace - this avoids the need to turn AR on/off to get something to paste
+	ClipboardByPass:=ClipboardAll
+
 if (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return
 
@@ -753,7 +784,6 @@ Send {rbutton}
 Return
 
 TrayMenuHandler:
-
 ; Easy & Quick options first
 If (A_ThisMenuItem = "&Reload this script")
 	{
@@ -776,6 +806,16 @@ Else If (A_ThisMenuItem = "&Pause Script")
 	 Menu, tray, ToggleCheck, &Pause Script
 	 Pause
 	 Return
+	}
+Else If (A_ThisMenuItem = "&Pause clipboard history")
+	{
+	 CL3Api_State(ClipboardHistoryToggle)
+	 Menu, tray, ToggleCheck, &Pause clipboard history
+	 If ClipboardHistoryToggle
+		Menu, Tray, Icon, res\cl3.ico
+	 else	
+		Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
+	 ClipboardHistoryToggle:=!ClipboardHistoryToggle
 	}
 Else If (A_ThisMenuItem = "&AutoReplace Active")
 	{

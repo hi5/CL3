@@ -38,7 +38,7 @@ Similar to paste, only using the FIFO method.
 
 Example:
 
-`f3e` will the three most recent entries in the clipboard history in FIFO order: Item "c", "b" and "a" with `enter` in between
+`f3e` will paste the three most recent entries in the clipboard history in FIFO order: Item "c", "b" and "a" with `enter` in between
 
 ### Y
 
@@ -49,7 +49,7 @@ y : "Yank IDx or range (IDx-IDy)" yank (delete) items from the CL3 Clipboard his
 
 ### I
 
-i: "Insert" will insert/move the current clipboard contents to the "Index" position.
+i : "Insert" will insert/move the current clipboard contents to the "Index" position.
 
 Example:
 
@@ -72,19 +72,32 @@ s : "Store in Slot (1-10)" store Current clipboard contents in Slot 1 to 10
 
 Example:
 
-`s5` will make the current clipboard contents the 5th slot, you can paste this with <kbd>Right Control</kbd>+<kbd>5</kbd> - see Slots docs
+`s5` will make the current clipboard contents the 5th slot, you can paste this with <kbd>Right Control</kbd>+<kbd>5</kbd> - see Slots in the docs
 
 # B
 
-b:"Burst seperator (\n, \t, \\, char or word)"
-r : "Reverse"
+b :"Burst seperator (\n, \t, \\, char or word)"  
+rb: "Reverse burst"
 
-Bust (split) the current clipboard contents into individual entries.
+Burst (split) the current clipboard contents into individual entries.
 
 Example:
 
 The clipboard contents is `apple,pear,cherry`
 
-`b,` cherry, pear and apple are now items "a", "b" and "c" in the clipboard history
-`rb,` reverse it so, apple, pear and cherry are now items "a", "b" and "c" in the clipboard history
+`b,` cherry, pear and apple are now items "a", "b" and "c" in the clipboard history:
+
+```
+a. cherry
+b. pear
+c. apple
+```
+
+`rb,` reverse it so, apple, pear and cherry are now items "a", "b" and "c" in the clipboard history:
+
+```
+a. apple
+b. pear
+c. cherry
+```
 

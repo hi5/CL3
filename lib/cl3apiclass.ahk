@@ -12,12 +12,28 @@ Version           : 1.0
 CL3 version       : 1.9.4
 
 History:
+- 1.1 added State to turn clipboard history on/off
 - 1.0 initial version
 
 */
 
 class CL3API
 	{
+
+	 State(toggle)
+		{
+		 if toggle in on,true,1
+			{
+			 OnClipboardChange("FuncOnClipboardChange", 1)
+			 Menu, Tray, Icon, res\cl3.ico
+			}
+		 else if toggle in off,false,0
+				{
+				 OnClipboardChange("FuncOnClipboardChange", 0)
+				 Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
+				}
+		}
+
 	 Upper(Data)
 		{
 		 for k, v in jxon_load(data)

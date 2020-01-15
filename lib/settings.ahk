@@ -55,6 +55,7 @@ Settings_Default()
 		, hk_slot9         :">^9"
 		, hk_slot0         :">^0"
 		, hk_notes         :"#n"
+		, hk_BypassAutoReplace :""
 		, hk_cmdr          :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
 		, MenuWidth         : 40
@@ -106,6 +107,9 @@ Settings_Hotkeys()
 	 IniRead, hk_cyclecancel   , %ini%, Hotkeys, hk_cyclecancel   ,x
 	 IniRead, hk_notes         , %ini%, Hotkeys, hk_notes         ,#n
 	 IniRead, hk_cmdr          , %ini%, Hotkeys, hk_cmdr          ,#j
+	 IniRead, hk_BypassAutoReplace, %ini%, Hotkeys, hk_BypassAutoReplace
+	 If (hk_BypassAutoReplace = "ERROR")
+	 	hk_BypassAutoReplace:=""
 
 	 Loop, 10
 		{
@@ -117,6 +121,8 @@ Settings_Hotkeys()
 	 Hotkey, %hk_menu%             , hk_menu
 	 Hotkey, %hk_plaintext%        , hk_plaintext
 	 Hotkey, %hk_clipchain%        , hk_clipchain
+	 If (hk_BypassAutoReplace <> "")
+		 Hotkey, %hk_BypassAutoReplace%, hk_BypassAutoReplace
 
 	 if (hk_clipchainpaste = "^v")
 		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste_defaultpaste

@@ -63,7 +63,7 @@ Gui Settings:Add,  Button, x5 yp+140  w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
 Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
-Gui Settings:Add,  GroupBox, xp+110 y20 w100 h240                , Special
+Gui Settings:Add,  GroupBox, xp+110 y20 w100 h290                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
 Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_cmdr        , %hk_cmdr%
@@ -72,6 +72,8 @@ Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_notes       , %hk_notes%
 Gui Settings:Add,  Checkbox, xp-20 yp+30 vShowLines              , Show lines
 Gui Settings:Add,  Text    , xp    yp+30                         , Clipchain HK:
 Gui Settings:Add,  Edit    , xp    yp+20 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
+Gui Settings:Add,  Text    , xp    yp+30                         , Bypass AutoRepl.`npaste [1st entry]:
+Gui Settings:Add,  Edit    , xp    yp+30 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
 
 If ActivateApi
 	GuiControl,, ActivateApi, 1
@@ -130,6 +132,7 @@ IniWrite, %hk_cycleplugins%  , %ini%, Hotkeys, hk_cycleplugins
 IniWrite, %hk_cyclecancel%   , %ini%, Hotkeys, hk_cyclecancel
 IniWrite, %hk_notes%         , %ini%, Hotkeys, hk_notes
 IniWrite, %hk_cmdr%          , %ini%, Hotkeys, hk_cmdr
+IniWrite, %hk_BypassAutoReplace%, %ini%, Hotkeys, hk_BypassAutoReplace
 
 Loop, 9
 	IniWrite, % hk_slot%A_Index%  , %ini%, Hotkeys, hk_slot%A_Index%

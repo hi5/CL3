@@ -1,5 +1,13 @@
 # Changelog
 
+### v1.96
+
+* API: added CL3Api_State to turn clipboard history on/off - incl. changing tray icon
+* Tray menu: Pause clipboard history - option to turn clipboard history on/off - incl. changing tray icon
+* Change: Slots - Restore current clipboard from History after pasting Slot entry
+* New option to paste unmodified clipboard entry, retains all formatting - see Note 3 in readme.md
+* Added WatchFolder() to automaticallly reload CL3 when a file in the Template folder is updated/added/removed
+
 ### v1.95.2
 
 * Fix: Changed to #If for ClipChain paste hotkey

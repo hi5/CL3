@@ -1,4 +1,4 @@
-# CL3 <sup>v1.95.2</sup> - Clipboard caching utility
+# CL3 <sup>v1.96</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -10,20 +10,35 @@ Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://aut
 
 ### Shortcuts
 
-|Key                                                |Action  |
-|---------------------------------------------------|--------|
-|<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>        | Open the Clipboard history menu. |
-|<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>      | Paste the current clipboard content as plain text. |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>        | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. (Also delete and edit entries) |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>      | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>      | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
-|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>      | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO.   |
-|<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
-|<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd> | To cycle forward, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
-|<kbd>LWin</kbd>+<kbd>f</kbd>, hold <kbd>LWin</kbd> | To cycle through plugins repeatedly tap <kbd>f</kbd>. Release <kbd>LWin</kbd> to paste. You can use this in combination with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd> |
-|<kbd>LWin</kbd>+<kbd>x</kbd>                       | Cancel "cycle" pasting. (also for plugins <kbd>#</kbd>+<kbd>f</kbd>) |
+|Key<sup>[1](#note1)</sup>                           |Action  |
+|----------------------------------------------------|--------|
+|<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>v</kbd>         | Open the Clipboard history menu. |
+|<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>       | Paste the current clipboard content as plain text.<sup>[2](#note2)</sup> |
+|<kbd>*Undefined*</kbd>                              | Paste most recent item added to the clipboard unmodified.<sup>[3](#note3)</sup> |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>h</kbd>         | Open the [Search GUI](#search-plugin-v12) and search the clipboard history. (Also delete and edit entries) |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F12</kbd>       | Open the [Slots GUI](#slots-plugin-v12) and define your 10 texts for quick pasting. Quick pasting via <kbd>RCtrl</kbd>+<kbd>1</kbd>,  <kbd>RCtrl</kbd>+<kbd>2</kbd> to <kbd>RCtrl</kbd>+<kbd>0</kbd>. |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F11</kbd>       | Open/close the [ClipChain GUI](#clipchain-v15) - cycle through a predefined clipboard history - see [Wiki](https://github.com/hi5/CL3/wiki/ClipChain) |
+|<kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd>       | Start [FIFO](#fifo-v17) (Reverse paste) plugin - <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> stops FIFO.   |
+|<kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd>  | Repeatedly tap <kbd>v</kbd> to [cycle through the clipboard](#cycle-through-clipboard-history-v13) history. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>c</kbd>, hold <kbd>LWin</kbd>  | To cycle forward, repeatedly tap <kbd>c</kbd>. Release <kbd>LWin</kbd> to paste. |
+|<kbd>LWin</kbd>+<kbd>f</kbd>, hold <kbd>LWin</kbd>  | To cycle through plugins repeatedly tap <kbd>f</kbd>. Release <kbd>LWin</kbd> to paste. You can use this in combination with <kbd>#</kbd>+<kbd>v</kbd> and <kbd>#</kbd>+<kbd>c</kbd> |
+|<kbd>LWin</kbd>+<kbd>x</kbd>                        | Cancel "cycle" pasting. (also for plugins <kbd>#</kbd>+<kbd>f</kbd>) |
 
-Note: as of v1.93 you can define these Shortcuts via Settings.ini or use the Tray menu, Settings option
+<a name='note1'></a>
+Note 1: as of v1.93 you can define these Shortcuts via Settings.ini or use the Tray menu, Settings option.
+
+<a name='note2'></a>
+Note 2: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd> pastes the current clipboard item as plain (unformatted)
+text - this can be useful if you have selected rich / formatted text but don't want to paste that in your
+current application.
+
+<a name='note3'></a>
+Note 3: As CL3 might modify the clipboard content when using AutoReplace, the most recently copied
+item to the clipboard (after <kbd>Ctrl</kbd>+<kbd>c</kbd>) is also stored unmodified thus preserving
+the original format (layout, images, etc) - Define a hotkey in the Settings to paste this unmodified Clipboard.  
+Suggestion: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Capslock</kbd>, define as: ^+CAPSLOCK  
+This may be useful in Word processing or other specific formats if you notice formatting is
+lost or changed upon a regular paste (<kbd>Ctrl</kbd>+<kbd>v</kbd>).
 
 ## About CL3
 
@@ -34,11 +49,7 @@ You can call the clipboard history menu by its default hotkey <kbd>Ctrl</kbd>+<k
 If you prefer another hotkey you can change this and the other hotkeys via the Settings menu. Use the
 AutoHotkey syntax - more info about they syntax here <https://autohotkey.com/docs/Hotkeys.htm#Symbols>
 
-CL3 gets its name from CLCL CLone = CL3
-
-As of v1.3: Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd> to paste the current clipboard item as 
-plain (unformatted) text - this can be useful if you have selected rich / formatted text but don't want
-to paste that in your current application.
+_CL3 gets its name from CLCL CLone = CL3_
 
 ### Features
 
@@ -254,6 +265,7 @@ Animations:
 - API: [ObjRegisterActive()](https://www.autohotkey.com/boards/viewtopic.php?t=6148) by Lexikos 
 - API: [JSON/JXON](https://github.com/cocobelgica/AutoHotkey-JSON) by cocobelgica
 - Notes: [GetActiveBrowserURL()](https://www.autohotkey.com/boards/viewtopic.php?t=3702) by Antonio Bueno
+- [WatchFolder()](https://github.com/AHK-just-me/WatchFolder) by just me
 
 # OCR-TIP
 
