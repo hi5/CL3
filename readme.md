@@ -1,4 +1,4 @@
-# CL3 <sup>v1.96</sup> - Clipboard caching utility
+# CL3 <sup>v1.97</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -109,6 +109,8 @@ Default plugins included with CL3 ([v1.0]):
 3. Upper (convert to upper case)
 4. Title (convert to title case, basic)
 5. see other updates for more
+
+* Copying files by Pasting - if you have copied file paths to the clipboard (^c in file explorer for example) you can copy (paste) these files if you wish. Basic instructions on how to set it up here https://www.autohotkey.com/boards/viewtopic.php?p=314316#p314316
 
 ### Search plugin [v1.2+]
 
@@ -226,7 +228,7 @@ Some ideas for further development you may wish to consider:
 - Extending the number of menu entries in the secondary menu ("more history")
 - ~~Allow the user to search the extensive history~~ _v1.2+_
 - Include rich text formats
-- Include images
+- Include images - rough guide to add it (very alpha) here https://www.autohotkey.com/boards/viewtopic.php?p=314319#p314319
 - Exclude certain programs
 - Introduce various paste methods, also for specific programs 
   for example send each character individually
@@ -269,8 +271,9 @@ Animations:
 
 # OCR-TIP
 
-If you need to "grab" text from Images, Screens, Locked PDFs etc you can use this nifty Vis2 AutoHotkey script by iseahound:
+If you need to "grab" text from Images, Screens, Locked PDFs etc you can use one of these nifty AutoHotkey scripts:
 
+1) Vis2 by iseahound
 - Download: https://github.com/iseahound/Vis2 
 - Forum: https://www.autohotkey.com/boards/viewtopic.php?f=6&t=36047 (shows demo animation)
 
@@ -285,7 +288,31 @@ stats.visocr++
 return
 ```
 
+2) Windows 10 OCR tool by malcev, teadrinker, and flyingDman
+
+- Download from the forum https://www.autohotkey.com/boards/viewtopic.php?p=325660#p325660
+
+You can 'add' it to CL3 as shown above wit the Vis2 example Run ...
+
+Look for the line `msgbox % text` and change it to:
+
+```autohotkey
+clipboard:=text
+Sleep 100
+ExitApp ; to close the script after OCR
+```
+
 After the OCR is complete it is added to the clipboard and thus the CL3 clipboard history.
+
+# PastePrivateRules.ahk
+
+Add an optional include file that "does something" before it actually pastes.  
+The file is not present in the repository and a new has to be created in `cl3\plugins\` with the name `PastePrivateRules.ahk`
+
+* Pasting file(s) from CL3 history https://www.autohotkey.com/boards/viewtopic.php?p=314316#p314316 using `ClipboardSetFiles()` and `If WinActive()`
+* Append to File name in "Open/Save as" dialogs - https://github.com/hi5/CL3/issues/14
+
+Note: your `PastePrivateRules.ahk` will never be part of this GitHub repository so anything you add won't be overwritten if you update CL3 in the future. 
 
 # Changelog
 

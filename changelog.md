@@ -1,5 +1,12 @@
 # Changelog
 
+### v1.97
+
+* New setting: CopyDelay to set time in milliseconds to wait before adding a copy of a new clipboard entry to the CL3 history.  
+  This may resolve some conflicts when other programs or scripts access the clipboard.  
+  Increasing this value may work around this issue.  
+  The previously hardcoded PasteDelay (50ms) can now also be set.
+
 ### v1.96
 
 * API: added CL3Api_State to turn clipboard history on/off - incl. changing tray icon

@@ -20,6 +20,8 @@ Settings()
 	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
 	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
+	 IniRead, CopyDelay          , %ini%, settings, CopyDelay, 0
+	 IniRead, PasteDelay         , %ini%, settings, PasteDelay, 50
 	 IniRead, ActivateApi        , %ini%, settings, ActivateApi, 0
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
 	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
@@ -62,7 +64,9 @@ Settings_Default()
 		, SearchWindowWidth : 595
 		, SearchWindowHeight: 300
 		, ActivateApi       : 0
-		, ShowLines         : 1 }
+		, ShowLines         : 1
+		, CopyDelay         : 0 
+		, PasteDelay        : 50 }
 
 	}
 	

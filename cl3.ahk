@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.96
+Version     : 1.97
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -37,7 +37,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.96"
+version:="v1.97"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -58,11 +58,14 @@ iconX:="icon-x.ico"
 iconY:="icon-y.ico"
 iconZ:="icon-z.ico"
 
+Pause, Off
+Suspend, Off
+
 Settings()
 Settings_Hotkeys()
 
 ; tray menu
-Menu, Tray, Icon, res\cl3.ico
+Menu, Tray, Icon, res\cl3.ico, , 1
 Menu, tray, Tip , %name% %version% 
 Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%     , DoubleTrayClick
@@ -505,7 +508,7 @@ If (History.MaxIndex() > 20)
 			Continue
 		 If (A_Index < 45)
 			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500),lines)
-		 Else	 
+		 Else
 			 key:=% "  " DispMenuText(SubStr(text,1,500),lines)
 		 Menu, SubMenu4, Add, %key%, MenuHandler
 		 Try
@@ -575,7 +578,8 @@ PasteIt()
 		Return
 	 #Include *i %A_ScriptDir%\plugins\PastePrivateRules.ahk
 	 WinActivate, ahk_id %ActiveWindowID%
-	 Sleep 50
+	 If PasteDelay
+		Sleep % PasteDelay
 	 Send ^v
 	 PasteTime := A_TickCount
 	 oldttext:="", ttext:="", ActiveWindowID:=""
@@ -708,8 +712,12 @@ FuncOnClipboardChange() {
 ; 0 if the clipboard is now empty;
 ; 1 if it contains something that can be expressed as text (this includes files copied from an Explorer window);
 ; 2 if it contains something entirely non-text such as a picture.
+
 If (A_EventInfo <> 1)
 	Return
+
+If CopyDelay
+	Sleep % CopyDelay
 
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text

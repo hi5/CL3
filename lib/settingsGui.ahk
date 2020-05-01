@@ -44,17 +44,17 @@ Gui Settings:Add,  Text, xp-40 yp+30                  , Slot 10:
 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slot0, % hk_slot0
 
 Gui Settings:Add,  GroupBox, xp+60 y20 w130 h320                , Other
-Gui Settings:Add,  Text, xp+8 yp+24                             , Max History:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory        , %MaxHistory%
-Gui Settings:Add,  Text, xp-70 yp+30                            , Menu width:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMenuWidth         , %MenuWidth%
-Gui Settings:Add,  Text, xp-70 yp+20                            , ___________________
-Gui Settings:Add,  Text, xp    yp+30                            , Search width:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowWidth , %SearchWindowWidth%
-Gui Settings:Add,  Text, xp-70 yp+30                            , Search height:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowHeight, %SearchWindowHeight%
-Gui Settings:Add,  Text, xp-70 yp+20                            , ___________________
-Gui Settings:Add,  Text, xp    yp+30                            , CyclePlugins:
+Gui Settings:Add,  Text, xp+8 yp+24                                     , Max History:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory Number         , %MaxHistory%
+Gui Settings:Add,  Text, xp-70 yp+30                                    , Menu width:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMenuWidth Number          , %MenuWidth%
+Gui Settings:Add,  Text, xp-70 yp+20                                    , ___________________
+Gui Settings:Add,  Text, xp    yp+30                                    , Search width:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowWidth Number  , %SearchWindowWidth%
+Gui Settings:Add,  Text, xp-70 yp+30                                    , Search height:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowHeight Number , %SearchWindowHeight%
+Gui Settings:Add,  Text, xp-70 yp+20                                    , ___________________
+Gui Settings:Add,  Text, xp    yp+30                                    , CyclePlugins:
 
 Gosub, UpdateCyclePlugins
 Gui Settings:Add,  Edit, xp-5  yp+15  w125 R9 vEditCyclePlugins , %EditCyclePlugins%
@@ -63,7 +63,7 @@ Gui Settings:Add,  Button, x5 yp+140  w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
 Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
-Gui Settings:Add,  GroupBox, xp+110 y20 w100 h290                , Special
+Gui Settings:Add,  GroupBox, xp+110 y20 w100 h352                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
 Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_cmdr        , %hk_cmdr%
@@ -74,6 +74,13 @@ Gui Settings:Add,  Text    , xp    yp+30                         , Clipchain HK:
 Gui Settings:Add,  Edit    , xp    yp+20 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
 Gui Settings:Add,  Text    , xp    yp+30                         , Bypass AutoRepl.`npaste [1st entry]:
 Gui Settings:Add,  Edit    , xp    yp+30 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
+Gui Settings:Add,  Text    , xp    yp+30                         , Clipb. delay (ms)
+Gui Settings:Font, cRed
+Gui Settings:Add,  Text    , xp+80 yp gModHelp2                  , ?
+Gui Settings:Font, cBlack
+Gui Settings:Add,  Edit    , xp-80 yp+20 w35 Number vCopyDelay   , %CopyDelay%
+Gui Settings:Add,  Edit    , xp+45 yp    w35 Number vPasteDelay  , %PasteDelay%
+
 
 If ActivateApi
 	GuiControl,, ActivateApi, 1
@@ -144,6 +151,8 @@ IniWrite, %SearchWindowWidth%  , %ini%, Settings, SearchWindowWidth
 IniWrite, %SearchWindowHeight% , %ini%, Settings, SearchWindowHeight
 IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
 IniWrite, %ShowLines%          , %ini%, Settings, ShowLines
+IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
+IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
 
 IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
 IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr
@@ -175,5 +184,16 @@ hk_cyclemodkey=RAlt
 hk_cyclemodkey=LCtrl
 
 Using "Default" to restore the default settings will also reset hk_cyclemodkey.
+)
+Return
+
+ModHelp2:
+MsgBox, 32, CL3 Clipboard delay Help,
+(
+Time in milliseconds to wait before adding a Copy of a new clipboard entry to the CL3 history. (left edit control)
+This may resolve some conflicts when other programs or scripts access the clipboard.
+Increasing this value may work around this issue.
+
+A value for a Paste Delay (right edit control) can also be set.
 )
 Return
