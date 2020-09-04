@@ -2,12 +2,13 @@
 
 Plugin            : Slots
 Purpose           : Load & Save 10 quick paste texts
-Version           : 1.3
+Version           : 1.4
 
 10 Slots
 Hotkeys: RCTRL-[1-0] 
 
 History:
+- 1.4 Attempt to prevent XMLRoot error - https://github.com/hi5/CL3/issues/15
 - 1.3 Restore current clipboard from History
 - 1.2 Added hotkey for QEDL() Ctrl+E (not public)
 - 1.1 Bug fix for not correctly updatin control (Edit0 vs Slot0) and moved XML to ClipData, improved firsttime init
@@ -20,7 +21,12 @@ If !IsObject(Slots)
 	{
 	 IfExist, %A_ScriptDir%\ClipData\Slots\Slots.xml
 		{
-		 XA_Load(A_ScriptDir "\ClipData\Slots\Slots.xml") ; the name of the variable containing the array is returned 
+		 If (XA_Load(A_ScriptDir "\ClipData\Slots\Slots.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+			{
+			 MsgBox, 16, Slots, Slots.xml seems to be corrupt, starting a new Slots.xml
+			 FileDelete, %A_ScriptDir%\ClipData\Slots\Slots.xml
+			 Slots:=[]
+			}
 		}
 	 else
 		{
@@ -134,13 +140,11 @@ Menu, SlotsMenu, Show
 Return
 
 MenuHandlerSlots:
-Try
+Slots:=[]
+If (XA_Load(A_ScriptDir "\ClipData\Slots\" A_ThisMenuItem) = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 	{
-	 Slots:=[]
-	 XA_Load(A_ScriptDir "\ClipData\Slots\" A_ThisMenuItem) ; the name of the variable containing the array is returned
-	}
-Catch
-	{
+	 MsgBox, 16, Slots, %A_ThisMenuItem% seems to be corrupt, starting a new Slots file
+	 FileDelete, %A_ScriptDir%\ClipData\Slots\%A_ThisMenuItem%
 	 Slots:=[]
 	 Loop, 10
 		Slots[Index-1]:="Slot" A_Index-1 "a"

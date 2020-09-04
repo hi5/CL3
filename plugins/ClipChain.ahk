@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.5.1
+Version           : 1.6
 CL3 version       : 1.5
 
 History:
+- 1.6 Attempt to prevent XMLRoot error - https://github.com/hi5/CL3/issues/15
 - 1.5.1 Fix for hotkey, using much more reliable #If
 - 1.5 Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste actions - see Clipchain HK (settings)
 - 1.4 Added QEDL() for edit and insert (not public)
@@ -31,7 +32,12 @@ If !IsObject(ClipChainData)
 	{
 	 IfExist, %A_ScriptDir%\ClipData\ClipChain\ClipChain.xml
 		{
-		 XA_Load(A_ScriptDir "\ClipData\ClipChain\ClipChain.xml") ; the name of the variable containing the array is returned 
+		 If (XA_Load(A_ScriptDir "\ClipData\ClipChain\ClipChain.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+			{
+			 MsgBox, 16, ClipChain, ClipChain.xml seems to be corrupt, starting new empty chain.
+			 FileDelete, %A_ScriptDir%\ClipData\ClipChain\ClipChain.xml
+			 ClipChain:=[]
+			}
 		}
 	 else
 		{
@@ -408,12 +414,10 @@ Menu, ClipChainLoadFile, Show
 Return
 
 MenuHandlerClipChainLoadFile:
-Try
+If (XA_Load(A_ScriptDir "\ClipData\ClipChain\" A_ThisMenuItem) = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 	{
-	 XA_Load(A_ScriptDir "\ClipData\ClipChain\" A_ThisMenuItem) ; the name of the variable containing the array is returned
-	}
-Catch
-	{
+	 MsgBox, 16, ClipChain, %A_ThisMenuItem% seems to be corrupt, starting new empty ClipChain.
+	 FileDelete, %A_ScriptDir%\ClipData\ClipChain\%A_ThisMenuItem%
 	 ClipChainData:=[]
 	}
 Gui, ClipChain:Default

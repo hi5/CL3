@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.97
+Version     : 1.98
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -37,7 +37,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.97"
+version:="v1.98"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -107,20 +107,14 @@ Menu, SubMenu4, Add, TempText, MenuHandler
 IfNotExist, %A_ScriptDir%\ClipData\History\History.xml
 	Error:=1
 
-Try
-	{
-	 XA_Load( A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned
-	}
-Catch
-	{
-	 Error:=1
-	}
+if (XA_Load( A_ScriptDir "\ClipData\History\History.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+	Error:=1
 
 If (Error = 1)
 	{
 	 FileCopy, res\history.bak.txt, %A_ScriptDir%\ClipData\History\History.xml, 1
 	 History:=[]
-	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned
+	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned OR the value 1 in case of error
 	}
 
 OnExit, SaveSettings
@@ -683,6 +677,7 @@ TemplateClip:=0
 Return
 
 ClipBoardHandler:
+oldttext:="", ttext:="", ActiveWindowID:=""
 If (ClipText <> Clipboard)
 	{
 	 StrReplace(ClipText,"`n", "`n", Count)
@@ -727,8 +722,21 @@ If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we h
 ;If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
 ;	ScriptClipClipChain:=0
 
-If (hk_BypassAutoReplace <> "") ; this allows the various formats to be stored (temporarily) so we can paste the formatted text which may have been changed by AutoReplace - this avoids the need to turn AR on/off to get something to paste
-	ClipboardByPass:=ClipboardAll
+;CF_METAFILEPICT := 0x3 ; IsClipboardFormatAvailable
+
+; Skipping Excel.exe +
+; Skipping CF_METAFILEPICT avoids "This picture is too large and will be truncated" error MsgBox in Excel it seems
+; this allows the various formats to be stored (temporarily) so we can paste the formatted text which may have been changed by AutoReplace - this avoids the need to turn AR on/off to get something to paste
+If !WinActive("ahk_exe excel.exe")
+	{
+	 If (hk_BypassAutoReplace <> "")
+		{
+		 ClipboardByPass:=ClipboardAll
+		}
+	}
+else ; Excel is active; check CF_METAFILEPICT, if not present we can safely store ClipboardAll
+	If (DllCall("IsClipboardFormatAvailable", "Uint", 3) = 0)
+		ClipboardByPass:=ClipboardAll
 
 if (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return
@@ -821,7 +829,7 @@ Else If (A_ThisMenuItem = "&Pause clipboard history")
 	 Menu, tray, ToggleCheck, &Pause clipboard history
 	 If ClipboardHistoryToggle
 		Menu, Tray, Icon, res\cl3.ico
-	 else	
+	 else
 		Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
 	 ClipboardHistoryToggle:=!ClipboardHistoryToggle
 	}

@@ -307,7 +307,7 @@ After the OCR is complete it is added to the clipboard and thus the CL3 clipboar
 # PastePrivateRules.ahk
 
 Add an optional include file that "does something" before it actually pastes.  
-The file is not present in the repository and a new has to be created in `cl3\plugins\` with the name `PastePrivateRules.ahk`
+The file is not present in the repository and a new file has to be created in `cl3\plugins\` with the name `PastePrivateRules.ahk`
 
 * Pasting file(s) from CL3 history https://www.autohotkey.com/boards/viewtopic.php?p=314316#p314316 using `ClipboardSetFiles()` and `If WinActive()`
 * Append to File name in "Open/Save as" dialogs - https://github.com/hi5/CL3/issues/14

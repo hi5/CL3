@@ -26,7 +26,12 @@ Settings()
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
 	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
 	 SettingsObj:={"MaxHistory":MaxHistory,"ActivateCmdr":ActivateCmdr}
-	 XA_Load(A_ScriptDir "\stats.xml")
+	 If (XA_Load(A_ScriptDir "\stats.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+		{
+		 MsgBox, 16, Stats, Stats.xml seems to be corrupt, starting new empty Stats.
+		 FileDelete, %A_ScriptDir%\Stats.xml
+		 Stats_Create()
+		}
 	 Settings_Default()
 	}
 

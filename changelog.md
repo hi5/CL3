@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.98
+
+* Modified XA to account for empty XML files due to previous instance of CL3 not being able to save XML data correctly (system crash, forced shutdown, etc) - https://github.com/hi5/CL3/issues/15
+* Fix (attempt) error "This picture is too large and will be truncated" in Excel (Check for CF_METAFILEPICT in clipboard)
+* oldtext, ttext cleanup ...
+
 ### v1.97
 
 * New setting: CopyDelay to set time in milliseconds to wait before adding a copy of a new clipboard entry to the CL3 history.  

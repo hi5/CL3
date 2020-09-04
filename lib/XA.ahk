@@ -1,13 +1,19 @@
 ﻿/*
 
-Save/Load Arrays - trueski - http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/
+Save/Load Arrays - trueski
+- original source  : http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/
+- Updated source   : https://github.com/hi5/XA (see notes)
+  AutoHotkey forum : https://autohotkey.com/boards/viewtopic.php?f=6&t=34849  
 
 Examples:
 
 XA_Save("Array", Path) ; put variable name in quotes
 XA_Load(Path)          ; the name of the variable containing the array is returned
 
-Note: indented code to personal pref.
+Notes:
+- indented code to personal pref.
+- added XA_CleanInvalidChars()
+- added InStr(XMLText,"<?xml") to prevent error when trying to read empty XML file (20200904)
 
 */
 
@@ -21,18 +27,22 @@ XA_Save(Array, Path) {
 
 XA_Load(Path) {
 	 Local XMLText, XMLObj, XMLRoot, Root1, Root2
-  
+	
 	 If (!FileExist(Path))
 		Return 1
-	
+
 	 FileRead, XMLText, % Path
+
+	 If !InStr(XMLText,"<?xml")
+		Return 1
+
 	 StringReplace, XMLText, XMLText, %A_Space%&%A_Space%, %A_Space%&amp;%A_Space%, All ; dirty hack
-  
+	
 	 XMLObj	:= XA_LoadXML(XMLText)
 	 XMLObj	:= XMLObj.selectSingleNode("/*") ; */
-	 XMLRoot   := XMLObj.nodeName
+	 XMLRoot:= XMLObj.nodeName
 	 %XMLRoot% := XA_XMLToArray(XMLObj.childNodes)
-  
+
 	 Return XMLRoot
 	}
 
@@ -51,7 +61,7 @@ XA_XMLToArray(nodes, NodeName="") {
 		
 		 else ;VALUE
 			Obj := node.nodeValue
-		 
+		
 		 if node.hasChildNodes
 			{
 			 ; Same node name was used for multiple nodes
@@ -64,7 +74,7 @@ XA_XMLToArray(nodes, NodeName="") {
 					 ItemCount := 0
 					}
 				 ItemCount++
-			  
+			
 				 ; Use the supplied ID if available
 				 If (node.getAttribute("id") != "")
 					Obj[NodeName][node.getAttribute("id")] := XA_XMLToArray(node.childNodes, node.getAttribute("id"))
@@ -73,13 +83,13 @@ XA_XMLToArray(nodes, NodeName="") {
 				 Else
 					Obj[NodeName][ItemCount] := XA_XMLToArray(node.childNodes, ItemCount)
 					}
-		
+
 			 Else
 				Obj.Insert(NodeName, XA_XMLToArray(node.childNodes, NodeName))
 			}
+		}
+	 Return Obj
 	}
-   Return Obj
-}
 
 XA_LoadXML(ByRef data){
 	 o := ComObjCreate("MSXML2.DOMdocument.6.0")
@@ -94,20 +104,20 @@ XA_ArrayToXML(theArray, tabCount=1, NodeName="") {
 	 tabSpace := "" 
 	 extraTabSpace := "" 
 	 theXML := ""
-	
+
 	 if (!IsObject(theArray)) 
 		{
 		 root := theArray
 		 theArray := %theArray%
 		 ; StringReplace, theArray, theArray, %A_Space%&%A_Space%, %A_Space%&amp;%A_Space%, All ; dirty hack
 		}
-	
+
 	While (A_Index < tabCount) 
 		{
 		 tabSpace .= "`t" 
 		 extraTabSpace := tabSpace . "`t"
-		} 
-	 
+		}
+
 	 for tag, val in theArray 
 		{
 		 If (!IsObject(val))
@@ -117,7 +127,7 @@ XA_ArrayToXML(theArray, tabCount=1, NodeName="") {
 			 Else
 				theXML .= "`n" . tabSpace . "<" . tag . ">" . XA_XMLEncode(val) . "</" . tag . ">"
 			}
-		
+
 		 Else
 			{
 			 If (XA_InvalidTag(tag))
@@ -126,7 +136,7 @@ XA_ArrayToXML(theArray, tabCount=1, NodeName="") {
 				theXML .= "`n" . tabSpace . "<" . tag . ">" . "`n" . XA_ArrayToXML(val, tabCount, "") . "`n" . tabSpace . "</" . tag . ">"
 			}
 		} 
-	
+
 	 theXML := SubStr(theXML, 2)
 	 Return theXML
 	}
@@ -136,22 +146,22 @@ XA_InvalidTag(Tag) {
 	 Chars3	 := SubStr(Tag, 1, 3)
 	 StartChars := "~``!@#$%^&*()_-+={[}]|\:;""'<,>.?/1234567890 	`n`r"
 	 Chars := """'<>=/ 	`n`r"
-	
+
 	 Loop, Parse, StartChars
 		{
 		 If (Char1 = A_LoopField)
 			Return 1
 		}
-	
+
 	 Loop, Parse, Chars
 		{
 		 If (InStr(Tag, A_LoopField))
 			Return 1
 		}
-	
+
 	 If (Chars3 = "xml")
 		Return 1
-	  
+	
 	 Return 0
 	}
 
@@ -167,7 +177,7 @@ XA_XMLEncode(Text) {
 	 StringReplace, Text, Text, ", &quot;, All
 	 StringReplace, Text, Text, ', &apos;, All
 	 Return XA_CleanInvalidChars(Text)                  ; additional fix see below for reference 
-	}	
+	}
 
 XA_CleanInvalidChars(text, replace="") {
 		re := "[^\x09\x0A\x0D\x20-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]"
@@ -183,6 +193,6 @@ XA_CleanInvalidChars(text, replace="") {
 		    string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]"; 
 		    return Regex.Replace(text, re, ""); 
 			}
-		*/	
-		
-	}	
+		*/
+
+	}

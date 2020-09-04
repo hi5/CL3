@@ -1,10 +1,12 @@
 ﻿/*
 
 Plugin            : AutoReplace()
-Version           : 1.4
+Version           : 1.6
 CL3 version       : 1.4
 
 History:
+- 1.6 Attempt to prevent XMLRoot error - https://github.com/hi5/CL3/issues/15
+- 1.5 Optional tray menu "replace actions" indicator
 - 1.4 Added fixed setting for Bypass (excell.exe) to avoid problems pasting content in Excel, default setting inactive
 - 1.3 Added A_Space/A_Tab/%A_Space%/%A_Tab% for space/tab Replacement
 - 1.2 Added 'Try' as a fix for rare issue
@@ -16,7 +18,12 @@ If !IsObject(AutoReplace)
 	{
 	 IfExist, %A_ScriptDir%\ClipData\AutoReplace\AutoReplace.xml
 		{
-		 XA_Load(A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml") ; the name of the variable containing the array is returned
+		 If (XA_Load(A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+			{
+			 MsgBox, 16, AutoReplace, AutoReplace.xml seems to be corrupt, starting a new empty AutoReplace.xml.
+			 FileDelete, %A_ScriptDir%\ClipData\AutoReplace\AutoReplace.xml
+			 AutoReplace:=[]
+			}
 		}
 	 else
 		{
@@ -131,14 +138,14 @@ AutoReplace()
 	{
 	 global AutoReplace,IconExe
 	 if !AutoReplace.Settings.Active ; bypass AutoReplace
-	 	Return
+		Return
 	 if RegExMatch(IconExe, "im)\\(" StrReplace(AutoReplace.Settings.Bypass,",","|") ")$") ; bypass AutoReplace
-	 	Return
+		Return
 	 ClipStore:=ClipboardAll ; store all formats
 	 ClipStoreText:=Clipboard ; store text
 
 	 OnClipboardChange("FuncOnClipboardChange", 0)
-
+	 ChangedClipboard:=0,OutputVarCount:=0
 	 for k, v in AutoReplace
 	 {
 		if (v.type = "0") or (v.type = "")
@@ -147,28 +154,33 @@ AutoReplace()
 				{
 				 ReplaceString:=v.replace
 				 if ReplaceString = %A_Space%
-				 	ReplaceString:=" "
+					ReplaceString:=" "
 				 else if ReplaceString = A_Space
-				 	ReplaceString:=" "
+					ReplaceString:=" "
 				 if ReplaceString = %A_Tab%
-				 	ReplaceString:=" "
+					ReplaceString:="	"
 				 else if ReplaceString = A_Tab
-				 	ReplaceString:="	"
-				 Clipboard:=StrReplace(Clipboard, v.find, ReplaceString)
+					ReplaceString:="	"
+				 Clipboard:=StrReplace(Clipboard, v.find, ReplaceString, OutputVarCount)
+				 If OutputVarCount
+					ChangedClipboard:=1
 				}
 			}
 		else if (v.type = "1")
 			{
 			 Try
-			 	{
-				 Clipboard:=RegExReplace(Clipboard, v.find, v.replace)
-			 	}
+				{
+				 Clipboard:=RegExReplace(Clipboard, v.find, v.replace, OutputVarCount)
+				 If OutputVarCount
+					ChangedClipboard:=1
+				}
 			}
 	 }
 	 if (Clipboard = ClipStoreText) ; if we haven't actually modified the text make sure we restore all formats
-	 	Clipboard:=ClipStore
+		 Clipboard:=ClipStore
 	 ClipStore:=""
-
+	 If ChangedClipboard
+		 TrayTip, CL3AutoReplace, 1
 	 OnClipboardChange("FuncOnClipboardChange", 1)
 
 	}
