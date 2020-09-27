@@ -31,7 +31,7 @@ Example:
 
 **Format:**
 
-You can define how a new entry to a new entry that will be append to a Notes file will look in  
+Define the format of a new entry that will be append to a Notes file will look in  
 `ClipData\Notes\NotesTemplate.txt`
 
 This is a simple text file with a number of special variables:

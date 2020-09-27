@@ -66,11 +66,17 @@ Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 Gui Settings:Add,  GroupBox, xp+110 y20 w100 h352                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
-Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_cmdr        , %hk_cmdr%
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_cmdr        , %hk_cmdr%
 Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateNotes          , notes plugin
-Gui Settings:Add,  Edit    , xp+20 yp+20 w60 h20 vhk_notes       , %hk_notes%
-Gui Settings:Add,  Checkbox, xp-20 yp+30 vShowLines              , Show lines
-Gui Settings:Add,  Text    , xp    yp+30                         , Clipchain HK:
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_notes       , %hk_notes%
+Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateBackup         , Auto Backup
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vBackupTimer Number, %BackupTimer%
+Gui Settings:Add,  Checkbox, xp-20 yp+25 vShowLines              , Show lines
+
+LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vLineFormat     , %LineFormat%
+Gui Settings:Add,  Checkbox, xp-20 yp+30 vAutoReplaceTrayTip     , AutoRepl. TT
+Gui Settings:Add,  Text    , xp    yp+25                         , Clipchain HK:
 Gui Settings:Add,  Edit    , xp    yp+20 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
 Gui Settings:Add,  Text    , xp    yp+30                         , Bypass AutoRepl.`npaste [1st entry]:
 Gui Settings:Add,  Edit    , xp    yp+30 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
@@ -88,8 +94,12 @@ If ActivateNotes
 	GuiControl,, ActivateNotes, 1
 If ActivateCmdr
 	GuiControl,, ActivateCmdr, 1
+If ActivateBackup
+	GuiControl,, ActivateBackup, 1
 If ShowLines
 	GuiControl,, ShowLines, 1
+If AutoReplaceTrayTip
+	GuiControl,, AutoReplaceTrayTip, 1
 
 ;Gui Settings:Add,  GroupBox, xp-8 yp+30 w100 h168                , Info
 ;Gui Settings:Font, s6
@@ -150,9 +160,15 @@ IniWrite, %MenuWidth%          , %ini%, Settings, MenuWidth
 IniWrite, %SearchWindowWidth%  , %ini%, Settings, SearchWindowWidth
 IniWrite, %SearchWindowHeight% , %ini%, Settings, SearchWindowHeight
 IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
+IniWrite, %ActivateBackup%     , %ini%, settings, ActivateBackup
+IniWrite, %BackupTimer%        , %ini%, settings, BackupTimer
 IniWrite, %ShowLines%          , %ini%, Settings, ShowLines
+IniWrite, %AutoReplaceTrayTip% , %ini%, Settings, AutoReplaceTrayTip
 IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
 IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
+
+LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
+IniWrite, %LineFormat%         , %ini%, settings, LineFormat
 
 IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
 IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr

@@ -5,11 +5,11 @@ CCMDR is an optional "expert" plugin which allows for (batch) operations on Clip
 Notes:
 
 - You need to Activate this plugin via the Settings first (tick the checkbox)
-- Default hotkey: <kbd>#</kbd>+<kbd>j</kbd> (can be change in settings)
+- Default hotkey: <kbd>#</kbd>+<kbd>j</kbd> (change in settings)
 
 General:
 
-After pressing the CCMDR hotkey a small input Gui will appear - press ESC or Hotkey again to close.  
+After pressing the CCMDR hotkey, a small input Gui will appear - press ESC or Hotkey again to close.  
 
 Each "cmd" will consist of an "Action" by typing one or more letters followed by an "Index" or "Index Range".
 
@@ -66,7 +66,7 @@ Examples:
 `u2`   will set the 2nd item in the CL3 Clipboard history to upper case - "b" in the CL3 menu  
 `u1-5` will set the first five entries (1 to 5) in the CL3 Clipboard history to upper case - "a" to "e" in the CL3 menu
 
-# S
+### S
 
 s : "Store in Slot (1-10)" store Current clipboard contents in Slot 1 to 10
 
@@ -74,7 +74,7 @@ Example:
 
 `s5` will make the current clipboard contents the 5th slot, you can paste this with <kbd>Right Control</kbd>+<kbd>5</kbd> - see Slots in the docs
 
-# B
+### B
 
 b :"Burst seperator (\n, \t, \\, char or word)"  
 rb: "Reverse burst"

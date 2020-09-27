@@ -92,7 +92,7 @@ Return
 
 Command(cmd)
 	{
-	 global History,Slots
+	 global History,History_Save,Slots
 	 cmd:=trim(cmd," ")
 	 Command:=SubStr(cmd,1,1)
 	 if (Command = "r") ; for burst, paste
@@ -135,6 +135,7 @@ Command(cmd)
 		 if RegExMatch(cmd,"\b1\b") ; if we've modified the current clipboard ensure we update it 
 			Clipboard:=History[1].text
 
+		 History_Save:=1
 		 OnClipboardChange("FuncOnClipboardChange", 1)
 
 		 return
@@ -155,7 +156,9 @@ Command(cmd)
 				SlotID:=0
 			 if SlotID between 0 and 9
 				{
+				 XMLSave("Slots","-" A_Now)
 				 Slots[SlotID]:=History[1].text
+				 XMLSave("Slots")
 				 GuiControl, Slots:Text, Slot%SlotID%, % History[1].text ; update gui which we already setup in the Slots plugins
 				}
 			 else
@@ -184,6 +187,7 @@ Command(cmd)
 			 OnClipboardChange("FuncOnClipboardChange", 0)
 			 Clipboard:=History[1].text
 			 OnClipboardChange("FuncOnClipboardChange", 1)
+			 History_Save:=1
 			 Gosub, Checkhistory
 			}
 		}
@@ -291,6 +295,7 @@ Command(cmd)
 				to:=cmdrAsc2Number(to)
 			 to-=from-1
 			 History.RemoveAt(from,to)
+			 History_Save:=1
 			 return
 			}
 

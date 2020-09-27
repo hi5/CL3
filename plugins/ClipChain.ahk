@@ -121,6 +121,8 @@ Return
 ClipChainPasteDoubleClick:
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
+If ClipChainPause
+	Return
 If (ClipChainIndex > ClipChainData.MaxIndex())
 	{
 	 ClipChainIndex:=1
@@ -255,6 +257,7 @@ ClipChainPauseStore:=""
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 ClipChainGuiTitle:=""
 Gosub, ClipChainSet
+XMLSave("ClipChainData")
 Return
 
 ClipChainInsertGui:
@@ -276,6 +279,7 @@ Gui, ClipChainInsertGui:Show, , %ClipChainGuiTitle%
 Return
 
 ClipChainDel:
+XMLSave("ClipChainData","-" A_Now)
 ClipChainDataIndex:=""
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
@@ -290,6 +294,7 @@ If (ClipChainData.Length() <> 0)
 	ClipChainData.RemoveAt(ClipChainDataIndex)
 Gosub, ClipChainUpdateIDX
 Gosub, ClipChainSet
+XMLSave("ClipChainData")
 Return
 
 ClipChainCheckboxes:
@@ -316,6 +321,7 @@ Gosub, ClipChainUpdateIndicator
 Return
 
 ClipChainLoad:
+XMLSave("ClipChainData","-" A_Now)
 ClipChainData:=RegExReplace(Clipboard,"m)^\s+$") ; v1.1 remove white space from empty lines
 If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first entry, could mess up a filepath...
 	ClipChainData:=SubStr(ClipChainData,2)
@@ -329,6 +335,7 @@ LV_Delete()
 for k,v in ClipChainData
 	LV_Add("", "", ClipChainHelper(v), A_Index)
 LV_Modify(1,"Col1", "||")
+XMLSave("ClipChainData")
 Return
 
 ClipChainHelper(in) {
@@ -373,7 +380,6 @@ IniWrite, %ClipChainNoHistory%   , %A_ScriptDir%\ClipData\ClipChain\ClipChain.in
 IniWrite, %ClipChainTrans%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainTrans
 IniWrite, %ClipChainPause%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause
 Return
-
 
 ClipChainMoveUp:
 ClipChainLvHandle.Move(1) ; Move selected rows up.

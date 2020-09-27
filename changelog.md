@@ -1,5 +1,18 @@
 # Changelog
 
+### v1.99
+
+* New setting: Exclude programs so copied text will not be added to the clipboard history (useful for password managers for example).  
+  A "*" is added to the Menu and "Cycle" tooltips for the first entry (a*.) to indicate the current clipboard has different content as to what is shown.  
+  Selecting 'a*' will still paste the selected text, not the actual current clipboard.
+* New setting: Lineformat (edit control under "Show Lines") \t placeholder for tab to right align, \l placeholder for number of lines.  
+  Default: \t(\l line),\t(\l lines)
+  Comma separated for single and multiple lines.
+* New setting: Show "TrayTip" using OSDTIP_Pop when AutoReplace has been executed on a new clipboard entry.
+* New setting: Auto Backup every X Minutes - automatically backup History. ClipChain, AutoReplace, and Slots only when there is an edit. Keep 5 most recent copies - saved as *.xml.bak in respective ClipData folders.
+* Update XA - https://github.com/hi5/XA
+* Fix ClipChain "Pause" should work correctly now while pressing hotkey (didn't work after v1.95 update of hotkey setup it seems)
+
 ### v1.98
 
 * Modified XA to account for empty XML files due to previous instance of CL3 not being able to save XML data correctly (system crash, forced shutdown, etc) - https://github.com/hi5/CL3/issues/15

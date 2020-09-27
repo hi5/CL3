@@ -20,11 +20,22 @@ Settings()
 	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
 	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
+	 IniRead, AutoReplaceTrayTip , %ini%, settings, AutoReplaceTrayTip, 0
 	 IniRead, CopyDelay          , %ini%, settings, CopyDelay, 0
 	 IniRead, PasteDelay         , %ini%, settings, PasteDelay, 50
 	 IniRead, ActivateApi        , %ini%, settings, ActivateApi, 0
+	 IniRead, ActivateBackup     , %ini%, settings, ActivateBackup, 0
+	 IniRead, BackupTimer        , %ini%, settings, BackupTimer, 10
+	 IniRead, Exclude            , %ini%, settings, Exclude, 0
+	 IniRead, LineFormat         , %ini%, settings, LineFormat, \t(\l line),\t(\l lines)
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
 	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
+	 If (Exclude = 0) or (Exclude = "Error")
+		Exclude:=""
+	 StringLower, Exclude, Exclude
+
+	 LineTextFormat:=StrSplit(StrReplace(LineFormat,"\t",A_Tab),",")
+
 	 SettingsObj:={"MaxHistory":MaxHistory,"ActivateCmdr":ActivateCmdr}
 	 If (XA_Load(A_ScriptDir "\stats.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 		{
@@ -70,8 +81,11 @@ Settings_Default()
 		, SearchWindowHeight: 300
 		, ActivateApi       : 0
 		, ShowLines         : 1
+		, AutoReplaceTrayTip: 0
 		, CopyDelay         : 0 
-		, PasteDelay        : 50 }
+		, PasteDelay        : 50 
+		, Exclude           : ""
+		, LineFormat        : "\t(\l line),\t(\l lines)" }
 
 	}
 	
@@ -153,10 +167,10 @@ Settings_Hotkeys()
 	 Hotkey, %hk_cmdr%                               , hk_cmdr
 	 Hotkey, %hk_notes%                              , hk_notes
 	 if !ActivateCmdr
-	 	Hotkey, %hk_cmdr%, off
+		Hotkey, %hk_cmdr%, off
 	 if !ActivateNotes
-	 	Hotkey, %hk_notes%, off
- 	}
+		Hotkey, %hk_notes%, off
+	}
 
 Settings_menu:
 #Include %A_ScriptDir%\lib\SettingsGui.ahk

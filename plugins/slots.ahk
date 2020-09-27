@@ -96,13 +96,14 @@ Return
 
 SlotsSave:
 Gui, Slots:Submit, Hide
+XMLSave("Slots","-" A_Now)
 Index:=0
 Loop, 10
 	{
 	 Slots[Index]:=Slot%Index%
 	 Index++
 	}
-XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml") ; put variable name in quotes
+XMLSave("Slots")
 Return
 
 SlotsSaveAs:
@@ -115,6 +116,7 @@ If (SaveAsName = "")
 	 Gui, Slots:Show
 	 Return
 	}
+XMLSave("Slots","-" A_Now)
 Index:=0
 Loop, 10
 	{
@@ -140,6 +142,7 @@ Menu, SlotsMenu, Show
 Return
 
 MenuHandlerSlots:
+XMLSave("Slots","-" A_Now)
 Slots:=[]
 If (XA_Load(A_ScriptDir "\ClipData\Slots\" A_ThisMenuItem) = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 	{

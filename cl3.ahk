@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.98
+Version     : 1.99
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -37,7 +37,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.98"
+version:="v1.99"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -50,13 +50,9 @@ ClipboardHistoryToggle:=0
 TemplateClip:=0
 ;CyclePluginClip:=0
 
-iconA:="icon-a.ico"
-iconC:="icon-c.ico"
-iconS:="icon-s.ico"
-iconT:="icon-t.ico"
-iconX:="icon-x.ico"
-iconY:="icon-y.ico"
-iconZ:="icon-z.ico"
+iconlist:="a,c,s,t,x,y,z"
+loop, parse, iconlist, CSV
+	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 Pause, Off
 Suspend, Off
@@ -144,6 +140,9 @@ StringUpper, templatesfolderlist, templatesfolderlist
 
 OnClipboardChange("FuncOnClipboardChange")
 
+If ActivateBackup
+	SetTimer, Backup, % BackupTimer*60000 ; minutes
+
 /*
 FILE_NOTIFY_CHANGE_FILE_NAME   = 1   (0x00000001) : Notify about renaming, creating, or deleting a file.
 FILE_NOTIFY_CHANGE_DIR_NAME    = 2   (0x00000002) : Notify about creating or deleting a directory.
@@ -217,7 +216,7 @@ $^v:: ; v1.91, $ for v1.95 (due to clipchain updates)
 hk_clipchainpaste_defaultpaste:
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI") or ClipChainPause
 	{
-	 PasteIt()
+	 PasteIt("normal")
 	 Return
 	}
 If WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
@@ -243,8 +242,11 @@ ClipCycleFirst:=1
 While GetKeyState(hk_cyclemodkey,"D") and cyclebackward
 	{
 ;	 If !(PreviousClipCycleCounter = ClipCycleCounter) and (oldttext <> ttext)
+	 Indicator:=""
+	 If (ClipCycleCounter = 1) and (ClipboardPrivate = 1)
+		Indicator:="*"
 	 If (ClipCycleCounter <> 0)
-		ttext:=% Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text)
+		ttext:=% Chr(96+ClipCycleCounter) Indicator " : " DispToolTipText(History[ClipCycleCounter].text)
 	 else
 		ttext:="[cancelled]"
 	 If (oldttext <> ttext)
@@ -288,8 +290,11 @@ If (ClipCycleCounter < 1)
 While GetKeyState(hk_cyclemodkey,"D") and cycleforward
 	{
 ;	 If !(PreviousClipCycleCounter = ClipCycleCounter) and (oldttext <> ttext)
+	 Indicator:=""
+	 If (ClipCycleCounter = 1) and (ClipboardPrivate = 1)
+		Indicator:="*"
 	 If (ClipCycleCounter <> 0)
-		ttext:=% Chr(96+ClipCycleCounter) " : " DispToolTipText(History[ClipCycleCounter].text)
+		ttext:=% Chr(96+ClipCycleCounter) Indicator " : " DispToolTipText(History[ClipCycleCounter].text)
 	 else
 		ttext:="[cancelled]"
 	 If (oldttext <> ttext)
@@ -383,9 +388,12 @@ for k, v in History
 	 text:=v.text
 	 icon:=v.icon
 	 lines:=v.lines
+	 Indicator:=""
 	 if (icon = "")
 		icon:="res\" iconA
- 	 key:=% "&" Chr(96+A_Index) ". " DispMenuText(SubStr(text,1,500),lines)
+	 If (A_Index=1) and (ClipboardPrivate = 1) ; indicate to user clipboard has different data as first entry in history (excluded programs)
+		Indicator:="*"
+	 key:=% "&" Chr(96+A_Index) Indicator ". " DispMenuText(SubStr(text,1,500),lines)
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 if (k = 1)
 		Menu, ClipMenu, Default, %key%
@@ -533,11 +541,11 @@ Return
 
 DispMenuText(TextIn,lines="1")
 	{
-	 global MenuWidth,ShowLines
+	 global MenuWidth,ShowLines,LineTextFormat
 	 if (lines=1)
-		linetext:=" line)"
+		linetext:=LineTextFormat[1]
 	 else
-		linetext:=" lines)"
+		linetext:=LineTextFormat[2]
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
@@ -546,10 +554,9 @@ DispMenuText(TextIn,lines="1")
 		{
 		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...	
 		}
+	 TextOut .= " " Chr(171)
 	 if ShowLines
-		TextOut .= " " Chr(171) " (" Lines linetext ; 171 << 
-	 else
-		TextOut .= " " Chr(171) 
+		TextOut .= StrReplace(linetext,"\l",lines)
 	 Return LTRIM(TextOut," `t")
 	}
 
@@ -564,9 +571,9 @@ DispToolTipText(TextIn,Format=0)
 	 Return TextOut
 	}
 
-PasteIt()
+PasteIt(source="")
 	{
-	 global StartTime,PasteTime,ActiveWindowID,oldttext,ttext
+	 global StartTime,PasteTime,ActiveWindowID,oldttext,ttext,ClipboardOwnerProcessName,ClipboardPrivate
 	 StartTime:=A_TickCount
 	 If ((StartTime - PasteTime) < 75) ; to prevent double paste after using #f/#v in combination
 		Return
@@ -576,7 +583,10 @@ PasteIt()
 		Sleep % PasteDelay
 	 Send ^v
 	 PasteTime := A_TickCount
-	 oldttext:="", ttext:="", ActiveWindowID:=""
+	 oldttext:="", ttext:="", ActiveWindowID:="",ClipboardOwnerProcessName:=""
+
+	 If (source <> "normal")
+		ClipboardPrivate:=0
 	}
 
 
@@ -711,12 +721,30 @@ FuncOnClipboardChange() {
 If (A_EventInfo <> 1)
 	Return
 
+;ProcesshWnd:=DllCall("GetClipboardOwner", Ptr) ; may not work for all Executables
+WinGet, ClipboardOwnerProcessName, ProcessName, % "ahk_id " DllCall("GetClipboardOwner", Ptr)
+
+If (ClipboardOwnerProcessName = "")
+	WinGet, ClipboardOwnerProcessName, ProcessName, A
+
+StringLower, ClipboardOwnerProcessName, ClipboardOwnerProcessName ; just in case process has mixed case "KeePass.exe" - Exclude is set to lowercase after IniRead (lib\settings.ahk)
+
+if ClipboardOwnerProcessName in %Exclude%
+	{
+	 ClipboardOwnerProcessName:="",ClipboardPrivate:=1
+	 Return
+	}
+else
+	ClipboardOwnerProcessName:="", ClipboardPrivate:=0
+
 If CopyDelay
 	Sleep % CopyDelay
 
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text
 	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1})
+
+History_Save:=1
 
 ; no longer used v1.95
 ;If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
@@ -874,13 +902,20 @@ Else If (Trim(A_ThisMenuItem) = "Exit")
 Return
 
 SaveSettings:
+SetTimer, Backup, Off
+
+;If (A_TimeIdle > BackupTimer*60000) ; no need to backup if there was no input
+;	Return
+
 While (History.MaxIndex() > MaxHistory)
 	History.remove(History.MaxIndex())
+
 XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable name in quotes
-XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml")
-XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
-XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 XA_Save("stats", A_ScriptDir "\stats.xml")
+
+;XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml")
+;XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
+;XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
 
 If ActivateApi
 	ObjRegisterActive(CL3API, "")
@@ -888,5 +923,71 @@ If ActivateApi
 Sleep 100
 
 ExitApp
+
+XMLSave(savelist,id="")
+	{
+	 global
+	 local keeplist,objectname,objectfile,ext
+
+	 If !ActivateBackup and (id <> "")
+		Return
+	 if id
+		ext:=".xml.bak"
+	 else
+		ext:=".xml"
+
+	 Loop, parse, savelist, CSV
+		{
+		 If (A_LoopField = "stats")
+			{
+			 XA_Save("stats", A_ScriptDir "\stats.xml")
+			 Continue
+			}
+		 If (A_LoopField = "ClipChainData")
+			{
+			 objectname:="ClipChainData"
+			 objectfile:="ClipChain" id ext
+			}
+		 else
+			{
+			 objectname:=A_LoopField
+			 objectfile:=A_LoopField id ext
+			}
+		 If (objectname = "ClipChainData")
+			XA_Save(objectname, A_ScriptDir "\ClipData\ClipChain\" objectfile)
+		 else
+			XA_Save(objectname, A_ScriptDir "\ClipData\" objectname "\" objectfile)
+		}
+
+		; keep only the 5 most recent backups
+		Loop, parse, % "History,Slots,ClipChain,AutoReplace", CSV
+			{
+			 keeplist:=""
+			 Loop, Files, %A_ScriptDir%\ClipData\%A_LoopField%\*.bak
+				keeplist .= A_LoopFileFullPath "`n"
+			 Sort, keeplist, RN
+			 ;MsgBox, %keeplist% ; debug
+			 Loop, parse, keeplist, `n, `r
+				{
+				 If (A_Index < 6)
+					continue
+				 FileDelete, %A_LoopField%
+				 ;MsgBox, %A_LoopField% ; debug
+				}
+			}
+	}
+
+Backup:
+;If (A_TimeIdle > BackupTimer*60000) ; no need to backup if there was no input
+;	Return
+
+; XMLSave("History","-" A_Now)
+If History_Save
+	{
+	 ; XA_Save("History", A_ScriptDir "\ClipData\History\History-" A_Now ".xml.bak") ; put variable name in quotes
+	 XMLSave("History","-" A_Now)
+	 History_Save:=0
+	}
+Return
 
 #include %A_ScriptDir%\lib\cl3apiclass.ahk

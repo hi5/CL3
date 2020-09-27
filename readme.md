@@ -1,4 +1,4 @@
-# CL3 <sup>v1.98</sup> - Clipboard caching utility
+# CL3 <sup>v1.99</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -144,6 +144,8 @@ it to the history. You can use StringReplace or a Regular Expression. Settings a
 **Note: very experimental plugin. The plugin interface (GUI) needs to refined, entire process should be improved.
 A Listview would be more logical and flexible. But for now it does the job, albeit crudely.**
 
+Feedback available via "Tray Tip" - see settings.
+
 ### ClipChain [v1.5+]
 
 The CL3 ClipChain plugin allows you to cycle through a predefined clipboard history.  
@@ -191,6 +193,11 @@ If you start FIFO at 'D' pressing <kbd>Ctrl</kbd>+<kbd>v</kbd> four times will p
 After pasting the last (here fourth) item, FIFO stops.  
 TrayTips will appear at the start and stop of a FIFO cycle.
 
+### Sort [v1.94+]
+
+Sort via a number of predefined settings or set specific options via small Gui (see "Set Delimeter and other options" in Sort menu).  
+See [Sort](https://www.autohotkey.com/docs/commands/Sort.htm) documentation for explanation.
+
 ## Yank (delete) entry
 
 If you select the yank option in the menu you will be presented with a 
@@ -225,11 +232,11 @@ None really, but feel free to fork and extend the script and send a pull request
 
 Some ideas for further development you may wish to consider:
 
-- Extending the number of menu entries in the secondary menu ("more history")
 - ~~Allow the user to search the extensive history~~ _v1.2+_
+- ~~Exclude certain programs~~ _v1.99+_
+- Extending the number of menu entries in the secondary menu ("more history")
 - Include rich text formats
 - Include images - rough guide to add it (very alpha) here https://www.autohotkey.com/boards/viewtopic.php?p=314319#p314319
-- Exclude certain programs
 - Introduce various paste methods, also for specific programs 
   for example send each character individually
 - More (default) plugins:
@@ -268,6 +275,7 @@ Animations:
 - API: [JSON/JXON](https://github.com/cocobelgica/AutoHotkey-JSON) by cocobelgica
 - Notes: [GetActiveBrowserURL()](https://www.autohotkey.com/boards/viewtopic.php?t=3702) by Antonio Bueno
 - [WatchFolder()](https://github.com/AHK-just-me/WatchFolder) by just me
+- [OSDTIP_Pop()](https://www.autohotkey.com/boards/viewtopic.php?t=76881#p333577) by SKAN
 
 # OCR-TIP
 
@@ -292,7 +300,7 @@ return
 
 - Download from the forum https://www.autohotkey.com/boards/viewtopic.php?p=325660#p325660
 
-You can 'add' it to CL3 as shown above wit the Vis2 example Run ...
+You can 'add' it to CL3 as shown above with the Vis2 example Run ...
 
 Look for the line `msgbox % text` and change it to:
 

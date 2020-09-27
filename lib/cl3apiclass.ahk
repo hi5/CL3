@@ -12,6 +12,7 @@ Version           : 1.0
 CL3 version       : 1.9.4
 
 History:
+- 1.2 backup data Slots, ClipChainData, History
 - 1.1 added State to turn clipboard history on/off
 - 1.0 initial version
 
@@ -57,6 +58,7 @@ class CL3API
 
 	 Chain(Data)
 		{
+		 XMLSave("ClipChainData","-" A_Now) ; put variable name in quotes
 		 ClipChainData:=[]
 		 for k, v in jxon_load(data)
 			ClipChainData.Push(v)
@@ -66,6 +68,7 @@ class CL3API
 
 	 ChainInsertAt(Index,Data)
 		{
+		 XMLSave("ClipChainData","-" A_Now) ; put variable name in quotes
 		 ClipChainData.InsertAt(Index,Data)
 		 Gosub, ClipChainListview
 		 return 1
@@ -73,6 +76,7 @@ class CL3API
 
 	 ChainRemove(Index)
 		{
+		 XMLSave("ClipChainData","-" A_Now) ; put variable name in quotes
 	 	 ClipChainData.Remove(Index)
 		 Gosub, ClipChainListview
 		 return 1
@@ -81,10 +85,12 @@ class CL3API
 	 Slot(SlotID,Data)
 		{
 		 if (SlotID = 10)
-				SlotID:=0
+			SlotID:=0
 		 if SlotID between 0 and 9
 			{
+			 XMLSave("Slots","-" A_Now) ; put variable name in quotes
 			 Slots[SlotID]:=Data
+			 XMLSave("Slots") ; put variable name in quotes
 			 GuiControl, Slots:Text, Slot%SlotID%, % Data ; update gui which we already setup in the Slots plugins
 			}
 		 return 1
@@ -92,6 +98,7 @@ class CL3API
 
 	 Burst(Data,reverse=0)
 		{
+		 XMLSave("History","-" A_Now) ; put variable name in quotes
 		 Loop, % Data.count()
 			{
 			 If !Reverse
@@ -146,14 +153,17 @@ class CL3API
 		{
 		 StrReplace(Data,"`n","`n",Count)
 		 History.InsertAt(Idx,{"text":Data,"IconExe":"","lines":Count+1})
+		 History_Save:=1
 		 return 1
 		}
 
 	 Remove(Data)
 		{
+		 XMLSave("History","-" A_Now) ; put variable name in quotes
 		 for k, v in jxon_load(data)
 			{
 			 History.Remove(k)
+			 History_Save:=1
 			}
 		 return 1
 		}
