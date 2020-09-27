@@ -3,7 +3,7 @@
 Save/Load Arrays - trueski
 - original source  : http://www.autohotkey.com/board/topic/85461-ahk-l-saveload-arrays/
 - Updated source   : https://github.com/hi5/XA (see notes)
-  AutoHotkey forum : https://autohotkey.com/boards/viewtopic.php?f=6&t=34849  
+  AutoHotkey forum : https://autohotkey.com/boards/viewtopic.php?f=6&t=34849
 
 Examples:
 
@@ -13,7 +13,7 @@ XA_Load(Path)          ; the name of the variable containing the array is return
 Notes:
 - indented code to personal pref.
 - added XA_CleanInvalidChars()
-- added InStr(XMLText,"<?xml") to prevent error when trying to read empty XML file (20200904)
+- added InStr(XMLText,"<?xml") and Try/Catch to prevent error when trying to read empty/faulty/non XML file (20200904)
 
 */
 
@@ -37,11 +37,18 @@ XA_Load(Path) {
 		Return 1
 
 	 StringReplace, XMLText, XMLText, %A_Space%&%A_Space%, %A_Space%&amp;%A_Space%, All ; dirty hack
-	
-	 XMLObj	:= XA_LoadXML(XMLText)
-	 XMLObj	:= XMLObj.selectSingleNode("/*") ; */
-	 XMLRoot:= XMLObj.nodeName
-	 %XMLRoot% := XA_XMLToArray(XMLObj.childNodes)
+
+	 Try
+		{
+		 XMLObj	:= XA_LoadXML(XMLText)
+		 XMLObj	:= XMLObj.selectSingleNode("/*") ; */
+		 XMLRoot:= XMLObj.nodeName
+		 %XMLRoot% := XA_XMLToArray(XMLObj.childNodes)
+		}
+	 Catch
+		{
+		 Return 1
+		}
 
 	 Return XMLRoot
 	}
@@ -98,27 +105,27 @@ XA_LoadXML(ByRef data){
 	 return o
 	}
 
-XA_ArrayToXML(theArray, tabCount=1, NodeName="") {	 
+XA_ArrayToXML(theArray, tabCount=1, NodeName="") {
 	 Local tabSpace, extraTabSpace, tag, val, theXML, root
 	 tabCount++
-	 tabSpace := "" 
-	 extraTabSpace := "" 
+	 tabSpace := ""
+	 extraTabSpace := ""
 	 theXML := ""
 
-	 if (!IsObject(theArray)) 
+	 if (!IsObject(theArray))
 		{
 		 root := theArray
 		 theArray := %theArray%
 		 ; StringReplace, theArray, theArray, %A_Space%&%A_Space%, %A_Space%&amp;%A_Space%, All ; dirty hack
 		}
 
-	While (A_Index < tabCount) 
+	While (A_Index < tabCount)
 		{
-		 tabSpace .= "`t" 
+		 tabSpace .= "`t"
 		 extraTabSpace := tabSpace . "`t"
 		}
 
-	 for tag, val in theArray 
+	 for tag, val in theArray
 		{
 		 If (!IsObject(val))
 			{
@@ -135,14 +142,14 @@ XA_ArrayToXML(theArray, tabCount=1, NodeName="") {
 			 Else
 				theXML .= "`n" . tabSpace . "<" . tag . ">" . "`n" . XA_ArrayToXML(val, tabCount, "") . "`n" . tabSpace . "</" . tag . ">"
 			}
-		} 
+		}
 
 	 theXML := SubStr(theXML, 2)
 	 Return theXML
 	}
 
 XA_InvalidTag(Tag) {
-	 Char1	  := SubStr(Tag, 1, 1) 
+	 Char1	  := SubStr(Tag, 1, 1)
 	 Chars3	 := SubStr(Tag, 1, 3)
 	 StartChars := "~``!@#$%^&*()_-+={[}]|\:;""'<,>.?/1234567890 	`n`r"
 	 Chars := """'<>=/ 	`n`r"
@@ -168,15 +175,15 @@ XA_InvalidTag(Tag) {
 ; XA_XMLEncode references:
 ; https://en.wikipedia.org/wiki/XML#Escaping
 ; https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Predefined_entities_in_XML
-; added again as original source code posted at forum was lost due to forum upgrade 
+; added again as original source code posted at forum was lost due to forum upgrade
 
-XA_XMLEncode(Text) { 
+XA_XMLEncode(Text) {
 	 StringReplace, Text, Text, &, &amp;, All
 	 StringReplace, Text, Text, <, &lt;, All
 	 StringReplace, Text, Text, >, &gt;, All
 	 StringReplace, Text, Text, ", &quot;, All
 	 StringReplace, Text, Text, ', &apos;, All
-	 Return XA_CleanInvalidChars(Text)                  ; additional fix see below for reference 
+	 Return XA_CleanInvalidChars(Text)                  ; additional fix see below for reference
 	}
 
 XA_CleanInvalidChars(text, replace="") {
@@ -185,13 +192,13 @@ XA_CleanInvalidChars(text, replace="") {
 
 		/*
 			Source: http://stackoverflow.com/questions/730133/invalid-characters-in-xml
-			public static string CleanInvalidXmlChars(string text) 
-			{ 
-		    // From xml spec valid chars: 
-		    // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]     
-		    // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF. 
-		    string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]"; 
-		    return Regex.Replace(text, re, ""); 
+			public static string CleanInvalidXmlChars(string text)
+			{
+			// From xml spec valid chars:
+			// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+			// any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
+			string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-u10FFFF]";
+			return Regex.Replace(text, re, "");
 			}
 		*/
 
