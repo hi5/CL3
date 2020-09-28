@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.99.1
+
+* Adding correct Settings GUI to Github
+
 ### v1.99
 
 * New setting: Exclude programs so copied text will not be added to the clipboard history (useful for password managers for example).  

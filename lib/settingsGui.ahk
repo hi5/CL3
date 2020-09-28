@@ -59,11 +59,14 @@ Gui Settings:Add,  Text, xp    yp+30                                    , CycleP
 Gosub, UpdateCyclePlugins
 Gui Settings:Add,  Edit, xp-5  yp+15  w125 R9 vEditCyclePlugins , %EditCyclePlugins%
 
-Gui Settings:Add,  Button, x5 yp+140  w100 h25 gSettingsSave     , &Save
+Gui Settings:Add,  GroupBox, x5   yp+140 w416 h55               , Exclude programs (CSV list: program1.exe,program2.exe)
+Gui Settings:Add,  Edit,     xp+8 yp+20  w395 h20 vExclude     , %Exclude%
+
+Gui Settings:Add,  Button, x5 yp+40   w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
 Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
-Gui Settings:Add,  GroupBox, xp+110 y20 w100 h352                , Special
+Gui Settings:Add,  GroupBox, xp+110 y20 w100 h412                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
 Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_cmdr        , %hk_cmdr%
@@ -105,7 +108,7 @@ If AutoReplaceTrayTip
 ;Gui Settings:Font, s6
 ;Gui Settings:Add,  Text    , xp+8 yp+24, CL3 
 
-Gui Show, w545 h380, CL3 Settings - %version%
+Gui Show, w545 h440, CL3 Settings - %version%
 Return
 
 SettingsGuiEscape:
@@ -166,12 +169,14 @@ IniWrite, %ShowLines%          , %ini%, Settings, ShowLines
 IniWrite, %AutoReplaceTrayTip% , %ini%, Settings, AutoReplaceTrayTip
 IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
 IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
+IniWrite, %Exclude%            , %ini%, Settings, Exclude
 
 LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 IniWrite, %LineFormat%         , %ini%, settings, LineFormat
 
 IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
 IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr
+
 
 Sleep 100
 Reload ; if hotkey(s) have changed we'd need to deactivate/reactive all hotkeys, reloading saves us the trouble
