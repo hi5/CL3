@@ -1,5 +1,14 @@
 # Changelog
 
+### v1.100
+
+* New setting: number of entries in "z. More history" (default 26 for a to z), repeating menu accelerators. Use a negative value e.g. -30 to avoid repeating menu accelerators.
+* New setting: second Show Menu hotkey to be able to define mouse button for example (Winkey+LButton).
+* If there are over 26 templates in a folder, repeating menu accelerators (a-z).
+* New: Check if a sub-folder in \templates\ has a "settings.ini" with a "shortcut" key, if so, setup hotkey to show sub-templates menu directly by passing the main menu, templates, folder navigation.
+* Now using CRC32 to avoid duplicate entries, hopefully faster and more efficient.
+* Fix: Compact(ing) adding lines and crc to compacted history as well.
+
 ### v1.99.1
 
 * Adding correct Settings GUI to Github

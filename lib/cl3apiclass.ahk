@@ -8,10 +8,11 @@ using ObjRegisterActive() by Lexikos @ https://www.autohotkey.com/boards/viewtop
 We use JSON Dump/Load to pass on strings from-to CL3 to client script.
 Code by cocobelgica @ https://github.com/cocobelgica/AutoHotkey-JSON
 
-Version           : 1.0
+Version           : 1.3
 CL3 version       : 1.9.4
 
 History:
+- 1.3 added ToggleCheck for tray menu
 - 1.2 backup data Slots, ClipChainData, History
 - 1.1 added State to turn clipboard history on/off
 - 1.0 initial version
@@ -26,11 +27,13 @@ class CL3API
 		 if toggle in on,true,1
 			{
 			 OnClipboardChange("FuncOnClipboardChange", 1)
+			 Menu, tray, ToggleCheck, &Pause clipboard history
 			 Menu, Tray, Icon, res\cl3.ico
 			}
 		 else if toggle in off,false,0
 				{
 				 OnClipboardChange("FuncOnClipboardChange", 0)
+				 Menu, tray, ToggleCheck, &Pause clipboard history
 				 Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
 				}
 		}

@@ -17,6 +17,7 @@ Settings()
 	 Stats_Create()
 	 IniRead, MaxHistory         , %ini%, settings, MaxHistory, 150
 	 IniRead, MenuWidth          , %ini%, settings, MenuWidth, 40
+	 IniRead, MoreHistory        , %ini%, settings, MoreHistory, 18
 	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
 	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
@@ -51,6 +52,7 @@ Settings_Default()
 	 global
  	 Settings_Plugins:={ Plugins : "Title`,Lower`,Upper`,LowerReplaceSpace" }
 	 Settings_Hotkeys:={ hk_menu         :"^!v"
+		, hk_menu2         :""
 		, hk_plaintext     :"^+v"
 		, hk_slots         :"^#F12"
 		, hk_clipchain     :"^#F11"
@@ -77,6 +79,7 @@ Settings_Default()
 		, hk_cmdr          :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
 		, MenuWidth         : 40
+		, MoreHistory       : 26
 		, SearchWindowWidth : 595
 		, SearchWindowHeight: 300
 		, ActivateApi       : 0
@@ -117,6 +120,7 @@ Settings_Hotkeys()
 	 ini:=A_ScriptDir "\settings.ini"
 
 	 IniRead, hk_menu          , %ini%, Hotkeys, hk_menu          ,^!v
+	 IniRead, hk_menu2         , %ini%, Hotkeys, hk_menu2         ,ERROR
 	 IniRead, hk_plaintext     , %ini%, Hotkeys, hk_plaintext     ,^+v
 	 IniRead, hk_slots         , %ini%, Hotkeys, hk_slots         ,^#F12
 	 IniRead, hk_clipchain     , %ini%, Hotkeys, hk_clipchain     ,^#F11
@@ -133,6 +137,8 @@ Settings_Hotkeys()
 	 IniRead, hk_BypassAutoReplace, %ini%, Hotkeys, hk_BypassAutoReplace
 	 If (hk_BypassAutoReplace = "ERROR")
 	 	hk_BypassAutoReplace:=""
+	 If (hk_menu2 = "ERROR")
+	 	hk_menu2:=""
 
 	 Loop, 10
 		{
@@ -142,6 +148,8 @@ Settings_Hotkeys()
 		}
 
 	 Hotkey, %hk_menu%             , hk_menu
+	 If hk_menu2
+	 	Hotkey, %hk_menu2%           , hk_menu2
 	 Hotkey, %hk_plaintext%        , hk_plaintext
 	 Hotkey, %hk_clipchain%        , hk_clipchain
 	 If (hk_BypassAutoReplace <> "")

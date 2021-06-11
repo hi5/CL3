@@ -97,6 +97,7 @@ If (id = 1)
 OnClipboardChange("FuncOnClipboardChange", 1)
 StrReplace(ClipText, "`n", "`n", Count)
 History[id,"lines"]:=Count+1
+History[id,"crc"]:=crc32(ClipText)
 ClipText:=""
 ChooseID:=ID
 id:=""

@@ -1,4 +1,4 @@
-# CL3 <sup>v1.99.1</sup> - Clipboard caching utility
+# CL3 <sup>v1.100</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -78,7 +78,13 @@ entries by naming your files in the order you wish them to appear.
 As of v1.9+ Templates now support sub-folders. A Sub-folder will be added as a
 sub-menu entry and its text files processed as described above. If a "favicon.ico"
 is present in a sub-folder it will be used in the Templates Menu, otherwise it
-will use the default Template icon (res\icon-t.ico)
+will use the default Template icon (res\icon-t.ico)  
+As of v1.100+: Add `settings.ini` to (each) sub-folder with a shortcut key (AutoHotkey syntax) to be able to display the templates in the sub-folder directly to avoid the need to bring up the main menu (allowing for faster access)
+
+```ini
+[settings]
+shortcut=#Numpad8
+```
 
 **Note**: there is one default entry in the Templates menu: "_0. Open templates folder_"
 which will open the templates folder in Total Commander - if it is running - or 
@@ -234,7 +240,7 @@ Some ideas for further development you may wish to consider:
 
 - ~~Allow the user to search the extensive history~~ _v1.2+_
 - ~~Exclude certain programs~~ _v1.99+_
-- Extending the number of menu entries in the secondary menu ("more history")
+- ~~Extending the number of menu entries in the secondary menu ("more history")~~ _v1.100+_
 - Include rich text formats
 - Include images - rough guide to add it (very alpha) here https://www.autohotkey.com/boards/viewtopic.php?p=314319#p314319
 - Introduce various paste methods, also for specific programs 
@@ -276,6 +282,7 @@ Animations:
 - Notes: [GetActiveBrowserURL()](https://www.autohotkey.com/boards/viewtopic.php?t=3702) by Antonio Bueno
 - [WatchFolder()](https://github.com/AHK-just-me/WatchFolder) by just me
 - [OSDTIP_Pop()](https://www.autohotkey.com/boards/viewtopic.php?t=76881#p333577) by SKAN
+- [CRC32()](https://github.com/ahkscript/libcrypt.ahk/blob/master/src/CRC32.ahk) by jNizM
 
 # OCR-TIP
 

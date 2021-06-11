@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.99.1
+Version     : 1.100
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
@@ -30,14 +30,16 @@ See readme.md for more info and documentation on plugins and templates.
 */
 
 ; General script settings
+#NoEnv
 #SingleInstance, Force
+#KeyHistory 0
 SetBatchlines, -1
 SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.99.1"
+version:="v1.100"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -138,6 +140,7 @@ templatesfolderlist:=Trim(templatesfolderlist,"|")
 Sort, templatesfolderlist, D|
 StringUpper, templatesfolderlist, templatesfolderlist
 
+Template_Hotkeys()
 OnClipboardChange("FuncOnClipboardChange")
 
 If ActivateBackup
@@ -184,6 +187,8 @@ Return
 
 ; show clipboard history menu
 ;!^v::
+hk_menu2:
+MousePos:=1
 hk_menu:
 Gosub, FifoInit
 BuildMenuFromFifo:
@@ -194,13 +199,22 @@ MenuX+=A_CaretX
 MenuX+=20
 MenuY+=A_CaretY
 MenuY+=10
-If (A_CaretX <> "")
-	Menu, ClipMenu, Show, %MenuX%, %MenuY%
-Else
- {
-;	TrayTip, TrayMenu, CL3Coords2, 2 ; debug
-	Menu, ClipMenu, Show
- }
+If !MousePos
+	{
+	 If (A_CaretX <> "")
+		Menu, ClipMenu, Show, %MenuX%, %MenuY%
+	 Else
+	 {
+	 ;	TrayTip, TrayMenu, CL3Coords2, 2 ; debug
+		Menu, ClipMenu, Show
+	 }
+	}
+else
+	{
+	 MouseGetPos, MenuX, MenuY
+	 Menu, ClipMenu, Show, %MenuX%, %MenuY%
+	}
+MousePos:=0
 Return
 
 ; 1x paste as plain text
@@ -443,9 +457,13 @@ Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
 
 If (templatefilelist <> "")
 	{
+	 MenuAccelerator:=0
 	 Loop, Parse, templatefilelist, |
 		{
-		 key:=% "&" Chr(96+A_Index) ". " ; %
+		 if (Mod(MenuAccelerator,26)=0)
+			 	MenuAccelerator:=0
+		 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
+;		 key:=% "&" Chr(96+A_Index) ". " ; %
 		 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
 		 StringTrimRight,MenuText,MenuText,4
 		 Menu, Submenu2, Add, %MenuText%, TemplateMenuHandler
@@ -466,11 +484,14 @@ If (templatefilelist <> "")
 				 Sort, templatefolderFiles, D|
 				}
 			templatefolderFiles:=Trim(templatefolderFiles,"|")
+			MenuAccelerator:=0
 			Loop, parse, templatefolderFiles, |
 				{
 				 FileRead, a, templates\%templatefolder%\%A_LoopField%
 				 Templates[templatefolder,A_Index]:=a
-				 key:=% "&" Chr(96+A_Index) ". " ; %
+				 if (Mod(MenuAccelerator,26)=0)
+				 	MenuAccelerator:=0
+				 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
 				 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
 				 Menu, %templatefolder%, Add, %MenuText%, TemplateMenuHandler
 				 Menu, %templatefolder%, Icon, %MenuText%, res\%iconT%,,16
@@ -501,6 +522,8 @@ Loop 18
 
 If (History.MaxIndex() > 20)
 	{
+	 MenuAccelerator:=0
+	 MenuAcceleratorDone:=0
 	 for k, v in History
 		{
 		 text:=v.text
@@ -508,16 +531,26 @@ If (History.MaxIndex() > 20)
 		 lines:=v.lines
 		 If (A_Index < 19)
 			Continue
-		 If (A_Index < 45)
-			 key:=% "&" Chr(96-18+A_Index) ". " DispMenuText(SubStr(text,1,500),lines)
-		 Else
-			 key:=% "  " DispMenuText(SubStr(text,1,500),lines)
+
+		 If (MenuAccelerator < 27) and (MenuAcceleratorDone = 0)
+				key:=% "&" Chr(96+(++MenuAccelerator)) ". " DispMenuText(SubStr(text,1,500),lines)
+		 If (MenuAcceleratorDone = 1)
+			key:=% "  " DispMenuText(SubStr(text,1,500),lines)
 		 Menu, SubMenu4, Add, %key%, MenuHandler
 		 Try
 			Menu, SubMenu4, Icon, %key%, % icon
 		 Catch
 			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
-		 If (A_Index > 43)
+
+
+		 if (Mod(MenuAccelerator,26)=0)
+			{
+			 MenuAccelerator:=0
+			 If (MoreHistory < 0)
+				MenuAcceleratorDone:=1
+			}
+
+		 If (A_Index > 17+Abs(MoreHistory))
 			Break
 		} 
 	}
@@ -710,8 +743,10 @@ Gosub, CheckHistory
 MenuItemPos:=0
 Return
 
+; check clipboard
 FuncOnClipboardChange() {
  global
+Critical, On
 
 ; The built-in variable A_EventInfo contains:
 ; 0 if the clipboard is now empty;
@@ -732,6 +767,7 @@ StringLower, ClipboardOwnerProcessName, ClipboardOwnerProcessName ; just in case
 if ClipboardOwnerProcessName in %Exclude%
 	{
 	 ClipboardOwnerProcessName:="",ClipboardPrivate:=1
+	 ClipText:=""
 	 Return
 	}
 else
@@ -781,7 +817,9 @@ ClipText=%Clipboard%
 
 StrReplace(ClipText, "`n", "`n", Count)
 
-History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
+crc:=crc32(ClipText)
+
+History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc})
 
 Gosub, CheckHistory
 
@@ -795,11 +833,30 @@ Return
 CheckHistory: ; check for duplicate entries
 
 newhistory:=[]
+HaveCRCList:="|"
+
+for k, v in History
+	{
+	 CurrentCRC:=v.crc
+	 if !CurrentCRC ; just to make sure it isn't empty
+		CurrentCRC:=crc32(v.text)
+	 if !InStr(HaveCRCList, "|" CurrentCRC "|")
+		newhistory.push({"text":v.text,"icon":v.icon,"lines":v.lines,"crc":CurrentCRC})
+	 HaveCRCList .= v.crc "|"
+	 if (k >= MaxHistory)
+		break
+	}
+
+/* ; old method prior to v1.100, deprecated:
+
+newhistory:=[]
+
 for k, v in History
 	{
 	 check:=v.text
 	 icon:=v.icon
 	 lines:=v.lines
+	 crc:=v.crc
 	 new:=true
 	 for p, q in newhistory
 		{
@@ -814,10 +871,10 @@ for k, v in History
 		break
 	}
 
+*/	
+
+crc:="",HaveCRCList:=""
 History:=newhistory
-
-check:="", new:="", icon:="", lines:=""
-
 newhistory:=[]
 
 Return
@@ -989,5 +1046,50 @@ If History_Save
 	 History_Save:=0
 	}
 Return
+
+Template_Hotkeys()
+	{
+	 global templatesfolderlist
+	 Loop, parse, templatesfolderlist, |
+	 	{
+		 IniRead, TemplatesShortcut, %A_ScriptDir%\templates\%A_LoopField%\settings.ini, settings, shortcut
+		 If (TemplatesShortcut <> "ERROR")
+			{
+			 fn := func("ShowMenu").Bind(A_LoopField)
+			 Hotkey, % TemplatesShortcut, % fn
+			}
+	 	}
+	}
+
+ShowMenu(menuname){
+WinGetPos, MenuX, MenuY, , , A
+MenuX+=A_CaretX
+MenuX+=20
+MenuY+=A_CaretY
+MenuY+=10
+If (A_CaretX <> "")
+{
+	Try
+		Menu, %menuname%, Show, %MenuX%, %MenuY%
+	Catch
+		{
+		 Gosub, BuildMenuHistory
+		 Gosub, BuildMenuPluginTemplate
+		 Menu, %menuname%, Show, %MenuX%, %MenuY%
+		}
+}
+Else
+ {
+;	TrayTip, TrayMenu, CL3Coords2, 2 ; debug
+	Try
+		Menu, %menuname%, Show
+	Catch
+		{
+		 Gosub, BuildMenuHistory
+		 Gosub, BuildMenuPluginTemplate
+		 Menu, %menuname%, Show, %MenuX%, %MenuY%
+		}
+ }
+}
 
 #include %A_ScriptDir%\lib\cl3apiclass.ahk

@@ -1,10 +1,11 @@
 ﻿/*
 
 Plugin            : AutoReplace()
-Version           : 1.6
+Version           : 1.7
 CL3 version       : 1.4
 
 History:
+- 1.7 Don't use clipboard in String Replacement but text variable
 - 1.6 Attempt to prevent XMLRoot error - https://github.com/hi5/CL3/issues/15
 - 1.5 Optional tray menu "replace actions" indicator (reverted change, code commented, see "TrayTip" code near the end)
 - 1.4 Added fixed setting for Bypass (excell.exe) to avoid problems pasting content in Excel, default setting inactive
@@ -142,11 +143,12 @@ AutoReplace()
 	{
 	 global AutoReplace,IconExe,AutoReplaceTrayTip
 	 if !AutoReplace.Settings.Active ; bypass AutoReplace
-		Return
+		Return clipboard
 	 if RegExMatch(IconExe, "im)\\(" StrReplace(AutoReplace.Settings.Bypass,",","|") ")$") ; bypass AutoReplace
 		Return
-	 ClipStore:=ClipboardAll ; store all formats
-	 ClipStoreText:=Clipboard ; store text
+	 ClipStore:=ClipboardAll             ; store all formats
+	 ClipStoreText:=Clipboard            ; store text
+	 ClipStoreTextReplace:=ClipStoreText ; store text
 
 	 OnClipboardChange("FuncOnClipboardChange", 0)
 	 ChangedClipboard:=0,OutputVarCount:=0
@@ -165,7 +167,7 @@ AutoReplace()
 					ReplaceString:="	"
 				 else if ReplaceString = A_Tab
 					ReplaceString:="	"
-				 Clipboard:=StrReplace(Clipboard, v.find, ReplaceString, OutputVarCount)
+				 ClipStoreTextReplace:=StrReplace(ClipStoreTextReplace, v.find, ReplaceString, OutputVarCount)
 				 If OutputVarCount
 					ChangedClipboard+=OutputVarCount
 				}
@@ -174,7 +176,7 @@ AutoReplace()
 			{
 			 Try
 				{
-				 Clipboard:=RegExReplace(Clipboard, v.find, v.replace, OutputVarCount)
+				 ClipStoreTextReplace:=RegExReplace(ClipStoreTextReplace, v.find, v.replace, OutputVarCount)
 				 If OutputVarCount
 					ChangedClipboard+=OutputVarCount
 				}
@@ -183,12 +185,15 @@ AutoReplace()
 	 if (Clipboard = ClipStoreText) ; if we haven't actually modified the text make sure we restore all formats
 		 Clipboard:=ClipStore
 	 ClipStore:=""
-	 If ChangedClipboard and AutoReplaceTrayTip
+	 If ChangedClipboard
 		{
-		 OSDTIP_Pop("CL3 AutoReplace", ChangedClipboard " replacement(s)", -750,"W130 H60 U1")
+		 Clipboard:=ClipStoreTextReplace
+		 If AutoReplaceTrayTip
+			OSDTIP_Pop("CL3 AutoReplace", ChangedClipboard " replacement(s)", -750,"W130 H60 U1")
 		}
+	 ClipStoreTextReplace:=""
 	 OnClipboardChange("FuncOnClipboardChange", 1)
-
+	 Return
 	}
 
 AutoReplaceMenu:

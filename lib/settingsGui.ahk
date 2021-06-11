@@ -6,14 +6,16 @@ Gui Settings:Add,  GroupBox, x5 y20 w170 h320, General hotkeys
 
 Gui Settings:Add,  Text, xp+8  yp+25                           , Show Menu (History):
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_menu         , %hk_menu%
-Gui Settings:Add,  Text, xp-110 yp+30                          , Paste Plain text:
+Gui Settings:Add,  Text, xp-110 yp+25                          , Show Menu 2 (History):
+Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_menu2        , %hk_menu2%
+Gui Settings:Add,  Text, xp-110 yp+25                          , Paste Plain text:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_plaintext    , %hk_plaintext%
 Gui Settings:Add,  Text, xp-110 yp+20                          , __________________________
-Gui Settings:Add,  Text, xp     yp+30                          , Search:
+Gui Settings:Add,  Text, xp     yp+25                          , Search:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_search       , %hk_search%
-Gui Settings:Add,  Text, xp-110 yp+30                          , FiFo:
+Gui Settings:Add,  Text, xp-110 yp+25                          , FiFo:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_fifo         , %hk_fifo%
-Gui Settings:Add,  Text, xp-110 yp+30                          , ClipChain:
+Gui Settings:Add,  Text, xp-110 yp+25                          , ClipChain:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_clipchain    , %hk_clipchain%
 Gui Settings:Add,  Text, xp-110 yp+20                          , __________________________
 
@@ -48,18 +50,22 @@ Gui Settings:Add,  Text, xp+8 yp+24                                     , Max Hi
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory Number         , %MaxHistory%
 Gui Settings:Add,  Text, xp-70 yp+30                                    , Menu width:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMenuWidth Number          , %MenuWidth%
+Gui Settings:Add,  Text, xp-70 yp+30                                    , More History:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 
+Gui Settings:Add,  UpDown, Range-100-300 vMoreHistory                   , %MoreHistory%
 Gui Settings:Add,  Text, xp-70 yp+20                                    , ___________________
 Gui Settings:Add,  Text, xp    yp+30                                    , Search width:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowWidth Number  , %SearchWindowWidth%
 Gui Settings:Add,  Text, xp-70 yp+30                                    , Search height:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowHeight Number , %SearchWindowHeight%
 Gui Settings:Add,  Text, xp-70 yp+20                                    , ___________________
-Gui Settings:Add,  Text, xp    yp+30                                    , CyclePlugins:
+Gui Settings:Add,  Text, xp    yp+20                                    , CyclePlugins:
 
 Gosub, UpdateCyclePlugins
-Gui Settings:Add,  Edit, xp-5  yp+15  w125 R9 vEditCyclePlugins , %EditCyclePlugins%
+Gui Settings:Add,  Edit, xp-5  yp+15  w125 R8 vEditCyclePlugins , %EditCyclePlugins%
 
-Gui Settings:Add,  GroupBox, x5   yp+140 w416 h55               , Exclude programs (CSV list: program1.exe,program2.exe)
+Gui Settings:Add,  GroupBox, x5   yp+120 w416 h55               , Exclude programs (CSV list: program1.exe,program2.exe)
+
 Gui Settings:Add,  Edit,     xp+8 yp+20  w395 h20 vExclude     , %Exclude%
 
 Gui Settings:Add,  Button, x5 yp+40   w100 h25 gSettingsSave     , &Save
@@ -138,7 +144,8 @@ Gui, Settings:Submit, Destroy
 CyclePlugins:=Trim(StrReplace(EditCyclePlugins,"`n",","),", ")
 IniWrite, %CyclePlugins%       , %ini%, Plugins, CyclePlugins
 
-IniWrite, %hk_menu%, %ini%, Hotkeys, hk_menu
+IniWrite, %hk_menu%, %ini%   , Hotkeys, hk_menu
+IniWrite, %hk_menu2%, %ini%  , Hotkeys, hk_menu2
 IniWrite, %hk_plaintext%     , %ini%, Hotkeys, hk_plaintext
 IniWrite, %hk_slots%         , %ini%, Hotkeys, hk_slots
 IniWrite, %hk_clipchain%     , %ini%, Hotkeys, hk_clipchain
@@ -158,8 +165,9 @@ Loop, 9
 	IniWrite, % hk_slot%A_Index%  , %ini%, Hotkeys, hk_slot%A_Index%
 IniWrite, %hk_slot0%, %ini%, Hotkeys, hk_slot0
 
-IniWrite, %MaxHistory%         , %ini%, Settings, MaxHistory
 IniWrite, %MenuWidth%          , %ini%, Settings, MenuWidth
+IniWrite, %MaxHistory%         , %ini%, Settings, MaxHistory
+IniWrite, %MoreHistory%        , %ini%, Settings, MoreHistory
 IniWrite, %SearchWindowWidth%  , %ini%, Settings, SearchWindowWidth
 IniWrite, %SearchWindowHeight% , %ini%, Settings, SearchWindowHeight
 IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
@@ -196,7 +204,7 @@ ModHelp:
 MsgBox, 32, CL3 CyclePlugins Help,
 (
 If you want to change the default modifier from LWin to say RAlt:
-Close CL3 and the hk_cyclemodkey key edit in settings.ini
+Close CL3 and edit the hk_cyclemodkey key in settings.ini
 (see [Hotkeys] section)
 
 Examples:

@@ -2,8 +2,11 @@
 
 Plugin            : Compact history
 Purpose           : Parse history and remove entries over certain size
-Version           : 1.0
+Version           : 1.1
 CL3 version       : 1.6
+
+History:
+- v1.1 adding lines and crc to compacted history as well
 
 */
 
@@ -34,10 +37,8 @@ if (ChoiceMax <> "")
 	 newhistory:=[]
 	 for k, v in History
 		{
-		 check:=v.text
-		 icon:=v.icon
 		 if (A_Index <= ChoiceMax)
-			newhistory.push({"text":check,"icon":icon})
+			newhistory.push({"text":v.text,"icon":v.icon,"lines":v.lines,"crc":v.crc})
 		}
 	 History:=newhistory
 	 newhistory:=[]	 
@@ -50,10 +51,8 @@ if (Choice <> "")
 		 newhistory:=[]
 		 for k, v in History
 			{
-			 check:=v.text
-			 icon:=v.icon
 			 if (StrLen(check) < Choice)
-				newhistory.push({"text":check,"icon":icon})
+				newhistory.push({"text":v.text,"icon":v.icon,"lines":v.lines,"crc":v.crc})
 			}
 		 History:=newhistory
 		 newhistory:=[]
