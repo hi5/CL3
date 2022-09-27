@@ -18,7 +18,7 @@ Sort(Text, options="")	{
 SortMenuSetup: ; label we jump to from Plugins.ahk
                ; prepare an object for the menu which we can easily reuse for checking which 
                ; option we choose in the handler. Name has to be 'PLUGIN'MENU (sortmenu) as we use that 
-               ; to check if we have an object to insert a submemu while parsing the plugins
+               ; to check if we have an object to insert a submenu while parsing the plugins
 SortMenu:={ "a" : "Standard (new line)|"
 	, "b" : "R - Reverse (new line)|R"
 	, "c" : "N - Numerical (new line)|N"
@@ -42,7 +42,7 @@ SortMenuHandler:
 SortMenuItem:=A_ThisMenuItem
 for k, v in SortMenu ; here we can re-use the menu object
 	If (SortMenuItem = "&" k ". " StrSplit(v,"|").1)
-		If !InStr(v,"Set Delimeter and other options")
+		If !InStr(v,"Set Delimiter and other options")
 			ClipText:=Sort(History[1].text,StrSplit(v,"|").2)
 		else
 			{
