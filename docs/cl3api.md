@@ -1,4 +1,4 @@
-﻿# CL3 API Functions v1.0
+﻿# CL3 API Functions v1.4
 
 You can modify CL3's clipboard history via external scripts by using this API.
 
@@ -90,6 +90,15 @@ CL3Api_ChainRemove(3)        ; Remove third item from History
 CL3Api_ChainRemove([2,3,4])  ; Remove 2nd, 3rd and 4th item from ClipChain
 ```
 
+### CL3Api_ChainClean()
+
+Clear the ClipChain.
+
+```autohotkey
+CL3Api_ChainClean()
+```
+
+
 ### CL3Api_Slot(Index,String)
 
 Insert "String" at "Index" position in the current Slot.
@@ -97,6 +106,14 @@ More information about Slots here https://github.com/hi5/CL3#slots-plugin-v12
 
 ```autohotkey
 CL3Api_Slot(2,"AutoHotkey scripting language") ; Update 2nd slot with new text, to paste: Right-Control+2
+```
+
+### CL3Api_SlotPaste(Index)
+
+Paste Slot item (1, 10)
+
+```autohotkey
+CL3Api_SlotPaste(2) ; Paste Slot number 2
 ```
 
 ### CL3Api_Burst(Object,Reverse=0)
@@ -159,7 +176,7 @@ CL3Api_Remove([2,3,4])      ; Remove 2nd, 3rd and 4th item from History
 
 Search the Clipboard history for "string" and return the **text** in an Array.
 String is converted to a case insensitive regular expression and will find words independent on their position.
-(e.g. "search this" will resturn all entries with the words 'search' AND 'this' somewhere in the text.
+(e.g. "search this" will return all entries with the words 'search' AND 'this' somewhere in the text.
 By default it returns all results, but you can limit the number of results.
 
 ```autohotkey

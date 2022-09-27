@@ -76,7 +76,7 @@ Example:
 
 ### B
 
-b :"Burst seperator (\n, \t, \\, char or word)"  
+b : "Burst separator (\n, \t, \\, char or word)"  
 rb: "Reverse burst"
 
 Burst (split) the current clipboard contents into individual entries.
