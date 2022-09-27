@@ -1,10 +1,10 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.100
+Version     : 1.101
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
-              http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey 
+              http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
 Source      : https://github.com/hi5/CL3
 
 Features:
@@ -14,7 +14,7 @@ Features:
 - Delete entries from history
 - No duplicate entries in clipboard (automatically removed)
 - Templates: simply textfiles which are read at start up
-- Plugins: AutoHotkey functions (scripts) defined in seperate files
+- Plugins: AutoHotkey functions (scripts) defined in separate files
   v1.2: Search and Slots for quick pasting
   v1.3: Cycle through clipboard history, paste current clipboard as plain text
   v1.4: AutoReplace define find/replace rules to modify clipboard before adding it the clipboard
@@ -33,13 +33,14 @@ See readme.md for more info and documentation on plugins and templates.
 #NoEnv
 #SingleInstance, Force
 #KeyHistory 0
+SetTitleMatchMode, 2
 SetBatchlines, -1
 SendMode, Input
 SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.100"
+version:="v1.101"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -61,37 +62,38 @@ Suspend, Off
 
 Settings()
 Settings_Hotkeys()
+HistoryRules()
 
 ; tray menu
 Menu, Tray, Icon, res\cl3.ico, , 1
-Menu, tray, Tip , %name% %version% 
+Menu, tray, Tip , %name% %version%
 Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%     , DoubleTrayClick
 Menu, tray, Icon, %name% %version%    , res\cl3.ico
-Menu, tray, Default, %name% %version% 
+Menu, tray, Default, %name% %version%
 Menu, tray, Click, 1 ; this will show the tray menu because we send {rbutton} at the DoubleTrayClick label
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &AutoReplace Active  , TrayMenuHandler
 Menu, tray, Add, &FIFO Active         , TrayMenuHandler
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &Usage statistics    , TrayMenuHandler
 Menu, tray, Icon,&Usage statistics    , shell32.dll, 278
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &Settings            , TrayMenuHandler
 Menu, tray, Icon,&Settings            , dsuiext.dll, 36
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &Reload this script  , TrayMenuHandler
 Menu, tray, Icon,&Reload this script  , shell32.dll, 239
 Menu, tray, Add, &Edit this script    , TrayMenuHandler
 Menu, tray, Icon,&Edit this script    , comres.dll, 7
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &Suspend Hotkeys     , TrayMenuHandler
 Menu, tray, Icon,&Suspend Hotkeys     , %A_AhkPath%, 3
 Menu, tray, Add, &Pause Script        , TrayMenuHandler
 Menu, tray, Icon,&Pause Script        , %A_AhkPath%, 4
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, &Pause clipboard history, TrayMenuHandler
-Menu, tray, Add, 
+Menu, tray, Add,
 Menu, tray, Add, Exit                 , SaveSettings
 Menu, tray, Icon, %MenuPadding%Exit   , shell32.dll, 132
 
@@ -102,39 +104,39 @@ Menu, SubMenu3, Add, TempText, MenuHandler
 Menu, SubMenu4, Add, TempText, MenuHandler
 
 ; load clipboard history and templates
-IfNotExist, %A_ScriptDir%\ClipData\History\History.xml
+IfNotExist, %ClipDataFolder%History\History.xml
 	Error:=1
 
-if (XA_Load( A_ScriptDir "\ClipData\History\History.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+if (XA_Load( ClipDataFolder "History\History.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 	Error:=1
 
 If (Error = 1)
 	{
-	 FileCopy, res\history.bak.txt, %A_ScriptDir%\ClipData\History\History.xml, 1
+	 FileCopy, res\history.bak.txt, %ClipDataFolder%History\History.xml, 1
 	 History:=[]
-	 XA_Load(A_ScriptDir "\ClipData\History\History.xml") ; the name of the variable containing the array is returned OR the value 1 in case of error
+	 XA_Load(ClipDataFolder "History\History.xml") ; the name of the variable containing the array is returned OR the value 1 in case of error
 	}
 
 OnExit, SaveSettings
 
-If !FileExist("templates\*.txt")
-	FileCopy, res\01_Example.txt, templates\01_Example.txt, 0
+If !FileExist(TemplateFolder "*.txt")
+	FileCopy, res\01_Example.txt, %TemplateFolder%01_Example.txt, 0
 
 ; get templates in root folder first
-Loop, templates\*.txt
+Loop, %TemplateFolder%*.txt
 	templatefilelist .= A_LoopFileName "|"
 templatefilelist:=Trim(templatefilelist,"|")
 Sort, templatefilelist, D|
 
 Loop, parse, templatefilelist, |
 	{
-	 FileRead, a, templates\%A_LoopField%
+	 FileRead, a, %TemplateFolder%%A_LoopField%
 	 Templates["submenu2",A_Index]:=a
 	 a:=""
 	}
 
 ; now check for folders for possible sub-submenus
-Loop, Files, templates\*.*, D
+Loop, Files, %TemplateFolder%*.*, D
 	templatesfolderlist .= A_LoopFileName "|"
 templatesfolderlist:=Trim(templatesfolderlist,"|")
 Sort, templatesfolderlist, D|
@@ -153,7 +155,7 @@ FILE_NOTIFY_CHANGE_SIZE        = 8   (0x00000008) : Notify about any file-size c
 FILE_NOTIFY_CHANGE_LAST_WRITE  = 16  (0x00000010) : Notify about any change to the last write-time of files.
                                = 27
 */
-WatchFolder("templates\", "UpdateTemplate", true, 27) ; just a shortcut to reload the template menu to avoid manual reload
+WatchFolder(TemplateFolder, "UpdateTemplate", true, 27) ; just a shortcut to reload the template menu to avoid manual reload
 
 If ActivateApi
 	ObjRegisterActive(CL3API, "{01DA04FA-790F-40B6-9FB7-CE6C1D53DC38}")
@@ -271,7 +273,7 @@ While GetKeyState(hk_cyclemodkey,"D") and cyclebackward
 	 Sleep 100
 	 KeyWait, %hk_cyclebackward% ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
-ToolTip	
+ToolTip
 If (ClipCycleCounter > 0) ; If zero we've cancelled it
 	{
 	 ClipText:=History[ClipCycleCounter].text
@@ -346,7 +348,7 @@ Return
 hk_cycleplugins:
 If !ActiveWindowID
 	WinGet, ActiveWindowID, ID, A
-cycleforward:=0, cyclebackward:=0	
+cycleforward:=0, cyclebackward:=0
 CycleFormat:=0
 If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
 	ClipCycleCounter:=1
@@ -384,7 +386,7 @@ if (CycleFormat > CyclePlugins.MaxIndex())
 	CycleFormat:=0
 CycleFormat++
 Sleep 100
-Return	
+Return
 
 BuildMenuHistory:
 Menu, ClipMenu, Delete
@@ -451,6 +453,12 @@ If !FIFOACTIVE
 			 Menu, Submenu1, Add, %MenuText%, :%MenuTextClean%Menu
 			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
 			}
+		 If IsObject(SlotsNamed) and (MenuTextClean ="Slots")
+			{
+			 Gosub, QuickSlotsMenu
+			 Menu, Submenu1, Add, %MenuText%, :QuickSlotsMenu
+			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+			}
 		}
 Menu, ClipMenu, Add, &s. Special, :Submenu1
 Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
@@ -477,8 +485,8 @@ If (templatefilelist <> "")
 		 Loop, Parse, templatesfolderlist, |
 		 {
 
-			templatefolder:=A_LoopField
-			Loop, files, templates\%A_LoopField%\*.txt
+			subtemplatefolder:=A_LoopField
+			Loop, files, %TemplateFolder%%A_LoopField%\*.txt
 				{
 				 templatefolderFiles .= A_LoopFileName "|"
 				 Sort, templatefolderFiles, D|
@@ -487,14 +495,14 @@ If (templatefilelist <> "")
 			MenuAccelerator:=0
 			Loop, parse, templatefolderFiles, |
 				{
-				 FileRead, a, templates\%templatefolder%\%A_LoopField%
+				 FileRead, a, %TemplateFolder%%subtemplatefolder%\%A_LoopField%
 				 Templates[templatefolder,A_Index]:=a
 				 if (Mod(MenuAccelerator,26)=0)
 				 	MenuAccelerator:=0
 				 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
 				 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
-				 Menu, %templatefolder%, Add, %MenuText%, TemplateMenuHandler
-				 Menu, %templatefolder%, Icon, %MenuText%, res\%iconT%,,16
+				 Menu, %subtemplatefolder%, Add, %MenuText%, TemplateMenuHandler
+				 Menu, %subtemplatefolder%, Icon, %MenuText%, res\%iconT%,,16
 				 a:=""
 				}
 			templatefolderFiles:=""
@@ -504,7 +512,7 @@ If (templatefilelist <> "")
 			{
 			 Menu, SubMenu2, Add, &%A_LoopField%, :%A_LoopField%
 			 try
-				Menu, SubMenu2, Icon, &%A_LoopField%, templates\%A_LoopField%\favicon.ico,,16
+				Menu, SubMenu2, Icon, &%A_LoopField%, %TemplateFolder%%A_LoopField%\favicon.ico,,16
 			 catch
 				Menu, SubMenu2, Icon, &%A_LoopField%, res\%iconT%,,16
 			}
@@ -552,7 +560,7 @@ If (History.MaxIndex() > 20)
 
 		 If (A_Index > 17+Abs(MoreHistory))
 			Break
-		} 
+		}
 	}
 Else
 	{
@@ -579,13 +587,15 @@ DispMenuText(TextIn,lines="1")
 		linetext:=LineTextFormat[1]
 	 else
 		linetext:=LineTextFormat[2]
+	 if (lines = -1)
+		linetext:=""
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All
 	 If StrLen(TextOut) > 60
 		{
-		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...	
+		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...
 		}
 	 TextOut .= " " Chr(171)
 	 if ShowLines
@@ -655,7 +665,7 @@ If (A_ThisMenu = "ClipMenu")
 else
 	MenuItemPos:=A_ThisMenuItemPos+18
 
-; debug	
+; debug
 ; MsgBox % "A_ThisMenu-" A_ThisMenu " : A_ThisMenuItem-" A_ThisMenuItemPos " : MenuItemPost-" MenuItemPos
 
 If FIFOACTIVE
@@ -674,7 +684,7 @@ Return
 SpecialMenuHandler:
 SpecialFunc:=(SubStr(A_ThisMenuItem,4))
 StringReplace, SpecialFunc, SpecialFunc, %A_Space%,,All
-If (SpecialFunc = "AutoReplace")	
+If (SpecialFunc = "AutoReplace")
 	{
 	 Gosub, AutoReplace
 	 Return
@@ -685,7 +695,7 @@ Else
 	if (SpecialFunc = "Slots")
 		Gosub, hk_slots
 Else
-	if (SpecialFunc = "Search")	
+	if (SpecialFunc = "Search")
 		Gosub, hk_search
 Else
 	if (SpecialFunc = "ClipChain")
@@ -706,9 +716,9 @@ TemplateMenuHandler:
 If (A_ThisMenuItem = "&0. Open templates folder")
 	{
 	 IfWinExist, ahk_exe TOTALCMD.EXE
-		Run, c:\totalcmd\TOTALCMD.EXE /O /T %A_ScriptDir%\templates\
+		Run, c:\totalcmd\TOTALCMD.EXE /O /T %TemplateFolder%
 	 else
-		Run, %A_ScriptDir%\templates\
+		Run, %TemplateFolder%
 	 Return
 	}
 
@@ -802,7 +812,7 @@ else ; Excel is active; check CF_METAFILEPICT, if not present we can safely stor
 	If (DllCall("IsClipboardFormatAvailable", "Uint", 3) = 0)
 		ClipboardByPass:=ClipboardAll
 
-if (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
+If (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return
 
 AutoReplace()
@@ -815,13 +825,40 @@ If (Clipboard == History[1].text) ; v1.95
 
 ClipText=%Clipboard%
 
+AddToHistory:=1
+
+If HistoryRules.count()
+	for k, v in HistoryRules
+		{
+		 If !v.Active
+			Continue
+		 If !RegExMatch(ClipText,v.filter)
+			{
+			 AddToHistory:=0
+			}
+		}
+
+If !AddToHistory
+	{
+	 ClipText:=""
+	 If (HistoryRules["Copy"] = 1)
+		ClipboardPrivate:=1
+	 else
+		{
+		 ClipboardPrivate:=0
+		 Clipboard:=History[1].text
+		}	
+	 Return
+	}
+
 StrReplace(ClipText, "`n", "`n", Count)
 
 crc:=crc32(ClipText)
 
 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc})
 
-Gosub, CheckHistory
+If !AllowDupes
+	Gosub, CheckHistory
 
 stats.copieditems++
 
@@ -871,7 +908,7 @@ for k, v in History
 		break
 	}
 
-*/	
+*/
 
 crc:="",HaveCRCList:=""
 History:=newhistory
@@ -880,7 +917,7 @@ newhistory:=[]
 Return
 
 ; If the tray icon is double click we do not actually want to do anything
-DoubleTrayClick: 
+DoubleTrayClick:
 Send {rbutton}
 Return
 
@@ -911,7 +948,7 @@ Else If (A_ThisMenuItem = "&Pause Script")
 Else If (A_ThisMenuItem = "&Pause clipboard history")
 	{
 	 CL3Api_State(ClipboardHistoryToggle)
-	 Menu, tray, ToggleCheck, &Pause clipboard history
+;	 Menu, Tray, ToggleCheck, &Pause clipboard history
 	 If ClipboardHistoryToggle
 		Menu, Tray, Icon, res\cl3.ico
 	 else
@@ -924,7 +961,7 @@ Else If (A_ThisMenuItem = "&AutoReplace Active")
 		AutoReplace.Settings.Active:=0
 	 else
 		AutoReplace.Settings.Active:=1
-	 XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
+	 XA_Save("AutoReplace", ClipDataFolder "AutoReplace\AutoReplace.xml")
 	 Gosub, AutoReplaceMenu
 	}
 Else If (A_ThisMenuItem = "&FIFO Active")
@@ -967,12 +1004,12 @@ SetTimer, Backup, Off
 While (History.MaxIndex() > MaxHistory)
 	History.remove(History.MaxIndex())
 
-XA_Save("History", A_ScriptDir "\ClipData\History\History.xml") ; put variable name in quotes
+XA_Save("History", ClipDataFolder "History\History.xml") ; put variable name in quotes
 XA_Save("stats", A_ScriptDir "\stats.xml")
 
-;XA_Save("Slots", A_ScriptDir "\ClipData\Slots\Slots.xml")
-;XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
-;XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
+;XA_Save("Slots", ClipDataFolder "Slots\Slots.xml")
+;XA_Save("ClipChainData", ClipDataFolder "ClipChain\ClipChain.xml")
+;XA_Save("AutoReplace", ClipDataFolder "AutoReplace\AutoReplace.xml")
 
 If ActivateApi
 	ObjRegisterActive(CL3API, "")
@@ -1011,16 +1048,16 @@ XMLSave(savelist,id="")
 			 objectfile:=A_LoopField id ext
 			}
 		 If (objectname = "ClipChainData")
-			XA_Save(objectname, A_ScriptDir "\ClipData\ClipChain\" objectfile)
+			XA_Save(objectname, ClipDataFolder "ClipChain\" objectfile)
 		 else
-			XA_Save(objectname, A_ScriptDir "\ClipData\" objectname "\" objectfile)
+			XA_Save(objectname, ClipDataFolder "" objectname "\" objectfile)
 		}
 
 		; keep only the 5 most recent backups
 		Loop, parse, % "History,Slots,ClipChain,AutoReplace", CSV
 			{
 			 keeplist:=""
-			 Loop, Files, %A_ScriptDir%\ClipData\%A_LoopField%\*.bak
+			 Loop, Files, %ClipDataFolder%%A_LoopField%\*.bak
 				keeplist .= A_LoopFileFullPath "`n"
 			 Sort, keeplist, RN
 			 ;MsgBox, %keeplist% ; debug
@@ -1041,7 +1078,7 @@ Backup:
 ; XMLSave("History","-" A_Now)
 If History_Save
 	{
-	 ; XA_Save("History", A_ScriptDir "\ClipData\History\History-" A_Now ".xml.bak") ; put variable name in quotes
+	 ; XA_Save("History", ClipDataFolder "History\History-" A_Now ".xml.bak") ; put variable name in quotes
 	 XMLSave("History","-" A_Now)
 	 History_Save:=0
 	}
@@ -1049,10 +1086,10 @@ Return
 
 Template_Hotkeys()
 	{
-	 global templatesfolderlist
+	 global TemplateFolder,templatesfolderlist
 	 Loop, parse, templatesfolderlist, |
 	 	{
-		 IniRead, TemplatesShortcut, %A_ScriptDir%\templates\%A_LoopField%\settings.ini, settings, shortcut
+		 IniRead, TemplatesShortcut, %TemplateFolder%%A_LoopField%\settings.ini, settings, shortcut
 		 If (TemplatesShortcut <> "ERROR")
 			{
 			 fn := func("ShowMenu").Bind(A_LoopField)
@@ -1075,6 +1112,7 @@ If (A_CaretX <> "")
 		{
 		 Gosub, BuildMenuHistory
 		 Gosub, BuildMenuPluginTemplate
+		 Gosub, QuickSlotsMenu
 		 Menu, %menuname%, Show, %MenuX%, %MenuY%
 		}
 }
@@ -1087,9 +1125,11 @@ Else
 		{
 		 Gosub, BuildMenuHistory
 		 Gosub, BuildMenuPluginTemplate
+		 Gosub, QuickSlotsMenu
 		 Menu, %menuname%, Show, %MenuX%, %MenuY%
 		}
  }
 }
 
 #include %A_ScriptDir%\lib\cl3apiclass.ahk
+#Include *i %A_ScriptDir%\plugins\ClipboardPrivateRules.ahk
