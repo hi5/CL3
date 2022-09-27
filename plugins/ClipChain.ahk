@@ -2,10 +2,13 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.6
+Version           : 1.7
 CL3 version       : 1.5
 
 History:
+- 1.7 enter (multiple) delimiter(s) to split elements from clipboard;
+      define send key(s) after paste (AutoHotkey notation) e.g. {tab};
+      define Trim options
 - 1.6 Attempt to prevent XMLRoot error - https://github.com/hi5/CL3/issues/15
 - 1.5.1 Fix for hotkey, using much more reliable #If
 - 1.5 Clipchain: you can now define a hotkey (via settings) to "progress to next item" - this will allow you to keep ^v for normal copy/paste actions - see Clipchain HK (settings)
@@ -17,25 +20,35 @@ History:
 */
 
 ClipChainInit:
-IniRead, ClipChainX          , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainX, 100
-IniRead, ClipChainY          , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainY, 100
-IniRead, ClipChainNoHistory  , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainNoHistory , 0
-IniRead, ClipChainTrans      , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainTrans     , 0
-IniRead, ClipChainPause      , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause     , 0
+IniRead, ClipChainX          , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainX, 100
+IniRead, ClipChainY          , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainY, 100
+IniRead, ClipChainNoHistory  , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainNoHistory , 0
+IniRead, ClipChainTrans      , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrans     , 0
+IniRead, ClipChainKey        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey, 0
+IniRead, ClipChainSend       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainSend
+IniRead, ClipChainPause      , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause     , 0
+IniRead, ClipChainTrim       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrim      , 0
+IniRead, ClipChainTrimSet    , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrimSet
 
 If (ClipChainX = "") or (ClipChainX = "ERROR")
 	ClipChainX:=100
 If (ClipChainY = "") or (ClipChainY = "ERROR")
 	ClipChainY:=100
+If (ClipChainSend = "") or (ClipChainSend = "ERROR")
+	ClipChainSend:="[press to set]"
+If (ClipChainTrimSet = "") or (ClipChainTrimSet = "ERROR") or (ClipChainTrimSet = "0")
+	ClipChainTrimSet:="[press to set]"
+else
+	Gosub, SetTrim
 
 If !IsObject(ClipChainData)
 	{
-	 IfExist, %A_ScriptDir%\ClipData\ClipChain\ClipChain.xml
+	 IfExist, %ClipDataFolder%ClipChain\ClipChain.xml
 		{
-		 If (XA_Load(A_ScriptDir "\ClipData\ClipChain\ClipChain.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+		 If (XA_Load(ClipDataFolder "ClipChain\ClipChain.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 			{
 			 MsgBox, 16, ClipChain, ClipChain.xml seems to be corrupt, starting new empty chain.
-			 FileDelete, %A_ScriptDir%\ClipData\ClipChain\ClipChain.xml
+			 FileDelete, %ClipDataFolder%ClipChain\ClipChain.xml
 			 ClipChain:=[]
 			}
 		}
@@ -50,7 +63,8 @@ ClipChainIndex:=1
 Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Delete
 
-Menu, ClipChainMenu, Add, Load from Clipboard, ClipChainLoad
+Menu, ClipChainMenu, Add, Load from Clipboard (Default), ClipChainLoad
+Menu, ClipChainMenu, Add, Load from Clipboard (Set Delim), ClipChainLoadDelim
 Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Add, Load from File, ClipChainLoadFile
 Menu, ClipChainMenu, Add, Save to File, ClipChainSaveFile
@@ -58,8 +72,8 @@ Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Add, Clear ClipChain, ClipChainClear
 
 Gui, ClipChain:Default
-Gui, ClipChain:Font, % dpi("s8")
 Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate 
+Gui, ClipChain:Font, % dpi("s8")
 Gui, ClipChain:Add, Listview, % dpi("x0 y0 w185 h350 NoSortHdr grid vLVCGIndex gClipChainClicked hwndHLV"),?|ClipChain|IDX
 LV_ModifyCol(1,dpi()*25)
 LV_ModifyCol(2,dpi()*160)
@@ -83,14 +97,21 @@ Gui, ClipChain:font,% dpi("s11") ; " Wingdings "
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu     vButton6"), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s8")
-Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h80 vGbox2"), Options
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h140 vGbox2"), Options
 Gui, ClipChain:Add, Checkbox, % dpi("xp+10 yp+18 w75 h24 vClipChainNoHistory gClipChainCheckboxes"), No History
 Gui, ClipChain:Add, Checkbox, % dpi("xp+80 yp    w85 h24 vClipChainTrans     gClipChainCheckboxes"), Transparent
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainSend      gClipChainCheckboxes"), Send after
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainKey       gClipChainKeyUpdate" ), %ClipChainKey%
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainTrim      gClipChainCheckboxes"), Trim
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainTrimSet   gClipChainTrimUpdate"), %ClipChainTrimSet%
+
 Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainPause     gClipChainCheckboxes"), Pause
 Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainGuiClose  gClipChainGuiClose"  ), Close ClipChain
 
 GuiControl, ClipChain:, ClipChainNoHistory  , %ClipChainNoHistory%
 GuiControl, ClipChain:, ClipChainTrans      , %ClipChainTrans%
+GuiControl, ClipChain:, ClipChainSend       , %ClipChainSend%
+GuiControl, ClipChain:, ClipChainTrim       , %ClipChainTrim%
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 
 Gosub, ClipChainCheckboxes
@@ -98,12 +119,44 @@ ClipChainLvHandle := New LV_Rows(HLV)
 
 Return
 
+ClipChainTrimUpdate:
+InputBox, ClipChainTrimSet, ClipChain Trim characters, Set Trim characters Delimiter(s) (\n`,\r`,\t`,\s`)`nTrims Left and Right, , 300, 140, , , , , %ClipChainTrimSet%
+If ErrorLevel
+	Return
+If (ClipChainTrimSet = "")
+	{
+	 ClipChainTrimSet := "[press to set]"
+	 Return
+	}
+GuiControl, ClipChain:, ClipChainTrimSet      , %ClipChainTrimSet%
+SetTrim:
+TrimSet:=ClipChainTrimSet
+TrimSet:=StrReplace(TrimSet,"\n","`n")
+TrimSet:=StrReplace(TrimSet,"\r","`r")
+TrimSet:=StrReplace(TrimSet,"\t","`t")
+TrimSet:=StrReplace(TrimSet,"\s"," ")
+Return
+
+
+
+ClipChainKeyUpdate:
+InputBox, ClipChainKey, ClipChain Send after Paste, Send key(s) after paste (AutoHotkey notation), , 300, 130, , , , , %ClipChainKey%
+If ErrorLevel
+	Return
+If (ClipChainKey = "")
+	{
+	 ClipChainKey := "[press to set]"
+	 Return
+	}
+GuiControl, ClipChain:, ClipChainKey      , %ClipChainKey%
+Return
+
 #IfWinExist CL3ClipChain ahk_class AutoHotkeyGUI
 ~LButton::
 If ClipChainPause
 	Return
 If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
-	{ ; check if you doubleclicked on the listview if so move away focus from listview otherwise we couldn't set the new active item by double clicking in the LV
+	{ ; check if you double clicked on the listview if so move away focus from listview otherwise we couldn't set the new active item by double clicking in the LV
 	 ControlGetFocus, CL3ClipChainListview, CL3ClipChain ahk_class AutoHotkeyGUI
 	 If (CL3ClipChainListview = "SysListView321")
 	 	{
@@ -129,7 +182,14 @@ If (ClipChainIndex > ClipChainData.MaxIndex())
 	}
 If ClipChainNoHistory
 	OnClipboardChange("FuncOnClipboardChange", 0)
+If IsFunc("ClipboardPrivateRules")
+	ClipboardPrivateRules("ClipChain")
 Clipboard:=ClipChainData[ClipChainIndex]
+If ClipChainTrim
+{
+	Clipboard:=Trim(Clipboard,TrimSet)
+msgbox hi %TrimSet%
+}
 PasteIt()
 Sleep 100
 Clipboard:=History[1].text
@@ -137,6 +197,8 @@ If ClipChainNoHistory
 	OnClipboardChange("FuncOnClipboardChange", 1)
 stats.clipchain++
 ClipChainIndex++
+If ClipChainSend and (ClipChainSend <> "[press to set]")
+	Send % ClipChainKey
 Gosub, ClipChainUpdateIndicator
 Return
 #If
@@ -168,7 +230,7 @@ If (SaveAsName = "")
 	 Return
 	}
 StringReplace, SaveAsName, SaveAsName, .xml,,All
-XA_Save("ClipChainData", A_ScriptDir "\ClipData\ClipChain\" SaveAsName ".xml") ; put variable name in quotes
+XA_Save("ClipChainData", ClipDataFolder "ClipChain\" SaveAsName ".xml") ; put variable name in quotes
 Return
 
 ClipChainClear:
@@ -320,15 +382,45 @@ ClipChainIndex:=A_EventInfo
 Gosub, ClipChainUpdateIndicator
 Return
 
+ClipChainLoadDelim:
+InputBox, CCDelim, ClipChain Delimiter, Set Delimiter(s) CSV (\n`,\r`,\t`,\s`,\c)`nUse \c for comma, , 300, 140, , , , , \n
+If ErrorLevel
+	Return
+If (CCDelim = "")
+	Return
+
+CCDelim:=StrReplace(CCDelim,"\n","`n")
+CCDelim:=StrReplace(CCDelim,"\r","`r")
+CCDelim:=StrReplace(CCDelim,"\t","`t")
+CCDelim:=StrReplace(CCDelim,"\s"," ")
+
 ClipChainLoad:
 XMLSave("ClipChainData","-" A_Now)
 ClipChainData:=RegExReplace(Clipboard,"m)^\s+$") ; v1.1 remove white space from empty lines
-If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first entry, could mess up a filepath...
+If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first entry, could mess up a file path...
 	ClipChainData:=SubStr(ClipChainData,2)
-StringReplace,ClipChainData,ClipChainData,`r`n`r`n, % Chr(7), All
+;StringReplace,ClipChainData,ClipChainData,`r`n`r`n, % Chr(7), All
+
+Loop, parse, CCDelim, CSV
+	{
+	 If (A_LoopField = "\c")
+		{
+		 ClipChainData:=StrReplace(ClipChainData,",",Chr(7))
+		 continue
+		}
+	 ClipChainData:=StrReplace(ClipChainData,A_LoopField,Chr(7))
+	}
+
+If !CCDelim
+	{
+	 CCDelim:="`r`n`r`n"
+	 ClipChainData:=StrReplace(ClipChainData,CCDelim, Chr(7))
+	}
+
 #Include *i %A_ScriptDir%\plugins\ClipChainPRIVATERULES.ahk
 ClipChainData:=StrSplit(ClipChainData,Chr(7))
- 
+CCDelim:=""
+
 ClipChainListview:
 Gui, ClipChain:Default
 LV_Delete()
@@ -369,16 +461,25 @@ Gosub, ClipChainSaveWindowPosition
 Gosub, ClipChainSet
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, Hide
-XA_Save("ClipChainData",A_ScriptDir "\ClipData\ClipChain\ClipChain.xml")
+XA_Save("ClipChainData",ClipDataFolder "ClipChain\ClipChain.xml")
 Return
 
 ClipChainSaveWindowPosition:
 WinGetPos, ClipChainX, ClipChainY, , , CL3ClipChain ahk_class AutoHotkeyGUI
-IniWrite, %ClipChainX%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainX
-IniWrite, %ClipChainY%, %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainY
-IniWrite, %ClipChainNoHistory%   , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainNoHistory
-IniWrite, %ClipChainTrans%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainTrans
-IniWrite, %ClipChainPause%       , %A_ScriptDir%\ClipData\ClipChain\ClipChain.ini, Settings, ClipChainPause
+IniWrite, %ClipChainX%, %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainX
+IniWrite, %ClipChainY%, %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainY
+IniWrite, %ClipChainNoHistory%   , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainNoHistory
+IniWrite, %ClipChainTrans%       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrans
+IniWrite, %ClipChainKey%         , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey
+If (ClipChainSend = "[press to set]")
+	ClipChainSend:=""
+IniWrite, %ClipChainSend%        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainSend
+IniWrite, %ClipChainPause%       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause
+
+IniWrite, %ClipChainTrim%     , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrim
+If (ClipChainTrimSet = "[press to set]")
+	ClipChainTrimSet:=""
+IniWrite, %ClipChainTrimSet%     , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrimSet
 Return
 
 ClipChainMoveUp:
@@ -410,7 +511,7 @@ Menu, ClipChainLoadFile, Add
 Menu, ClipChainLoadFile, Delete
 Menu, ClipChainLoadFile, Add, ClipChain.xml, MenuHandlerClipChainLoadFile
 Menu, ClipChainLoadFile, Add
-Loop, %A_ScriptDir%\ClipData\ClipChain\*.xml
+Loop, %ClipDataFolder%ClipChain\*.xml
 	{
 	 If (A_LoopFileName = "ClipChain.xml")
 		Continue
@@ -420,10 +521,10 @@ Menu, ClipChainLoadFile, Show
 Return
 
 MenuHandlerClipChainLoadFile:
-If (XA_Load(A_ScriptDir "\ClipData\ClipChain\" A_ThisMenuItem) = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+If (XA_Load(ClipDataFolder "ClipChain\" A_ThisMenuItem) = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 	{
 	 MsgBox, 16, ClipChain, %A_ThisMenuItem% seems to be corrupt, starting new empty ClipChain.
-	 FileDelete, %A_ScriptDir%\ClipData\ClipChain\%A_ThisMenuItem%
+	 FileDelete, %ClipDataFolder%ClipChain\%A_ThisMenuItem%
 	 ClipChainData:=[]
 	}
 Gui, ClipChain:Default
