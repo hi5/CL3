@@ -1,17 +1,30 @@
 # Changelog
 
+### v1.101
+
+* Change: added `Try` to most `HotKey` commands. Allows the user to bypass default features/plugins by deleting the associated hotkey and avoid 'HotKey Error' crashes.
+* New setting: Allow Duplicates, do not automatically delete identical entries.
+* New ClipChain option: enter (multiple) delimiter(s) to split elements from clipboard.
+* New ClipChain option: define send key(s) after paste (AutoHotkey notation) e.g. {tab}.
+* New ClipChain option: define Trim options
+* New Named Slots, setup via ccmdr (sNAME) e.g. store current clipboard content as "name". Access via QuickSlotsMenu setting and Slots menu (if any named slots are created)
+* New Slots setting for QuickSlotsMenu, show all Slots (0-9) and named Slots
+* New API: ChainClear (Clear ClipChain), SlotPaste (paste specific slot ID)
+* New (expert) setting: define the `ClipData` and `Templates` Folders to separate the script from the user history, plugin, and template data (cloud, network, or other drive; appdata etc.)
+* New (Experimental, hidden): [HistoryRules](https://github.com/hi5/CL3/blob/master/docs/HistoryRules.md) to allow CL3 to filter clipboard content before adding it to history, allowing or skipping text.
+
 ### v1.100
 
 * New setting: number of entries in "z. More history" (default 26 for a to z), repeating menu accelerators. Use a negative value e.g. -30 to avoid repeating menu accelerators.
 * New setting: second Show Menu hotkey to be able to define mouse button for example (Winkey+LButton).
 * If there are over 26 templates in a folder, repeating menu accelerators (a-z).
-* New: Check if a sub-folder in \templates\ has a "settings.ini" with a "shortcut" key, if so, setup hotkey to show sub-templates menu directly by passing the main menu, templates, folder navigation.
+* New: Check if a sub-folder in \templates\ has a "settings.ini" with a "shortcut" key, if so, setup hotkey to show sub-templates menu directly bypassing the main menu, templates, folder navigation.
 * Now using CRC32 to avoid duplicate entries, hopefully faster and more efficient.
 * Fix: Compact(ing) adding lines and crc to compacted history as well.
 
 ### v1.99.1
 
-* Adding correct Settings GUI to Github
+* Adding correct Settings GUI to GitHub
 
 ### v1.99
 
@@ -45,7 +58,7 @@
 * Tray menu: Pause clipboard history - option to turn clipboard history on/off - incl. changing tray icon
 * Change: Slots - Restore current clipboard from History after pasting Slot entry
 * New option to paste unmodified clipboard entry, retains all formatting - see Note 3 in readme.md
-* Added WatchFolder() to automaticallly reload CL3 when a file in the Template folder is updated/added/removed
+* Added WatchFolder() to automatically reload CL3 when a file in the Template folder is updated/added/removed
 
 ### v1.95.2
 
@@ -105,11 +118,11 @@
 * Hotkeys and some other basic settings via settings.ini, accessible via Tray menu Settings
 * Basic stats, accessible via Tray menu "Usage statistics"
 * Search Plugin: fix for first Down:: (see comment in code plugins\search.ahk)
-* Search Plugin: pressing hotkey again toggles Gui (e.g. hide, show like slots and clipchain already do)
-* Attempt to have more stable ToolTip (less/no flickering as it no longer continously updates the TT if nothing changes)  
+* Search Plugin: pressing hotkey again toggles Gui (e.g. hide, show like slots and Clipchain already do)
+* Attempt to have more stable ToolTip (less/no flickering as it no longer continuously updates the TT if nothing changes)  
   (Note: using ToolTipFont https://autohotkey.com/boards/viewtopic.php?f=6&t=4777 results in error for these cycle tooltips)
 * Updated from OnClipboardChange: to OnClipboardChange() - improved efficiency by turning it on/off at various "actions" and "plugins"
-* Improved MaxHistory, not just on OnExit but now continously keep it at set entries - should help with memory consumption and overall speed
+* Improved MaxHistory, not just on OnExit but now continuously keep it at set entries - should help with memory consumption and overall speed
 * Added some (generic) icons to tray menu
 * Fixed issue with Cycle paste not correctly updating History
 

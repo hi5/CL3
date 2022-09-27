@@ -1,4 +1,4 @@
-# CL3 <sup>v1.100</sup> - Clipboard caching utility
+# CL3 <sup>v1.101</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -201,7 +201,7 @@ TrayTips will appear at the start and stop of a FIFO cycle.
 
 ### Sort [v1.94+]
 
-Sort via a number of predefined settings or set specific options via small Gui (see "Set Delimeter and other options" in Sort menu).  
+Sort via a number of predefined settings or set specific options via small Gui (see "Set Delimiter and other options" in Sort menu).  
 See [Sort](https://www.autohotkey.com/docs/commands/Sort.htm) documentation for explanation.
 
 ## Yank (delete) entry
@@ -318,6 +318,80 @@ ExitApp ; to close the script after OCR
 ```
 
 After the OCR is complete it is added to the clipboard and thus the CL3 clipboard history.
+
+# General TIPs
+
+As noted above, adding plugins via `plugins\MyPlugins.ahk` is the recommended method, see comments in [plugins.ahk](plugins/plugins.ahk) for instructions.
+
+Apart from plugins, `plugins\MyPlugins.ahk` is also a useful method to add additional functions and/or hotkeys to CL3 without the risk of losing them when updating.
+(MyPlugins.ahk will never be part of the public CL3 repository)
+
+1. Copy or Cut and Append to clipboard
+
+Some text editors already offer this functionality, but you make it available everywhere using CL3.  
+Add the following code for copy and/or cut to `plugins\MyPlugins.ahk`
+
+```autohotkey
+; copy text and append to clipboard item so a, ab, abc, abcd etc
+^+c::
+OnClipboardChange("FuncOnClipboardChange", 0)
+Send ^c
+Sleep, 100
+ClipText:=History[1].text . Clipboard ; if you want to use a separator insert it here e.g. "`n" or "|" 
+StrReplace(ClipText, "`n", "`n", Count)
+crc:=crc32(ClipText)
+History[1,"text"]:=ClipText
+History[1,"lines"]:=Count+1,
+History[1,"crc"]:=crc
+Clipboard:=ClipText
+Sleep, 100
+ClipText:="",Count:="",crc:=""
+OnClipboardChange("FuncOnClipboardChange", 1)
+Return
+
+; cut text and append to clipboard so a, ab, abc, abcd etc
+^+x::
+OnClipboardChange("FuncOnClipboardChange", 0)
+Send ^x
+Sleep, 100
+ClipText:=History[1].text . Clipboard ; if you want to use a separator insert it here e.g. "`n" or "|" 
+StrReplace(ClipText, "`n", "`n", Count)
+crc:=crc32(ClipText)
+History[1,"text"]:=ClipText
+History[1,"lines"]:=Count+1,
+History[1,"crc"]:=crc
+Clipboard:=ClipText
+Sleep, 100
+ClipText:="",Count:="",crc:=""
+OnClipboardChange("FuncOnClipboardChange", 1)
+Return
+
+```
+
+2. Adding shortcuts for pasting clipboard entries directly
+
+```autohotkey
+; forum post https://www.autohotkey.com/boards/viewtopic.php?f=76&t=90231&p=398527#p398527
+^+1:: ; current clipboard
+^+2:: ; second entry in clipboard history (b. in the menu)
+^+3:: ; third entry in clipboard history (c. in the menu)
+^+4::
+^+5::
+^+6::
+^+7::
+^+8::
+^+9::
+; add more if you wish, note that you need to modify the logic for "SubStr(A_ThisHotkey,0)" in that case
+OnClipboardChange("FuncOnClipboardChange", 0)
+Clipboard:=History[SubStr(A_ThisHotkey,0)].text
+Sleep 200
+PasteIt()
+Sleep 200
+Clipboard:=History[1].text
+OnClipboardChange("FuncOnClipboardChange", 1)
+Return
+```
+
 
 # PastePrivateRules.ahk
 
