@@ -5,10 +5,11 @@
 You can modify CL3's clipboard History, Slots and ClipChain via external scripts by using this API.
 See docs\cl3api.md
 
-Version           : 1.0
+Version           : 1.4
 CL3 version       : 1.9.4
 
 History:
+- see cl3apiclass.ahk
 - 1.0 initial version
 
 */
@@ -92,10 +93,24 @@ CL3Api_ChainRemove(Idx)
 	 return 1
 	}
 
+CL3Api_ChainClear()
+	{
+	 global cl3api
+	 cl3api.ChainClear()
+	 return 1
+	}
+
 CL3Api_Slot(Idx,Data)
 	{
 	 global cl3api
-	 cl3api.slot(Idx,Data)
+	 cl3api.Slot(Idx,Data)
+	 return 1
+	}
+
+CL3Api_SlotPaste(Idx)
+	{
+	 global cl3api
+	 cl3api.SlotPaste(Idx)
 	 return 1
 	}
 

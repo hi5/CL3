@@ -8,10 +8,11 @@ using ObjRegisterActive() by Lexikos @ https://www.autohotkey.com/boards/viewtop
 We use JSON Dump/Load to pass on strings from-to CL3 to client script.
 Code by cocobelgica @ https://github.com/cocobelgica/AutoHotkey-JSON
 
-Version           : 1.3
+Version           : 1.4
 CL3 version       : 1.9.4
 
 History:
+- 1.4 added SlotPaste, ClearClipChain
 - 1.3 added ToggleCheck for tray menu
 - 1.2 backup data Slots, ClipChainData, History
 - 1.1 added State to turn clipboard history on/off
@@ -80,10 +81,19 @@ class CL3API
 	 ChainRemove(Index)
 		{
 		 XMLSave("ClipChainData","-" A_Now) ; put variable name in quotes
-	 	 ClipChainData.Remove(Index)
+		 ClipChainData.Remove(Index)
 		 Gosub, ClipChainListview
 		 return 1
 		}
+
+	 ChainClear()
+		{
+		 XMLSave("ClipChainData","-" A_Now) ; put variable name in quotes
+		 ClipChainDataNew:=[]
+		 Gosub, ClipChainListview
+		 return 1
+		}
+
 
 	 Slot(SlotID,Data)
 		{
@@ -96,6 +106,21 @@ class CL3API
 			 XMLSave("Slots") ; put variable name in quotes
 			 GuiControl, Slots:Text, Slot%SlotID%, % Data ; update gui which we already setup in the Slots plugins
 			}
+		 return 1
+		}
+
+	 SlotPaste(SlotID)
+		{
+		 if (SlotID = 10)
+			SlotID:=0
+	 MsgBox % SlotID
+		 OnClipboardChange("FuncOnClipboardChange", 0)
+		 Clipboard:=Slots[SlotID]
+		 PasteIt()
+		 Sleep 100
+		 Clipboard:=History[1].text
+		 OnClipboardChange("FuncOnClipboardChange", 1)
+		 stats.slots++
 		 return 1
 		}
 
