@@ -14,9 +14,9 @@ History:
 NotesMenuSetup:
 
 NotesMenu:=[]
-IfNotExist, %A_ScriptDir%\ClipData\Notes\Notes.txt
-	FileCopy, %A_ScriptDir%\ClipData\Notes\Notes_Example.txt, %A_ScriptDir%\ClipData\Notes\Notes.txt
-FileRead, Notes, %A_ScriptDir%\ClipData\Notes\Notes.txt
+IfNotExist, %ClipDataFolder%Notes\Notes.txt
+	FileCopy, %ClipDataFolder%Notes\Notes_Example.txt, %ClipDataFolder%Notes\Notes.txt
+FileRead, Notes, %ClipDataFolder%Notes\Notes.txt
 Notes:=RegExReplace(Notes, "\R+\R", "`r`n")          ; remove empty lines
 Notes:=RegExReplace(Notes "`n", "m`a)(?=^\s*;).*\R") ; remove commented lines
 Notes:=StrReplace(Notes,"%A_ScriptDir%",A_ScriptDir)
@@ -55,7 +55,7 @@ Return
 
 NotesMenuHandler:
 NoteText:=""
-FileRead, NoteText, %A_ScriptDir%\ClipData\Notes\NotesTemplate.txt
+FileRead, NoteText, %ClipDataFolder%Notes\NotesTemplate.txt
 If !InStr(NoteText,"@clipboard@") ; be sure we can insert the clipboard
 	NoteText .= "@clipboard@"
 If InStr(NoteText,"@NoteTime=")

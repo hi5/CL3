@@ -17,12 +17,12 @@ History:
 AutoReplaceInit:
 If !IsObject(AutoReplace)
 	{
-	 IfExist, %A_ScriptDir%\ClipData\AutoReplace\AutoReplace.xml
+	 IfExist, %ClipDataFolder%AutoReplace\AutoReplace.xml
 		{
-		 If (XA_Load(A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
+		 If (XA_Load(ClipDataFolder "AutoReplace\AutoReplace.xml") = 1) ; the name of the variable containing the array is returned OR the value 1 in case of error
 			{
 			 MsgBox, 16, AutoReplace, AutoReplace.xml seems to be corrupt, starting a new empty AutoReplace.xml.
-			 FileDelete, %A_ScriptDir%\ClipData\AutoReplace\AutoReplace.xml
+			 FileDelete, %ClipDataFolder%AutoReplace\AutoReplace.xml
 			 AutoReplace:=[]
 			}
 		}
@@ -71,7 +71,7 @@ IfMsgBox, No
 	Return
 XMLSave("AutoReplace","-" A_Now)
 AutoReplace.RemoveAt(Rules)
-;XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
+;XA_Save("AutoReplace", ClipDataFolder "AutoReplace\AutoReplace.xml")
 XMLSave("AutoReplace")
 Gosub, AutoReplaceUpdateListbox
 Return
@@ -131,7 +131,7 @@ AutoReplace[Rules,"name"]:=name
 AutoReplace[Rules,"type"]:=type
 AutoReplace[Rules,"find"]:=find
 AutoReplace[Rules,"replace"]:=replace
-;XA_Save("AutoReplace", A_ScriptDir "\ClipData\AutoReplace\AutoReplace.xml")
+;XA_Save("AutoReplace", ClipDataFolder "AutoReplace\AutoReplace.xml")
 XMLSave("AutoReplace")
 Return
 
