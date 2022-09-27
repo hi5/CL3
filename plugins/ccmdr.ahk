@@ -4,10 +4,11 @@ Plugin            : ccmdr (optional via settings.ini)
 Purpose           : Allow for (batch) operations on clipboard history vs the
                     usual one by one operations via standard CL3 options.
                     see docs\ccmdr.md
-Version           : 1.0
+Version           : 1.1
 CL3 version       : v1.94
 
 History:
+- 1.1 added named slots
 - 1.0 initial version
 
 */
@@ -92,7 +93,7 @@ Return
 
 Command(cmd)
 	{
-	 global History,History_Save,Slots
+	 global History,History_Save,Slots,SlotsNamed
 	 cmd:=trim(cmd," ")
 	 Command:=SubStr(cmd,1,1)
 	 if (Command = "r") ; for burst, paste
@@ -165,9 +166,14 @@ Command(cmd)
 				{
 				 TrayTip, CL3:cmdr, Invalid SlotID`n(Command ignored), 1, 3 ; one second, error icon
 				}
+			 return
 			}
 		 ; TODO named Slots
-		 return
+		 If !IsObject(SlotsNamed)
+			SlotsNamed:={}
+		 SlotsNamed[cmd]:=History[1].text
+		 XA_Save("SlotsNamed", ClipDataFolder "Slots\SlotsNamed.xml")
+		 Gosub, QuickSlotsMenu
 		}
 	
 	 /*
