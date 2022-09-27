@@ -40,7 +40,7 @@ Settings()
 		Exclude:=""
 	 StringLower, Exclude, Exclude
 
-	 If (SettingsFolders = "") or (SettingsFolders = "ERROR")
+	 If (SettingsFolders = "") or (SettingsFolders = "ERROR") or (SettingsFolders = 0)
 		SettingsFolders:=""
 
 	 folders:=SettingsFolders

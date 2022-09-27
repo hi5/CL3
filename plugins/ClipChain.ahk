@@ -24,7 +24,7 @@ IniRead, ClipChainX          , %ClipDataFolder%ClipChain\ClipChain.ini, Settings
 IniRead, ClipChainY          , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainY, 100
 IniRead, ClipChainNoHistory  , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainNoHistory , 0
 IniRead, ClipChainTrans      , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrans     , 0
-IniRead, ClipChainKey        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey, 0
+IniRead, ClipChainKey        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey
 IniRead, ClipChainSend       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainSend
 IniRead, ClipChainPause      , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause     , 0
 IniRead, ClipChainTrim       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrim      , 0
@@ -34,9 +34,9 @@ If (ClipChainX = "") or (ClipChainX = "ERROR")
 	ClipChainX:=100
 If (ClipChainY = "") or (ClipChainY = "ERROR")
 	ClipChainY:=100
-If (ClipChainSend = "") or (ClipChainSend = "ERROR")
-	ClipChainSend:="[press to set]"
-If (ClipChainTrimSet = "") or (ClipChainTrimSet = "ERROR") or (ClipChainTrimSet = "0")
+If (ClipChainKey = "") or (ClipChainKey = "ERROR") or (ClipChainKey = 0)
+	ClipChainKey:="[press to set]"
+If (ClipChainTrimSet = "") or (ClipChainTrimSet = "ERROR") or (ClipChainTrimSet = 0)
 	ClipChainTrimSet:="[press to set]"
 else
 	Gosub, SetTrim
@@ -59,6 +59,8 @@ If !IsObject(ClipChainData)
 	}
 
 ClipChainIndex:=1
+
+;ClipboardPrivateRulesFunc:="ClipboardPrivateRules"
 
 Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Delete
@@ -110,7 +112,7 @@ Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainGuiClose  gCl
 
 GuiControl, ClipChain:, ClipChainNoHistory  , %ClipChainNoHistory%
 GuiControl, ClipChain:, ClipChainTrans      , %ClipChainTrans%
-GuiControl, ClipChain:, ClipChainSend       , %ClipChainSend%
+GuiControl, ClipChain:, ClipChainKey        , %ClipChainKey%
 GuiControl, ClipChain:, ClipChainTrim       , %ClipChainTrim%
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 
@@ -126,6 +128,7 @@ If ErrorLevel
 If (ClipChainTrimSet = "")
 	{
 	 ClipChainTrimSet := "[press to set]"
+	 GuiControl, ClipChain:, ClipChainTrimSet       , %ClipChainTrimSet%
 	 Return
 	}
 GuiControl, ClipChain:, ClipChainTrimSet      , %ClipChainTrimSet%
@@ -146,6 +149,7 @@ If ErrorLevel
 If (ClipChainKey = "")
 	{
 	 ClipChainKey := "[press to set]"
+	 GuiControl, ClipChain:, ClipChainKey      , %ClipChainKey%
 	 Return
 	}
 GuiControl, ClipChain:, ClipChainKey      , %ClipChainKey%
@@ -182,8 +186,8 @@ If (ClipChainIndex > ClipChainData.MaxIndex())
 	}
 If ClipChainNoHistory
 	OnClipboardChange("FuncOnClipboardChange", 0)
-If IsFunc("ClipboardPrivateRules")
-	ClipboardPrivateRules("ClipChain")
+;If IsFunc(ClipboardPrivateRulesFunc)
+;	%ClipboardPrivateRulesFunc%("ClipChain")
 Clipboard:=ClipChainData[ClipChainIndex]
 If ClipChainTrim
 {
@@ -197,7 +201,7 @@ If ClipChainNoHistory
 	OnClipboardChange("FuncOnClipboardChange", 1)
 stats.clipchain++
 ClipChainIndex++
-If ClipChainSend and (ClipChainSend <> "[press to set]")
+If ClipChainSend and (ClipChainKey <> "[press to set]")
 	Send % ClipChainKey
 Gosub, ClipChainUpdateIndicator
 Return
@@ -470,9 +474,9 @@ IniWrite, %ClipChainX%, %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipC
 IniWrite, %ClipChainY%, %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainY
 IniWrite, %ClipChainNoHistory%   , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainNoHistory
 IniWrite, %ClipChainTrans%       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrans
+If (ClipChainKey = "[press to set]")
+	ClipChainKey:=""
 IniWrite, %ClipChainKey%         , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey
-If (ClipChainSend = "[press to set]")
-	ClipChainSend:=""
 IniWrite, %ClipChainSend%        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainSend
 IniWrite, %ClipChainPause%       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause
 
