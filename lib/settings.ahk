@@ -1,7 +1,10 @@
 Settings()
 	{
 	 global
-	 local SettingsOutputVar
+	 local SettingsOutputVar,A_UserProfile,folders,tmpfolder
+	 EnvGet, A_UserProfile, USERPROFILE
+	 ahk_folders:="AppData, AppDataCommon, Desktop, DesktopCommon, MyDocuments, StartMenuCommon, Programs, ProgramsCommon, ProgramFiles, StartMenu, Startup, StartupCommon, ScriptDir, UserName, WinDir, WorkingDir, UserProfile"
+
 	 CyclePlugins:=[]
 	 ini:=A_ScriptDir "\settings.ini"
 	 ; CyclePlugins
@@ -18,6 +21,7 @@ Settings()
 	 IniRead, MaxHistory         , %ini%, settings, MaxHistory, 150
 	 IniRead, MenuWidth          , %ini%, settings, MenuWidth, 40
 	 IniRead, MoreHistory        , %ini%, settings, MoreHistory, 18
+	 IniRead, AllowDupes         , %ini%, settings, AllowDupes, 0
 	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
 	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
@@ -29,11 +33,41 @@ Settings()
 	 IniRead, BackupTimer        , %ini%, settings, BackupTimer, 10
 	 IniRead, Exclude            , %ini%, settings, Exclude, 0
 	 IniRead, LineFormat         , %ini%, settings, LineFormat, \t(\l line),\t(\l lines)
+	 IniRead, SettingsFolders    , %ini%, settings, SettingsFolders, 0
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
 	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
 	 If (Exclude = 0) or (Exclude = "Error")
 		Exclude:=""
 	 StringLower, Exclude, Exclude
+
+	 If (SettingsFolders = "") or (SettingsFolders = "ERROR")
+		SettingsFolders:=""
+
+	 folders:=SettingsFolders
+
+	 Loop, parse, ahk_folders, CSV
+	 	{
+		 tmpfolder:="A_" Trim(A_LoopField," ")
+		 folders:=StrReplace(folders,"%A_" Trim(A_LoopField," ") "%", %tmpfolder%)
+	 	}
+
+	 ClipDataFolder:=StrSplit(folders,";").1 "\ClipData\"
+	 If (ClipDataFolder = "\ClipData\")
+		ClipDataFolder:=A_ScriptDir "\ClipData\"
+	 TemplateFolder:=StrSplit(folders,";").2 "\Templates\"
+	 If (TemplateFolder = "\Templates\")
+		TemplateFolder:=A_ScriptDir "\Templates\"
+
+	 If !FileExist(ClipDataFolder)
+		FileCreateDir, %ClipDataFolder%
+	 Loop, parse, % "History,ClipChain,AutoReplace,Slots,Notes", CSV
+		{
+		 If !FileExist(ClipDataFolder A_LoopField)
+			FileCreateDir, %ClipDataFolder%%A_LoopField%
+		}
+
+	 If !FileExist(TemplateFolder)
+		FileCreateDir, %TemplateFolder%
 
 	 LineTextFormat:=StrSplit(StrReplace(LineFormat,"\t",A_Tab),",")
 
@@ -63,7 +97,7 @@ Settings_Default()
 		, hk_cyclebackward :"v"
 		, hk_cycleforward  :"c"
 		, hk_cycleplugins  :"f"
-		, hk_cyclecancel   :"x" 
+		, hk_cyclecancel   :"x"
 		, hk_slot1         :">^1"
 		, hk_slot2         :">^2"
 		, hk_slot3         :">^3"
@@ -74,24 +108,26 @@ Settings_Default()
 		, hk_slot8         :">^8"
 		, hk_slot9         :">^9"
 		, hk_slot0         :">^0"
+		, hk_slotsmenu     :""
 		, hk_notes         :"#n"
 		, hk_BypassAutoReplace :""
 		, hk_cmdr          :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
 		, MenuWidth         : 40
 		, MoreHistory       : 26
+		, AllowDupes        : 0
 		, SearchWindowWidth : 595
 		, SearchWindowHeight: 300
 		, ActivateApi       : 0
 		, ShowLines         : 1
 		, AutoReplaceTrayTip: 0
-		, CopyDelay         : 0 
-		, PasteDelay        : 50 
+		, CopyDelay         : 0
+		, PasteDelay        : 50
 		, Exclude           : ""
 		, LineFormat        : "\t(\l line),\t(\l lines)" }
 
 	}
-	
+
 Stats_Create()
 	{
 	 global stats
@@ -144,16 +180,35 @@ Settings_Hotkeys()
 		{
 		 Index:=A_Index-1
 		 IniRead, hk_slot%index%, %ini%, Hotkeys, hk_slot%index%, >^%index%
-		 Hotkey, % hk_slot%index%, hk_slotpaste
+		 If (hk_slot%index% <> "")
+			Try
+				Hotkey, % hk_slot%index%, hk_slotpaste
 		}
 
-	 Hotkey, %hk_menu%             , hk_menu
+	 IniRead, hk_slotsmenu, %ini%, Hotkeys, hk_slotsmenu
+	 If (hk_slotsmenu = "ERROR")
+		hk_slotsmenu:=""
+	 If (hk_slotsmenu <> "")
+		{
+		 fn := func("ShowMenu").Bind("QuickSlotsMenu")
+		 Try
+			Hotkey, %hk_slotsmenu%, % fn
+		}
+
+	 If !hk_menu
+		hk_menu:="^+v"
+	 Try
+			Hotkey, %hk_menu%             , hk_menu
 	 If hk_menu2
-	 	Hotkey, %hk_menu2%           , hk_menu2
-	 Hotkey, %hk_plaintext%        , hk_plaintext
+		Try
+			Hotkey, %hk_menu2%           , hk_menu2
+	 If hk_plaintext
+		Try
+			Hotkey, %hk_plaintext%        , hk_plaintext
 	 Hotkey, %hk_clipchain%        , hk_clipchain
-	 If (hk_BypassAutoReplace <> "")
-		 Hotkey, %hk_BypassAutoReplace%, hk_BypassAutoReplace
+	 If hk_BypassAutoReplace
+		Try
+			Hotkey, %hk_BypassAutoReplace%, hk_BypassAutoReplace
 
 	 if (hk_clipchainpaste = "^v")
 		Hotkey, $%hk_clipchainpaste%, hk_clipchainpaste_defaultpaste
@@ -161,23 +216,54 @@ Settings_Hotkeys()
 	 Hotkey, If, ClipChainActive()
 	 Hotkey, $%hk_clipchainpaste%, ClipChainPasteDoubleClick
 	 Hotkey, If
-
-	 Hotkey, %hk_fifo%             , hk_fifo
-	 Hotkey, %hk_slots%            , hk_slots
-	 Hotkey, %hk_search%           , hk_search
-	 Hotkey, %hk_cyclemodkey% & %hk_cyclebackward%   , hk_cyclebackward
-	 Hotkey, %hk_cyclemodkey% & %hk_cyclebackward% up, hk_cyclebackward_up
-	 Hotkey, %hk_cyclemodkey% & %hk_cycleforward%    , hk_cycleforward
-	 Hotkey, %hk_cyclemodkey% & %hk_cycleforward% up , hk_cycleforward_up
-	 Hotkey, %hk_cyclemodkey% & %hk_cycleplugins%    , hk_cycleplugins
-	 Hotkey, %hk_cyclemodkey% & %hk_cycleplugins% up , hk_cycleplugins_up
-	 Hotkey, %hk_cyclemodkey% & %hk_cyclecancel%     , hk_cyclecancel
-	 Hotkey, %hk_cmdr%                               , hk_cmdr
-	 Hotkey, %hk_notes%                              , hk_notes
+	 If hk_fifo
+		Try
+			Hotkey, %hk_fifo%             , hk_fifo
+	 If hk_slots
+		Try
+			Hotkey, %hk_slots%            , hk_slots
+	 If hk_search
+		Try
+			Hotkey, %hk_search%           , hk_search
+	 If hk_cyclemodkey
+		{
+		 If hk_cyclebackward
+			{
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cyclebackward%   , hk_cyclebackward
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cyclebackward% up, hk_cyclebackward_up
+			}
+		 If hk_cycleforward
+			{
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cycleforward%    , hk_cycleforward
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cycleforward% up , hk_cycleforward_up
+			}
+		 If hk_cycleplugins
+			{
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cycleplugins%    , hk_cycleplugins
+			 Try
+				Hotkey, %hk_cyclemodkey% & %hk_cycleplugins% up , hk_cycleplugins_up
+			}
+		 If hk_cyclebackward
+			Try
+				Hotkey, %hk_cyclemodkey% & %hk_cyclecancel%     , hk_cyclecancel
+		}
+	 If hk_cmdr
+		Try
+			Hotkey, %hk_cmdr%                               , hk_cmdr
+	 If hk_notes
+		Try
+			Hotkey, %hk_notes%                              , hk_notes
 	 if !ActivateCmdr
-		Hotkey, %hk_cmdr%, off
+		Try
+			Hotkey, %hk_cmdr%, off
 	 if !ActivateNotes
-		Hotkey, %hk_notes%, off
+		Try
+			Hotkey, %hk_notes%, off
 	}
 
 Settings_menu:

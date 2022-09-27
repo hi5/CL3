@@ -3,8 +3,11 @@ Gui, Settings:Destroy
 Gui, Settings:New
 
 Gui Settings:Add,  GroupBox, x5 y20 w170 h320, General hotkeys
+Gui Settings:Font, cRed
+Gui Settings:Add,  Text, xp+140   yp w25  gHelpHotkeys, %A_Space% [?] %A_Space%
+Gui Settings:Font, cBlack
 
-Gui Settings:Add,  Text, xp+8  yp+25                           , Show Menu (History):
+Gui Settings:Add,  Text, xp-132  yp+25                         , Show Menu (History*):
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_menu         , %hk_menu%
 Gui Settings:Add,  Text, xp-110 yp+25                          , Show Menu 2 (History):
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_menu2        , %hk_menu2%
@@ -33,28 +36,36 @@ Gui Settings:Add,  Text, xp-110 yp+30                          , Cycle plugin:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_cycleplugins , %hk_cycleplugins%
 
 Gui Settings:Add,  GroupBox, xp+60 y20 w100 h320        , Slots
-Gui Settings:Add,  Text, xp+8 yp+24                     , Show:
+Gui Settings:Font, cRed
+Gui Settings:Add,  Text, xp+70   yp w25  gHelpHotkeys   , %A_Space% [?] %A_Space%
+Gui Settings:Font, cBlack
+
+Gui Settings:Add,  Text, xp-62 yp+24                     , Show:
 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20   vhk_slots, %hk_slots%
 
 Loop, 9
 	{
-	 Gui Settings:Add,  Text, xp-40 yp+30                          , Slot %A_Index%:
+	 Gui Settings:Add,  Text, xp-40 yp+27                          , Slot %A_Index%:
 	 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slot%A_Index%, % hk_slot%A_Index%
 	}
 
-Gui Settings:Add,  Text, xp-40 yp+30                  , Slot 10:
+Gui Settings:Add,  Text, xp-40 yp+27                  , Slot 10:
 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slot0, % hk_slot0
+
+Gui Settings:Add,  Text, xp-40 yp+27                          , Menu:
+Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slotsmenu    , %hk_slotsmenu%
 
 Gui Settings:Add,  GroupBox, xp+60 y20 w130 h320                , Other
 Gui Settings:Add,  Text, xp+8 yp+24                                     , Max History:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory Number         , %MaxHistory%
-Gui Settings:Add,  Text, xp-70 yp+30                                    , Menu width:
+Gui Settings:Add,  Text, xp-70 yp+25                                    , Menu width:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMenuWidth Number          , %MenuWidth%
-Gui Settings:Add,  Text, xp-70 yp+30                                    , More History:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 
+Gui Settings:Add,  Text, xp-70 yp+25                                    , More History:
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20
 Gui Settings:Add,  UpDown, Range-100-300 vMoreHistory                   , %MoreHistory%
-Gui Settings:Add,  Text, xp-70 yp+20                                    , ___________________
-Gui Settings:Add,  Text, xp    yp+30                                    , Search width:
+Gui Settings:Add,  Checkbox, xp-70 yp+24 vAllowDupes                    , Allow Duplicates
+Gui Settings:Add,  Text, xp yp+15                                       , ___________________
+Gui Settings:Add,  Text, xp    yp+25                                    , Search width:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowWidth Number  , %SearchWindowWidth%
 Gui Settings:Add,  Text, xp-70 yp+30                                    , Search height:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowHeight Number , %SearchWindowHeight%
@@ -62,11 +73,21 @@ Gui Settings:Add,  Text, xp-70 yp+20                                    , ______
 Gui Settings:Add,  Text, xp    yp+20                                    , CyclePlugins:
 
 Gosub, UpdateCyclePlugins
-Gui Settings:Add,  Edit, xp-5  yp+15  w125 R8 vEditCyclePlugins , %EditCyclePlugins%
+Gui Settings:Add,  Edit, xp-5  yp+15  w125 R7 vEditCyclePlugins , %EditCyclePlugins%
 
-Gui Settings:Add,  GroupBox, x5   yp+120 w416 h55               , Exclude programs (CSV list: program1.exe,program2.exe)
+Gui Settings:Add,  GroupBox, x5   yp+120 w278 h55               , Exclude programs (CSV: program1.exe,prg2.exe)
 
-Gui Settings:Add,  Edit,     xp+8 yp+20  w395 h20 vExclude     , %Exclude%
+Gui Settings:Add,  Edit,     xp+8 yp+20  w260 h20 vExclude      , %Exclude%
+
+Gui Settings:Add,  GroupBox, xp+278 yp-20  w130 h55             , Folders (Dir1;Dir2)
+
+Gui Settings:Font, cRed
+Gui Settings:Add,  Text, xp+100   yp w25  gFoldersHelp   , %A_Space% [?] %A_Space%
+Gui Settings:Font, cBlack
+
+Gui Settings:Add,  Edit, xp-90 yp+20   w110 h20 vSettingsFolders HwndFldrs, %SettingsFolders%
+SetEditCueBanner(Fldrs,"Default CL3 Folders")
+
 
 Gui Settings:Add,  Button, x5 yp+40   w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
@@ -96,7 +117,8 @@ Gui Settings:Font, cBlack
 Gui Settings:Add,  Edit    , xp-80 yp+20 w35 Number vCopyDelay   , %CopyDelay%
 Gui Settings:Add,  Edit    , xp+45 yp    w35 Number vPasteDelay  , %PasteDelay%
 
-
+If AllowDupes
+	GuiControl,, AllowDupes, 1
 If ActivateApi
 	GuiControl,, ActivateApi, 1
 If ActivateNotes
@@ -112,7 +134,7 @@ If AutoReplaceTrayTip
 
 ;Gui Settings:Add,  GroupBox, xp-8 yp+30 w100 h168                , Info
 ;Gui Settings:Font, s6
-;Gui Settings:Add,  Text    , xp+8 yp+24, CL3 
+;Gui Settings:Add,  Text    , xp+8 yp+24, CL3
 
 Gui Show, w545 h440, CL3 Settings - %version%
 Return
@@ -165,9 +187,12 @@ Loop, 9
 	IniWrite, % hk_slot%A_Index%  , %ini%, Hotkeys, hk_slot%A_Index%
 IniWrite, %hk_slot0%, %ini%, Hotkeys, hk_slot0
 
+IniWrite, %hk_slotsmenu%       , %ini%, Hotkeys, hk_slotsmenu
+
 IniWrite, %MenuWidth%          , %ini%, Settings, MenuWidth
 IniWrite, %MaxHistory%         , %ini%, Settings, MaxHistory
 IniWrite, %MoreHistory%        , %ini%, Settings, MoreHistory
+IniWrite, %AllowDupes%         , %ini%, Settings, AllowDupes
 IniWrite, %SearchWindowWidth%  , %ini%, Settings, SearchWindowWidth
 IniWrite, %SearchWindowHeight% , %ini%, Settings, SearchWindowHeight
 IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
@@ -178,6 +203,7 @@ IniWrite, %AutoReplaceTrayTip% , %ini%, Settings, AutoReplaceTrayTip
 IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
 IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
 IniWrite, %Exclude%            , %ini%, Settings, Exclude
+IniWrite, %SettingsFolders%    , %ini%, Settings, SettingsFolders
 
 LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 IniWrite, %LineFormat%         , %ini%, settings, LineFormat
@@ -199,6 +225,30 @@ for k, v in CyclePlugins
 	else
 		EditCyclePlugins .= v "`n"
 Return
+
+HelpHotkeys:
+MsgBox, 32, CL3 Hotkeys Help,
+(
+To disable a feature/plugin, simple delete the associated hotkey(s).
+
+Example: to disable ClipChain or Slots, remove (all) hotkey(s).
+
+* Show menu hotkey is mandatory.
+
+Modifiers:
+
+#	Windows-key
+^	Ctrl
++	Shift
+!	Alt
+< >	use RIGHT or LEFT modifier (>^ = RIGHT Control)
+
+F1-F12	Function keys
+
+See AutoHotkey help for further details.
+)
+Return
+
 
 ModHelp:
 MsgBox, 32, CL3 CyclePlugins Help,
@@ -226,3 +276,45 @@ Increasing this value may work around this issue.
 A value for a Paste Delay (right edit control) can also be set.
 )
 Return
+
+FoldersHelp:
+MsgBox, 32, CL3 Clipboard folders Help,
+(
+[expert setting]
+
+By default CL3 uses two folders to store History/Plugin and Templates data.
+
+ClipData:
+
+`%A_ScriptDir`%\ClipData\
+
+* AutoReplace
+* ClipChain
+* History
+* Notes
+* Slots
+
+Templates:
+
+`%A_ScriptDir`%\Templates\
+
+You can change the path for one or both of these, separate them with a semi-colon (;).
+To only set the Templates folder start with semi-colon `;My_Preferred_Path_to_Templates_folder\
+
+Omit "ClipData\" and "Templates\" as those are automatically appended by CL3
+
+The following A_ variables are permitted (e.g. `%A_ScriptDir`%)
+
+%ahk_folders% (last one is an environment variable, use as `%A_UserProfile`%)
+
+Tip: if you use `%A_AppData`% - do add \CL3 as in `%A_AppData`%CL3
+
+)
+Return
+
+
+; https://autohotkey.com/board/topic/76540-function-seteditcuebanner-ahk-l/
+SetEditCueBanner(HWND, Cue) {  ; requires AHL_L
+   Static EM_SETCUEBANNER := (0x1500 + 1)
+   Return DllCall("User32.dll\SendMessageW", "Ptr", HWND, "Uint", EM_SETCUEBANNER, "Ptr", True, "WStr", Cue)
+}
