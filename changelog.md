@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.102
+
+* Fix: Templates in sub-folders weren't read into clipboard to be pasted correctly.
+
 ### v1.101
 
 * Change: added `Try` to most `HotKey` commands. Allows the user to bypass default features/plugins by deleting the associated hotkey and avoid 'HotKey Error' crashes.
