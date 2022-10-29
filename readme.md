@@ -1,4 +1,4 @@
-# CL3 <sup>v1.101</sup> - Clipboard caching utility
+# CL3 <sup>v1.103</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -138,6 +138,10 @@ To facilitate quick pasting of predefined texts you can use the <kbd>RCtrl</kbd>
 hotkeys. By default the 10 predefined texts are stored in _slots.xml_ but you can save and load as many slot-files
 as you like via the buttons available when the Slots gui is open. The last set used is always stored in _slots.xml_
 
+SlotsMenu [v1.101+]
+
+To display the Slots as a menu, define a Hotkey in the Settings, this will also include any `Named` Slots you defined via `ccmdr` (see [docs\ccmdr.md](docs\ccmdr.md))
+
 ### Dump History plugin [v1.32+]
 
 You can export the current clipboard history to a plain text file via the Special, Dump History menu option.  
@@ -221,6 +225,12 @@ To cycle forwards press <kbd>LWin</kbd>+<kbd>c</kbd>.
 of the <kbd>LWin</kbd> key.
 
 To cancel pasting press <kbd>LWin</kbd>+<kbd>x</kbd>.
+
+After reaching "Max History" it will cycle back to the first entry in the history (for a Max History of three: a->b->c->a).
+
+To apply a plugin (see below), hold <kbd>LWin</kbd> and press <kbd>f</kbd> repeatedly to _select_ a plugin.
+
+See [Wiki](https://github.com/hi5/CL3/wiki/Cycle-history)
 
 ## Cycle through plugins [v1.8+]
 

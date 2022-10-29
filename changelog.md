@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.103
+
+* Change: Limit Cycle through clipboard history to MaxHistory (useful for smaller values) https://github.com/hi5/CL3/issues/18
+* Change: Cycle back/forward through clipboard history now returns to start or end of the MaxHistory value (a->b->c->a) Also #18
+* New: Settings to show/hide CL3s "set" menu options "Special, Templates, Yank, More history, and Exit" (see settings menu: Setup menu)
+
 ### v1.102
 
 * Fix: Templates in sub-folders weren't read into clipboard to be pasted correctly.

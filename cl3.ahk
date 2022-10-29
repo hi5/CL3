@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.102
+Version     : 1.103
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
@@ -40,7 +40,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.102"
+version:="v1.103"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -289,6 +289,8 @@ hk_cyclebackward_up:
 PreviousClipCycleCounter:=ClipCycleCounter
 If (ClipCycleFirst = 0)
 	ClipCycleCounter++
+If (ClipCycleCounter = MaxHistory + 1)
+	ClipCycleCounter:=1
 ClipCycleFirst:=0
 Return
 
@@ -302,7 +304,7 @@ If (ClipCycleCounter=1) or (ClipCycleCounter=0)
 	Return
 ClipCycleCounter--
 If (ClipCycleCounter < 1)
-	ClipCycleCounter:=1
+	ClipCycleCounter:=MaxHistory
 While GetKeyState(hk_cyclemodkey,"D") and cycleforward
 	{
 ;	 If !(PreviousClipCycleCounter = ClipCycleCounter) and (oldttext <> ttext)
@@ -330,7 +332,7 @@ PreviousClipCycleCounter:=""
 If (ClipCycleBackCounter=0)
 	ClipCycleCounter--
 If (ClipCycleCounter < 1)
-	ClipCycleCounter:=1
+	ClipCycleCounter:=MaxHistory
 ClipCycleBackCounter:=0
 Return
 
@@ -428,14 +430,15 @@ Return
 
 BuildMenuPluginTemplate:
 
-Menu, ClipMenu, Add
+If ShowSpecial or ShowTemplates or ShowYank or ShowExit
+	Menu, ClipMenu, Add
 
 If !FIFOACTIVE
 	{
 	 pluginlist:=pluginlistClip "|#" MyPluginlistFunc "|#" pluginlistFunc
 	 loop, parse, pluginlist, |
 		{
-		 if (SubStr(A_LoopField,1,1) = "#")
+		 If (SubStr(A_LoopField,1,1) = "#")
 			{
 			 If (StrLen(A_LoopField) = 1)
 				continue
@@ -460,68 +463,73 @@ If !FIFOACTIVE
 			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
 			}
 		}
-Menu, ClipMenu, Add, &s. Special, :Submenu1
-Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
-
-If (templatefilelist <> "")
+If ShowSpecial
 	{
-	 MenuAccelerator:=0
-	 Loop, Parse, templatefilelist, |
+	 Menu, ClipMenu, Add, &s. Special, :Submenu1
+	 Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
+	}
+
+If ShowTemplates
+	{
+	 If (templatefilelist <> "")
 		{
-		 if (Mod(MenuAccelerator,26)=0)
-			 	MenuAccelerator:=0
-		 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
-;		 key:=% "&" Chr(96+A_Index) ". " ; %
-		 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
-		 StringTrimRight,MenuText,MenuText,4
-		 Menu, Submenu2, Add, %MenuText%, TemplateMenuHandler
-		 Menu, Submenu2, Icon, %MenuText%, res\%iconT%,,16
-		}
-	 Menu, Submenu2, Add, &0. Open templates folder, TemplateMenuHandler
-	 Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
-
-	If (templatesfolderlist <> "")
-		{
-		 Loop, Parse, templatesfolderlist, |
-		 {
-
-			subtemplatefolder:=A_LoopField
-			Loop, files, %TemplateFolder%%A_LoopField%\*.txt
-				{
-				 templatefolderFiles .= A_LoopFileName "|"
-				 Sort, templatefolderFiles, D|
-				}
-			templatefolderFiles:=Trim(templatefolderFiles,"|")
-			MenuAccelerator:=0
-			Loop, parse, templatefolderFiles, |
-				{
-				 FileRead, a, %TemplateFolder%%subtemplatefolder%\%A_LoopField%
-				 Templates[subtemplatefolder,A_Index]:=a
-				 if (Mod(MenuAccelerator,26)=0)
-				 	MenuAccelerator:=0
-				 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
-				 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
-				 Menu, %subtemplatefolder%, Add, %MenuText%, TemplateMenuHandler
-				 Menu, %subtemplatefolder%, Icon, %MenuText%, res\%iconT%,,16
-				 a:=""
-				}
-			templatefolderFiles:=""
-		 }
-
-		 Loop, parse, templatesfolderlist, |
+		 MenuAccelerator:=0
+		 Loop, Parse, templatefilelist, |
 			{
-			 Menu, SubMenu2, Add, &%A_LoopField%, :%A_LoopField%
-			 try
-				Menu, SubMenu2, Icon, &%A_LoopField%, %TemplateFolder%%A_LoopField%\favicon.ico,,16
-			 catch
-				Menu, SubMenu2, Icon, &%A_LoopField%, res\%iconT%,,16
+			 If (Mod(MenuAccelerator,26)=0)
+					MenuAccelerator:=0
+			 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
+	;		 key:=% "&" Chr(96+A_Index) ". " ; %
+			 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
+			 StringTrimRight,MenuText,MenuText,4
+			 Menu, Submenu2, Add, %MenuText%, TemplateMenuHandler
+			 Menu, Submenu2, Icon, %MenuText%, res\%iconT%,,16
+			}
+		 Menu, Submenu2, Add, &0. Open templates folder, TemplateMenuHandler
+		 Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
+
+		 If (templatesfolderlist <> "")
+			{
+			 Loop, Parse, templatesfolderlist, |
+				{
+				 subtemplatefolder:=A_LoopField
+				 Loop, files, %TemplateFolder%%A_LoopField%\*.txt
+					{
+					 templatefolderFiles .= A_LoopFileName "|"
+					 Sort, templatefolderFiles, D|
+					}
+				 templatefolderFiles:=Trim(templatefolderFiles,"|")
+				 MenuAccelerator:=0
+				 Loop, parse, templatefolderFiles, |
+					{
+					 FileRead, a, %TemplateFolder%%subtemplatefolder%\%A_LoopField%
+					 Templates[subtemplatefolder,A_Index]:=a
+					 if (Mod(MenuAccelerator,26)=0)
+						MenuAccelerator:=0
+					 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
+					 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
+					 Menu, %subtemplatefolder%, Add, %MenuText%, TemplateMenuHandler
+					 Menu, %subtemplatefolder%, Icon, %MenuText%, res\%iconT%,,16
+					 a:=""
+					}
+				 templatefolderFiles:=""
+				}
+
+			 Loop, parse, templatesfolderlist, |
+				{
+				 Menu, SubMenu2, Add, &%A_LoopField%, :%A_LoopField%
+				 try
+					Menu, SubMenu2, Icon, &%A_LoopField%, %TemplateFolder%%A_LoopField%\favicon.ico,,16
+				 catch
+					Menu, SubMenu2, Icon, &%A_LoopField%, res\%iconT%,,16
+				}
 			}
 		}
+	 Else
+		Menu, Submenu2, Add, "No templates", TemplateMenuHandler
+	 Menu, ClipMenu, Add, &t. Templates, :Submenu2
+	 Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 	}
-Else
-	Menu, Submenu2, Add, "No templates", TemplateMenuHandler
-Menu, ClipMenu, Add, &t. Templates, :Submenu2
-Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 Loop 18
 	Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
 }
@@ -551,7 +559,7 @@ If (History.MaxIndex() > 20)
 			Menu, SubMenu4, Icon, %key%, res\%iconA%, , 16
 
 
-		 if (Mod(MenuAccelerator,26)=0)
+		 If (Mod(MenuAccelerator,26)=0)
 			{
 			 MenuAccelerator:=0
 			 If (MoreHistory < 0)
@@ -568,26 +576,32 @@ Else
 	 Menu, SubMenu4, Icon, No entries ..., res\%iconA%, , 16
 	}
 
-If !FIFOACTIVE
+If !FIFOACTIVE and ShowYank
 	{
 	 Menu, ClipMenu, Add, &y. Yank entry, :Submenu3
 	 Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
 	}
-Menu, ClipMenu, Add, &z. More history, :Submenu4
-Menu, ClipMenu, Icon, &z. More history, res\%iconZ%,,16
-Menu, ClipMenu, Add
-Menu, ClipMenu, Add, E&xit (Close menu), MenuHandler
-Menu, ClipMenu, Icon, E&xit (Close menu), res\%iconX%,,16
+If ShowMorehistory
+	{
+	 Menu, ClipMenu, Add, &z. More history, :Submenu4
+	 Menu, ClipMenu, Icon, &z. More history, res\%iconZ%,,16
+	}
+If ShowExit
+	{
+	 Menu, ClipMenu, Add
+	 Menu, ClipMenu, Add, E&xit (Close menu), MenuHandler
+	 Menu, ClipMenu, Icon, E&xit (Close menu), res\%iconX%,,16
+	}
 Return
 
 DispMenuText(TextIn,lines="1")
 	{
 	 global MenuWidth,ShowLines,LineTextFormat
-	 if (lines=1)
+	 If (lines=1)
 		linetext:=LineTextFormat[1]
 	 else
 		linetext:=LineTextFormat[2]
-	 if (lines = -1)
+	 If (lines = -1)
 		linetext:=""
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
@@ -598,7 +612,7 @@ DispMenuText(TextIn,lines="1")
 		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...
 		}
 	 TextOut .= " " Chr(171)
-	 if ShowLines
+	 If ShowLines
 		TextOut .= StrReplace(linetext,"\l",lines)
 	 Return LTRIM(TextOut," `t")
 	}

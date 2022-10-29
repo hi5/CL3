@@ -1,4 +1,17 @@
 
+Menu, SetupMenu, Add, Show Special       , SetupMenuHandler
+Menu, SetupMenu, Add, Show Templates     , SetupMenuHandler 
+Menu, SetupMenu, Add, Show Yank          , SetupMenuHandler
+Menu, SetupMenu, Add, Show More history  , SetupMenuHandler
+Menu, SetupMenu, Add, Show Exit          , SetupMenuHandler
+
+for k, v in StrSplit("Show Special|Show Templates|Show Yank|Show More history|Show Exit","|")
+	{
+	 SetMenuCheck:=StrReplace(v, " ")
+	 If (%SetMenuCheck% = 1)
+	 	Menu, SetupMenu, Check, % v
+	}
+
 Gui, Settings:Destroy
 Gui, Settings:New
 
@@ -64,7 +77,8 @@ Gui Settings:Add,  Text, xp-70 yp+25                                    , More H
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20
 Gui Settings:Add,  UpDown, Range-100-300 vMoreHistory                   , %MoreHistory%
 Gui Settings:Add,  Checkbox, xp-70 yp+24 vAllowDupes                    , Allow Duplicates
-Gui Settings:Add,  Text, xp yp+15                                       , ___________________
+Gui Settings:Add,  Button, xp yp+24 h22 w110  gSetupMenu                , Setup Menu
+Gui Settings:Add,  Text, xp yp+22                                       , ___________________
 Gui Settings:Add,  Text, xp    yp+25                                    , Search width:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vSearchWindowWidth Number  , %SearchWindowWidth%
 Gui Settings:Add,  Text, xp-70 yp+30                                    , Search height:
@@ -73,9 +87,9 @@ Gui Settings:Add,  Text, xp-70 yp+20                                    , ______
 Gui Settings:Add,  Text, xp    yp+20                                    , CyclePlugins:
 
 Gosub, UpdateCyclePlugins
-Gui Settings:Add,  Edit, xp-5  yp+15  w125 R7 vEditCyclePlugins , %EditCyclePlugins%
+Gui Settings:Add,  Edit, xp-5  yp+15  w125 R5 vEditCyclePlugins , %EditCyclePlugins%
 
-Gui Settings:Add,  GroupBox, x5   yp+120 w278 h55               , Exclude programs (CSV: program1.exe,prg2.exe)
+Gui Settings:Add,  GroupBox, x5   yp+88 w278 h55               , Exclude programs (CSV: program1.exe,prg2.exe)
 
 Gui Settings:Add,  Edit,     xp+8 yp+20  w260 h20 vExclude      , %Exclude%
 
@@ -137,6 +151,23 @@ If AutoReplaceTrayTip
 ;Gui Settings:Add,  Text    , xp+8 yp+24, CL3
 
 Gui Show, w545 h440, CL3 Settings - %version%
+Return
+
+SetupMenu:
+Menu, SetupMenu, Show
+Return
+
+SetupMenuHandler:
+for k, v in StrSplit("Show Special|Show Templates|Show Yank|Show More history|Show Exit","|")
+	{
+	 If (A_ThisMenuItem = v)
+	 {
+		SetMenuCheck:=StrReplace(A_ThisMenuItem," ")
+		%SetMenuCheck%:=!%SetMenuCheck%
+		;MsgBox % SetMenuCheck ":" %SetMenuCheck%
+		Menu, SetupMenu, ToggleCheck, % A_ThisMenuItem
+	 }
+	}
 Return
 
 SettingsGuiEscape:
@@ -204,6 +235,11 @@ IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
 IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
 IniWrite, %Exclude%            , %ini%, Settings, Exclude
 IniWrite, %SettingsFolders%    , %ini%, Settings, SettingsFolders
+IniWrite, %ShowSpecial%        , %ini%, Settings, ShowSpecial
+IniWrite, %ShowTemplates%      , %ini%, Settings, ShowTemplates
+IniWrite, %ShowYank%           , %ini%, Settings, ShowYank  
+IniWrite, %ShowMorehistory%    , %ini%, Settings, ShowMorehistory
+IniWrite, %ShowExit%           , %ini%, Settings, ShowExit  
 
 LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 IniWrite, %LineFormat%         , %ini%, settings, LineFormat

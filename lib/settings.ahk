@@ -34,6 +34,11 @@ Settings()
 	 IniRead, Exclude            , %ini%, settings, Exclude, 0
 	 IniRead, LineFormat         , %ini%, settings, LineFormat, \t(\l line),\t(\l lines)
 	 IniRead, SettingsFolders    , %ini%, settings, SettingsFolders, 0
+	 IniRead, ShowSpecial        , %ini%, settings, ShowSpecial  , 1
+	 IniRead, ShowTemplates      , %ini%, settings, ShowTemplates, 1
+	 IniRead, ShowYank           , %ini%, settings, ShowYank     , 1
+	 IniRead, ShowMorehistory    , %ini%, settings, ShowMorehistory, 1
+	 IniRead, ShowExit           , %ini%, settings, ShowExit     , 1
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
 	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
 	 If (Exclude = 0) or (Exclude = "Error")
@@ -123,9 +128,13 @@ Settings_Default()
 		, AutoReplaceTrayTip: 0
 		, CopyDelay         : 0
 		, PasteDelay        : 50
+		, ShowSpecial       : 1
+		, ShowYank          : 1
+		, ShowTemplates     : 1
+		, ShowMorehistory   : 1
+		, ShowExit          : 1
 		, Exclude           : ""
 		, LineFormat        : "\t(\l line),\t(\l lines)" }
-
 	}
 
 Stats_Create()
