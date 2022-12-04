@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.104
+Version     : 1.105
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
@@ -40,7 +40,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.104"
+version:="v1.105"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -58,7 +58,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.104
+;@Ahk2Exe-SetFileVersion 1.105
 ;@Ahk2Exe-SetDescription CL3
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
@@ -66,6 +66,7 @@ loop, parse, iconlist, CSV
 ; <for compiled scripts>
 IfNotExist, %A_ScriptDir%\res
 	FileCreateDir, %A_ScriptDir%\res
+FileInstall, res\cl3.ico, %A_ScriptDir%\res\cl3.ico
 FileInstall, res\cl3_clipboard_history_paused.ico, %A_ScriptDir%\res\cl3_clipboard_history_paused.ico
 FileInstall, res\icon-a.ico, %A_ScriptDir%\res\icon-a.ico
 FileInstall, res\icon-c.ico, %A_ScriptDir%\res\icon-c.ico

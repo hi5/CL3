@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.105
+
+* Fix: adding missing ico to FileInstall for compiled scripts
+
 ### v1.104
 
 * New: basic check for update tray menu option for compiled scripts
