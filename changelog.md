@@ -1,5 +1,14 @@
 # Changelog
 
+### v1.104
+
+* New: basic check for update tray menu option for compiled scripts
+* New: ccmdr - Burst, adding \s for space
+* Fix: check for duplicates didn't work correctly, now it should
+* Fix: ClipChain plugin - fix cancelled "Load from Clipboard (Set Delim)"
+* Prepare code for compiling FileInstall icons, ;@Ahk2Exe-IgnoreBegin and ;@Ahk2Exe-IgnoreEnd
+  for Private includes (rules marked optional and QEDlg)
+  
 ### v1.103
 
 * Change: Limit Cycle through clipboard history to MaxHistory (useful for smaller values) https://github.com/hi5/CL3/issues/18

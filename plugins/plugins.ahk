@@ -58,7 +58,9 @@ Gosub, SortMenuSetup
 Gosub, ccmdersetup
 Gosub, NotesMenuSetup
 
+;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyPlugins.ahk
+;@Ahk2Exe-IgnoreEnd
 
 #include %A_ScriptDir%\plugins\LowerReplaceSpace.ahk
 #include %A_ScriptDir%\plugins\Lower.ahk

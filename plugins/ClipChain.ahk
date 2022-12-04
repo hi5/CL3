@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.7
+Version           : 1.71
 CL3 version       : 1.5
 
 History:
+- 1.71 fix cancelled Load from Clipboard (Set Delim)
 - 1.7 enter (multiple) delimiter(s) to split elements from clipboard;
       define send key(s) after paste (AutoHotkey notation) e.g. {tab};
       define Trim options
@@ -330,7 +331,9 @@ ClipChainInsertGui:
 ClipChainInsertActive:=0
 
 ; not public
+;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyQEDLG-ClipChain.ahk
+;@Ahk2Exe-IgnoreEnd
 
 Gui, ClipChainInsertGui:Destroy
 Gui, ClipChainInsertGui:Add, Text, x5 y5, Insert text into chain after %ClipChainDataIndex% item:
@@ -387,11 +390,10 @@ Gosub, ClipChainUpdateIndicator
 Return
 
 ClipChainLoadDelim:
+CCDelim:=""
 InputBox, CCDelim, ClipChain Delimiter, Set Delimiter(s) CSV (\n`,\r`,\t`,\s`,\c)`nUse \c for comma, , 300, 140, , , , , \n
-If ErrorLevel
-	Return
-If (CCDelim = "")
-	Return
+If ErrorLevel or  or (CCDelim = "")
+	 Return
 
 CCDelim:=StrReplace(CCDelim,"\n","`n")
 CCDelim:=StrReplace(CCDelim,"\r","`r")
@@ -405,14 +407,17 @@ If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first en
 	ClipChainData:=SubStr(ClipChainData,2)
 ;StringReplace,ClipChainData,ClipChainData,`r`n`r`n, % Chr(7), All
 
-Loop, parse, CCDelim, CSV
+If CCDelim
 	{
-	 If (A_LoopField = "\c")
+	 Loop, parse, CCDelim, CSV
 		{
-		 ClipChainData:=StrReplace(ClipChainData,",",Chr(7))
-		 continue
+		If (A_LoopField = "\c")
+			{
+			ClipChainData:=StrReplace(ClipChainData,",",Chr(7))
+			continue
+			}
+		 ClipChainData:=StrReplace(ClipChainData,A_LoopField,Chr(7))
 		}
-	 ClipChainData:=StrReplace(ClipChainData,A_LoopField,Chr(7))
 	}
 
 If !CCDelim
@@ -421,7 +426,10 @@ If !CCDelim
 	 ClipChainData:=StrReplace(ClipChainData,CCDelim, Chr(7))
 	}
 
-#Include *i %A_ScriptDir%\plugins\ClipChainPRIVATERULES.ahk
+;@Ahk2Exe-IgnoreBegin
+#Include *i %A_ScriptDir%\plugins\ClipChainPrivateRules.ahk
+;@Ahk2Exe-IgnoreEnd
+
 ClipChainData:=StrSplit(ClipChainData,Chr(7))
 CCDelim:=""
 

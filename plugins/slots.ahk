@@ -237,4 +237,6 @@ else
 Return
 
 ; not public
+;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyQEDLG-Slots.ahk
+;@Ahk2Exe-IgnoreEnd

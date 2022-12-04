@@ -4,17 +4,18 @@ Plugin            : ccmdr (optional via settings.ini)
 Purpose           : Allow for (batch) operations on clipboard history vs the
                     usual one by one operations via standard CL3 options.
                     see docs\ccmdr.md
-Version           : 1.1
+Version           : 1.2
 CL3 version       : v1.94
 
 History:
+- 1.2 burst, added \s for space
 - 1.1 added named slots
 - 1.0 initial version
 
 */
 
 ccmdersetup:
-HelpCommands:={	b:"Burst seperator (\n, \t, \\, char or word)"
+HelpCommands:={	b:"Burst seperator (\n, \t, \s, \\, char or word)"
 	, i : "Insert IDx"
 	, f : "FIFO IDx, e=enter, t=tab"
 	, l : "Lower case IDx or range (IDx-IDy)"
@@ -333,6 +334,11 @@ Command(cmd)
 		 if (command cmd = "b\\")
 			{
 			 Delim:="\"
+			 cmd:=""
+			}
+		 if (command cmd = "b\s")
+			{
+			 Delim:=" "
 			 cmd:=""
 			}
 		 if RegExMatch(cmd,")^.$")

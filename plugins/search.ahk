@@ -140,7 +140,9 @@ Return
 F4::
 Gosub, SearchGetID
 ; not public
+;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyQEDLG-Search.ahk
+;@Ahk2Exe-IgnoreEnd
 Gui, Search:Destroy
 
 Gui, SearchEdit:Destroy
@@ -232,4 +234,6 @@ oldLineCount:=LineCount
 Return
 
 ; not public
+;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyQEDLG.ahk
+;@Ahk2Exe-IgnoreEnd

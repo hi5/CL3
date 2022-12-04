@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.103
+Version     : 1.104
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
@@ -40,7 +40,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.103"
+version:="v1.104"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -56,6 +56,26 @@ TemplateClip:=0
 iconlist:="a,c,s,t,x,y,z"
 loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
+
+; <for compiled scripts>
+;@Ahk2Exe-SetFileVersion 1.104
+;@Ahk2Exe-SetDescription CL3
+;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
+; </for compiled scripts>
+
+; <for compiled scripts>
+IfNotExist, %A_ScriptDir%\res
+	FileCreateDir, %A_ScriptDir%\res
+FileInstall, res\cl3_clipboard_history_paused.ico, %A_ScriptDir%\res\cl3_clipboard_history_paused.ico
+FileInstall, res\icon-a.ico, %A_ScriptDir%\res\icon-a.ico
+FileInstall, res\icon-c.ico, %A_ScriptDir%\res\icon-c.ico
+FileInstall, res\icon-s.ico, %A_ScriptDir%\res\icon-s.ico
+FileInstall, res\icon-t.ico, %A_ScriptDir%\res\icon-t.ico
+FileInstall, res\icon-x.ico, %A_ScriptDir%\res\icon-x.ico
+FileInstall, res\icon-y.ico, %A_ScriptDir%\res\icon-y.ico
+FileInstall, res\icon-z.ico, %A_ScriptDir%\res\icon-z.ico
+FileInstall, res\01_Example.txt, %A_ScriptDir%\res\01_Example.txt
+; </for compiled scripts>
 
 Pause, Off
 Suspend, Off
@@ -81,11 +101,18 @@ Menu, tray, Icon,&Usage statistics    , shell32.dll, 278
 Menu, tray, Add,
 Menu, tray, Add, &Settings            , TrayMenuHandler
 Menu, tray, Icon,&Settings            , dsuiext.dll, 36
+If A_IsCompiled
+	{
+	 Menu, tray, Add, &Check for updates, TrayMenuHandler
+	}
 Menu, tray, Add,
-Menu, tray, Add, &Reload this script  , TrayMenuHandler
-Menu, tray, Icon,&Reload this script  , shell32.dll, 239
-Menu, tray, Add, &Edit this script    , TrayMenuHandler
-Menu, tray, Icon,&Edit this script    , comres.dll, 7
+Menu, tray, Add, &Reload CL3          , TrayMenuHandler
+Menu, tray, Icon,&Reload CL3          , shell32.dll, 239
+If !A_IsCompiled
+	{
+	 Menu, tray, Add, &Edit this script    , TrayMenuHandler
+	 Menu, tray, Icon,&Edit this script    , comres.dll, 7
+	}
 Menu, tray, Add,
 Menu, tray, Add, &Suspend Hotkeys     , TrayMenuHandler
 Menu, tray, Icon,&Suspend Hotkeys     , %A_AhkPath%, 3
@@ -634,7 +661,9 @@ PasteIt(source="")
 	 StartTime:=A_TickCount
 	 If ((StartTime - PasteTime) < 75) ; to prevent double paste after using #f/#v in combination
 		Return
+;@Ahk2Exe-IgnoreBegin
 	 #Include *i %A_ScriptDir%\plugins\PastePrivateRules.ahk
+;@Ahk2Exe-IgnoreEnd		
 	 WinActivate, ahk_id %ActiveWindowID%
 	 If PasteDelay
 		Sleep % PasteDelay
@@ -757,7 +786,11 @@ If (ClipText <> Clipboard)
 		}
 	 else
 		IconExe:="res\" iconT
-	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1})
+	 If History[MenuItemPos].HasKey("crc")	
+			crc:=History[MenuItemPos,"crc"]
+		 else
+	 crc:=crc32(ClipText)	 
+	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
 Clipboard:=ClipText
@@ -937,7 +970,7 @@ Return
 
 TrayMenuHandler:
 ; Easy & Quick options first
-If (A_ThisMenuItem = "&Reload this script")
+If (A_ThisMenuItem = "&Reload CL3")
 	{
 	 Reload
 	 Return
@@ -985,6 +1018,11 @@ Else If (A_ThisMenuItem = "&FIFO Active")
 Else If (A_ThisMenuItem = "&settings")
 	{
 	 Gosub, Settings_menu
+	}
+Else If (A_ThisMenuItem = "&Check for updates") ; compiled only
+	{
+	 Update(version)
+	 Return
 	}
 Else If (A_ThisMenuItem = "&Usage statistics")
 	{
@@ -1146,4 +1184,6 @@ Else
 }
 
 #include %A_ScriptDir%\lib\cl3apiclass.ahk
+;@Ahk2Exe-IgnoreBegin
 #Include *i %A_ScriptDir%\plugins\ClipboardPrivateRules.ahk
+;@Ahk2Exe-IgnoreEnd

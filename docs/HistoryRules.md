@@ -26,7 +26,7 @@ copy=1
 *keys* 
 
 global: `0` (disable); or `1` (enable) HistoryRules  
-copy: `0` do not copy to clipboard; or `1` copy to clipboard but do not include in Clipboard History (so you can still paste the copied text - an asterisk will be added to the first entry in the Clipboard History menu as indicator. Same behaviour as "[Excluded programs](https://github.com/hi5/CL3/blob/master/changelog.md#v199")
+copy: `0` do not copy to clipboard; or `1` copy to clipboard but do not include in Clipboard History (so you can still paste the copied text - an asterisk will be added to the first entry in the Clipboard History menu as indicator. Same behaviour as "[Excluded programs](https://github.com/hi5/CL3/blob/master/changelog.md#v199)"
 
 ### Rule() section(s)
 
@@ -49,6 +49,7 @@ filter: regular expression to match to allow contents to be added or ignored.
 ```ini
 [setting]
 global=1
+copy=1
 [Name of Rule1]
 active=0
 filter=i)www
