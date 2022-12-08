@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.106
+
+* Fix: correct path for compiled script (to executable) for tray menu icons
+* Adding Try to all Menu, Icon to avoid errors in case they are missing
+
 ### v1.105
 
 * Fix: adding missing ico to FileInstall for compiled scripts

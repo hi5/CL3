@@ -29,13 +29,15 @@ class CL3API
 			{
 			 OnClipboardChange("FuncOnClipboardChange", 1)
 			 Menu, tray, ToggleCheck, &Pause clipboard history
-			 Menu, Tray, Icon, res\cl3.ico
+			 Try
+				Menu, Tray, Icon, res\cl3.ico
 			}
 		 else if toggle in off,false,0
 				{
 				 OnClipboardChange("FuncOnClipboardChange", 0)
 				 Menu, tray, ToggleCheck, &Pause clipboard history
-				 Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
+				 Try
+					Menu, Tray, Icon, res\cl3_clipboard_history_paused.ico
 				}
 		}
 

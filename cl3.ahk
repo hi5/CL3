@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.105
+Version     : 1.106
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
@@ -40,7 +40,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.105"
+version:="v1.106"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -58,7 +58,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.105
+;@Ahk2Exe-SetFileVersion 1.106
 ;@Ahk2Exe-SetDescription CL3
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
@@ -85,12 +85,18 @@ Settings()
 Settings_Hotkeys()
 HistoryRules()
 
+ahk_icons_path:=A_AhkPath
+If A_IsCompiled
+	ahk_icons_path:=A_ScriptFullPath
+
 ; tray menu
-Menu, Tray, Icon, res\cl3.ico, , 1
+Try
+	Menu, Tray, Icon, res\cl3.ico, , 1
 Menu, tray, Tip , %name% %version%
 Menu, tray, NoStandard
 Menu, tray, Add, %name% %version%     , DoubleTrayClick
-Menu, tray, Icon, %name% %version%    , res\cl3.ico
+Try
+	Menu, tray, Icon, %name% %version%    , res\cl3.ico
 Menu, tray, Default, %name% %version%
 Menu, tray, Click, 1 ; this will show the tray menu because we send {rbutton} at the DoubleTrayClick label
 Menu, tray, Add,
@@ -98,32 +104,39 @@ Menu, tray, Add, &AutoReplace Active  , TrayMenuHandler
 Menu, tray, Add, &FIFO Active         , TrayMenuHandler
 Menu, tray, Add,
 Menu, tray, Add, &Usage statistics    , TrayMenuHandler
-Menu, tray, Icon,&Usage statistics    , shell32.dll, 278
+Try
+	Menu, tray, Icon,&Usage statistics    , shell32.dll, 278
 Menu, tray, Add,
 Menu, tray, Add, &Settings            , TrayMenuHandler
-Menu, tray, Icon,&Settings            , dsuiext.dll, 36
+Try
+	Menu, tray, Icon,&Settings            , dsuiext.dll, 36
 If A_IsCompiled
 	{
 	 Menu, tray, Add, &Check for updates, TrayMenuHandler
 	}
 Menu, tray, Add,
 Menu, tray, Add, &Reload CL3          , TrayMenuHandler
-Menu, tray, Icon,&Reload CL3          , shell32.dll, 239
+Try
+	Menu, tray, Icon,&Reload CL3          , shell32.dll, 239
 If !A_IsCompiled
 	{
 	 Menu, tray, Add, &Edit this script    , TrayMenuHandler
-	 Menu, tray, Icon,&Edit this script    , comres.dll, 7
+	 Try
+		Menu, tray, Icon,&Edit this script    , comres.dll, 7
 	}
 Menu, tray, Add,
 Menu, tray, Add, &Suspend Hotkeys     , TrayMenuHandler
-Menu, tray, Icon,&Suspend Hotkeys     , %A_AhkPath%, 3
+Try
+	Menu, tray, Icon,&Suspend Hotkeys     , %ahk_icons_path%, 3
 Menu, tray, Add, &Pause Script        , TrayMenuHandler
-Menu, tray, Icon,&Pause Script        , %A_AhkPath%, 4
+Try
+	Menu, tray, Icon,&Pause Script        , %ahk_icons_path%, 4
 Menu, tray, Add,
 Menu, tray, Add, &Pause clipboard history, TrayMenuHandler
 Menu, tray, Add,
 Menu, tray, Add, Exit                 , SaveSettings
-Menu, tray, Icon, %MenuPadding%Exit   , shell32.dll, 132
+Try
+	Menu, tray, Icon, %MenuPadding%Exit   , shell32.dll, 132
 
 Menu, ClipMenu, Add, TempText, MenuHandler
 Menu, SubMenu1, Add, TempText, MenuHandler
@@ -478,23 +491,27 @@ If !FIFOACTIVE
 		 MenuTextClean:=Trim(MenuText,"#")
 		 MenuText:=key RegExReplace(MenuText, "m)([A-Z]+)" , " $1")
 		 Menu, Submenu1, Add, %MenuText%, SpecialMenuHandler
-		 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+		 Try
+			Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
 		 If IsObject(%MenuTextClean%Menu)
 			{
 			 Menu, Submenu1, Add, %MenuText%, :%MenuTextClean%Menu
-			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+			 Try
+				Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
 			}
 		 If IsObject(SlotsNamed) and (MenuTextClean ="Slots")
 			{
 			 Gosub, QuickSlotsMenu
 			 Menu, Submenu1, Add, %MenuText%, :QuickSlotsMenu
-			 Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
+			 Try
+				Menu, Submenu1, Icon, %MenuText%, res\%iconS%,,16
 			}
 		}
 If ShowSpecial
 	{
 	 Menu, ClipMenu, Add, &s. Special, :Submenu1
-	 Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
+	 Try
+		Menu, ClipMenu, Icon, &s. Special, res\%iconS%,,16
 	}
 
 If ShowTemplates
@@ -514,7 +531,8 @@ If ShowTemplates
 			 Menu, Submenu2, Icon, %MenuText%, res\%iconT%,,16
 			}
 		 Menu, Submenu2, Add, &0. Open templates folder, TemplateMenuHandler
-		 Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
+		 Try
+			Menu, Submenu2, Icon, &0. Open templates folder, res\%iconT%,,16
 
 		 If (templatesfolderlist <> "")
 			{
@@ -537,7 +555,8 @@ If ShowTemplates
 					 key:=% "&" Chr(96+(++MenuAccelerator)) ". " ; %
 					 MenuText:=key SubStr(A_LoopField, InStr(A_LoopField,"_")+1)
 					 Menu, %subtemplatefolder%, Add, %MenuText%, TemplateMenuHandler
-					 Menu, %subtemplatefolder%, Icon, %MenuText%, res\%iconT%,,16
+					 Try
+						Menu, %subtemplatefolder%, Icon, %MenuText%, res\%iconT%,,16
 					 a:=""
 					}
 				 templatefolderFiles:=""
@@ -556,7 +575,8 @@ If ShowTemplates
 	 Else
 		Menu, Submenu2, Add, "No templates", TemplateMenuHandler
 	 Menu, ClipMenu, Add, &t. Templates, :Submenu2
-	 Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
+	 Try
+	 	Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 	}
 Loop 18
 	Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
@@ -601,24 +621,28 @@ If (History.MaxIndex() > 20)
 Else
 	{
 	 Menu, SubMenu4, Add, No entries ..., MenuHandler
-	 Menu, SubMenu4, Icon, No entries ..., res\%iconA%, , 16
+	 Try
+		Menu, SubMenu4, Icon, No entries ..., res\%iconA%, , 16
 	}
 
 If !FIFOACTIVE and ShowYank
 	{
 	 Menu, ClipMenu, Add, &y. Yank entry, :Submenu3
-	 Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
+	 Try
+		Menu, ClipMenu, Icon, &y. Yank entry, res\%iconY%,,16
 	}
 If ShowMorehistory
 	{
 	 Menu, ClipMenu, Add, &z. More history, :Submenu4
-	 Menu, ClipMenu, Icon, &z. More history, res\%iconZ%,,16
+	 Try
+		Menu, ClipMenu, Icon, &z. More history, res\%iconZ%,,16
 	}
 If ShowExit
 	{
 	 Menu, ClipMenu, Add
 	 Menu, ClipMenu, Add, E&xit (Close menu), MenuHandler
-	 Menu, ClipMenu, Icon, E&xit (Close menu), res\%iconX%,,16
+	 Try
+		Menu, ClipMenu, Icon, E&xit (Close menu), res\%iconX%,,16
 	}
 Return
 
