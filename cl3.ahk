@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.106
+Version     : 1.107
 Author      : hi5
 Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
               http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
@@ -40,7 +40,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.106"
+version:="v1.107"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -58,7 +58,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.106
+;@Ahk2Exe-SetFileVersion 1.107
 ;@Ahk2Exe-SetDescription CL3
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
@@ -452,7 +452,7 @@ for k, v in History
 		icon:="res\" iconA
 	 If (A_Index=1) and (ClipboardPrivate = 1) ; indicate to user clipboard has different data as first entry in history (excluded programs)
 		Indicator:="*"
-	 key:=% "&" Chr(96+A_Index) Indicator ". " DispMenuText(SubStr(text,1,500),lines)
+	 key:=% "&" Chr(96+A_Index) Indicator ". " DispMenuText(SubStr(text,1,500),lines,v.time)
 	 Menu, ClipMenu, Add, %key%, MenuHandler
 	 if (k = 1)
 		Menu, ClipMenu, Default, %key%
@@ -597,9 +597,9 @@ If (History.MaxIndex() > 20)
 			Continue
 
 		 If (MenuAccelerator < 27) and (MenuAcceleratorDone = 0)
-				key:=% "&" Chr(96+(++MenuAccelerator)) ". " DispMenuText(SubStr(text,1,500),lines)
+			key:=% "&" Chr(96+(++MenuAccelerator)) ". " DispMenuText(SubStr(text,1,500),lines,v.time)
 		 If (MenuAcceleratorDone = 1)
-			key:=% "  " DispMenuText(SubStr(text,1,500),lines)
+			key:=% "  " DispMenuText(SubStr(text,1,500),lines,v.time)
 		 Menu, SubMenu4, Add, %key%, MenuHandler
 		 Try
 			Menu, SubMenu4, Icon, %key%, % icon
@@ -646,26 +646,41 @@ If ShowExit
 	}
 Return
 
-DispMenuText(TextIn,lines="1")
+DispMenuText(TextIn,lines="1",time="")
 	{
-	 global MenuWidth,ShowLines,LineTextFormat
+	 global MenuWidth,ShowLines,LineTextFormat,ShowTime,TimeFormat
+
 	 If (lines=1)
 		linetext:=LineTextFormat[1]
 	 else
 		linetext:=LineTextFormat[2]
 	 If (lines = -1)
 		linetext:=""
+
 	 TextOut:=RegExReplace(TextIn,"m)^\s*")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All
-	 If StrLen(TextOut) > 60
+	 
+	 If StrLen(TextOut) > MenuWidth
 		{
 		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...
 		}
 	 TextOut .= " " Chr(171)
+
 	 If ShowLines
-		TextOut .= StrReplace(linetext,"\l",lines)
+		 TextOut .= StrReplace(linetext,"\l",lines)
+
+	 If ShowTime
+	 	{
+	 	 disptime:=""
+	 	 If TimeFormat and Time
+	 	 	{
+	 	 	 FormatTime, disptime, %time%, %TimeFormat%
+	 	 	 TextOut .= " " Chr(128336) " " disptime
+	 	 	}
+	 	}
+
 	 Return LTRIM(TextOut," `t")
 	}
 
@@ -783,11 +798,32 @@ Return
 TemplateMenuHandler:
 If (A_ThisMenuItem = "&0. Open templates folder")
 	{
-	 IfWinExist, ahk_exe TOTALCMD.EXE
-		Run, c:\totalcmd\TOTALCMD.EXE /O /T %TemplateFolder%
-	 else
-		Run, %TemplateFolder%
+
+	 ; try to get Commander_Path, it will be empty if TC is not running (yet)
+	 EnvGet, Commander_Path, Commander_Path
+	
+	 If (Commander_Path = "") ; try to read registry
+		RegRead Commander_Path, HKEY_CURRENT_USER, Software\Ghisler\Total Commander, InstallDir
+	
+	 WinGet TCName, ProcessName, ahk_class TTOTAL_CMD
+	 If (Commander_Path = "") 
+		WinGet TCPath, ProcessPath, ahk_exe %TCName%
+
+	 If (TCPath = "") and (Commander_Path <> "")
+	 	TCPath:=Commander_Path "\TOTALCMD.EXE"
+
+	 If (TCPath = "") and (Commander_Path = "")
+		{
+		 Run, %TemplateFolder%
+		 Return
+		}
+	 Try
+	 	{
+	 	 If FileExist(TCPath)	
+		 	Run, %TCPath% /O /T %TemplateFolder%
+	 	}
 	 Return
+
 	}
 
 ClipText:=Templates[A_ThisMenu,A_ThisMenuItemPos]
@@ -815,7 +851,7 @@ If (ClipText <> Clipboard)
 			crc:=History[MenuItemPos,"crc"]
 		 else
 	 crc:=crc32(ClipText)	 
-	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc})
+	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc,"time":A_Now})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
 Clipboard:=ClipText
@@ -860,7 +896,7 @@ If CopyDelay
 
 WinGet, IconExe, ProcessPath , A
 If ((History.MaxIndex() = 0) or (History.MaxIndex() = "")) ; just make sure we have the History Object and add "some" text
-	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1})
+	History.Insert(1,{"text":"Text","icon": IconExe,"lines": 1,"time":A_Now})
 
 History_Save:=1
 
@@ -927,7 +963,7 @@ StrReplace(ClipText, "`n", "`n", Count)
 
 crc:=crc32(ClipText)
 
-History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc})
+History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc,"time":A_Now})
 
 If !AllowDupes
 	Gosub, CheckHistory
@@ -950,7 +986,7 @@ for k, v in History
 	 if !CurrentCRC ; just to make sure it isn't empty
 		CurrentCRC:=crc32(v.text)
 	 if !InStr(HaveCRCList, "|" CurrentCRC "|")
-		newhistory.push({"text":v.text,"icon":v.icon,"lines":v.lines,"crc":CurrentCRC})
+		newhistory.push({"text":v.text,"icon":v.icon,"lines":v.lines,"crc":CurrentCRC,"time":v.time})
 	 HaveCRCList .= v.crc "|"
 	 if (k >= MaxHistory)
 		break

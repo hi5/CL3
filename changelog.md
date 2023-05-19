@@ -1,5 +1,12 @@
 # Changelog
 
+### v1.107
+
+* New: Option to show timestamp in clipboard history menu - https://github.com/hi5/CL3/issues/23  
+  See https://www.autohotkey.com/docs/v1/lib/FormatTime.htm#Time_Formats for options (e.g. HH:mm (24hr) or hh:mm tt (12hr AM/PM))
+* Fix: Open Template folder - now use commander_path env. variable/registry combined with WinGet ProcessPath/ProcessName, so it should now work with running 32/64 versions. Starts 32bit by default if TC is not running but can be detected.
+* Fix: Use MenuWidth setting in DispMenuText() function to check length instead of previously hardcoded value of 60
+
 ### v1.106
 
 * Fix: correct path for compiled script (to executable) for tray menu icons

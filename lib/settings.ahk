@@ -25,6 +25,7 @@ Settings()
 	 IniRead, SearchWindowWidth  , %ini%, settings, SearchWindowWidth, 595
 	 IniRead, SearchWindowHeight , %ini%, settings, SearchWindowHeight, 300
 	 IniRead, ShowLines          , %ini%, settings, ShowLines, 0
+	 IniRead, ShowTime           , %ini%, settings, ShowTime, 0
 	 IniRead, AutoReplaceTrayTip , %ini%, settings, AutoReplaceTrayTip, 0
 	 IniRead, CopyDelay          , %ini%, settings, CopyDelay, 0
 	 IniRead, PasteDelay         , %ini%, settings, PasteDelay, 50
@@ -33,6 +34,7 @@ Settings()
 	 IniRead, BackupTimer        , %ini%, settings, BackupTimer, 10
 	 IniRead, Exclude            , %ini%, settings, Exclude, 0
 	 IniRead, LineFormat         , %ini%, settings, LineFormat, \t(\l line),\t(\l lines)
+	 IniRead, TimeFormat         , %ini%, settings, TimeFormat, HH:mm
 	 IniRead, SettingsFolders    , %ini%, settings, SettingsFolders, 0
 	 IniRead, ShowSpecial        , %ini%, settings, ShowSpecial  , 1
 	 IniRead, ShowTemplates      , %ini%, settings, ShowTemplates, 1
@@ -125,6 +127,7 @@ Settings_Default()
 		, SearchWindowHeight: 300
 		, ActivateApi       : 0
 		, ShowLines         : 1
+		, ShowTime          : 0
 		, AutoReplaceTrayTip: 0
 		, CopyDelay         : 0
 		, PasteDelay        : 50
@@ -134,6 +137,7 @@ Settings_Default()
 		, ShowMorehistory   : 1
 		, ShowExit          : 1
 		, Exclude           : ""
+		, TimeFormat        : "HH:mm"		
 		, LineFormat        : "\t(\l line),\t(\l lines)" }
 	}
 

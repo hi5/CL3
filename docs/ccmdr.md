@@ -74,6 +74,8 @@ Example:
 
 `s5` will make the current clipboard contents the 5th slot, you can paste this with <kbd>Right Control</kbd>+<kbd>5</kbd> - see Slots in the docs
 
+`sNAME` can also be used, this will make the `NAME` appear in the SlotsMenu (see settings to define hotkey)
+
 ### B
 
 b : "Burst separator (\n, \t, \\, char or word)"  

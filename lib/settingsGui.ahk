@@ -68,7 +68,7 @@ Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slot0, % hk_slot0
 Gui Settings:Add,  Text, xp-40 yp+27                          , Menu:
 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20 vhk_slotsmenu    , %hk_slotsmenu%
 
-Gui Settings:Add,  GroupBox, xp+60 y20 w130 h320                , Other
+Gui Settings:Add,  GroupBox, xp+60 y20 w130 h320                        , Other
 Gui Settings:Add,  Text, xp+8 yp+24                                     , Max History:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory Number         , %MaxHistory%
 Gui Settings:Add,  Text, xp-70 yp+25                                    , Menu width:
@@ -89,7 +89,7 @@ Gui Settings:Add,  Text, xp    yp+20                                    , CycleP
 Gosub, UpdateCyclePlugins
 Gui Settings:Add,  Edit, xp-5  yp+15  w125 R5 vEditCyclePlugins , %EditCyclePlugins%
 
-Gui Settings:Add,  GroupBox, x5   yp+88 w278 h55               , Exclude programs (CSV: program1.exe,prg2.exe)
+Gui Settings:Add,  GroupBox, x5   yp+88 w278 h55                , Exclude programs (CSV: program1.exe,prg2.exe)
 
 Gui Settings:Add,  Edit,     xp+8 yp+20  w260 h20 vExclude      , %Exclude%
 
@@ -109,26 +109,33 @@ Gui Settings:Add,  Button, xp+159 yp  w100 h25 gSettingsGuiEscape, &Cancel
 
 Gui Settings:Add,  GroupBox, xp+110 y20 w100 h412                , Special
 Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
-Gui Settings:Add,  Checkbox, xp yp+30 vActivateCmdr              , ccmdr plugin
-Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_cmdr        , %hk_cmdr%
-Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateNotes          , notes plugin
-Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_notes       , %hk_notes%
-Gui Settings:Add,  Checkbox, xp-20 yp+30 vActivateBackup         , Auto Backup
-Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vBackupTimer Number, %BackupTimer%
-Gui Settings:Add,  Checkbox, xp-20 yp+25 vShowLines              , Show lines
 
+Gui Settings:Add,  Checkbox, xp yp+25 vActivateCmdr              , ccmdr plugin
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_cmdr        , %hk_cmdr%
+
+Gui Settings:Add,  Checkbox, xp-20 yp+25 vActivateNotes          , notes plugin
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_notes       , %hk_notes%
+
+Gui Settings:Add,  Checkbox, xp-20 yp+25 vActivateBackup         , Auto Backup
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vBackupTimer Number, %BackupTimer%
+
+Gui Settings:Add,  Checkbox, xp-20 yp+25 vShowLines              , Show lines
 LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vLineFormat     , %LineFormat%
-Gui Settings:Add,  Checkbox, xp-20 yp+30 vAutoReplaceTrayTip     , AutoRepl. TT
+
+Gui Settings:Add,  Checkbox, xp-20 yp+25 vShowTime               , Show time
+Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vTimeFormat     , %TimeFormat%
+
+Gui Settings:Add,  Checkbox, xp-20 yp+24 vAutoReplaceTrayTip     , AutoRepl. TT
 Gui Settings:Add,  Text    , xp    yp+25                         , Clipchain HK:
-Gui Settings:Add,  Edit    , xp    yp+20 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
-Gui Settings:Add,  Text    , xp    yp+30                         , Bypass AutoRepl.`npaste [1st entry]:
-Gui Settings:Add,  Edit    , xp    yp+30 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
-Gui Settings:Add,  Text    , xp    yp+30                         , Clipb. delay (ms)
+Gui Settings:Add,  Edit    , xp    yp+15 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
+Gui Settings:Add,  Text    , xp    yp+25                         , Bypass AutoRepl.`npaste [1st entry]:
+Gui Settings:Add,  Edit    , xp    yp+25 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
+Gui Settings:Add,  Text    , xp    yp+25                         , Clipb. delay (ms)
 Gui Settings:Font, cRed
 Gui Settings:Add,  Text    , xp+80 yp gModHelp2                  , ?
 Gui Settings:Font, cBlack
-Gui Settings:Add,  Edit    , xp-80 yp+20 w35 Number vCopyDelay   , %CopyDelay%
+Gui Settings:Add,  Edit    , xp-80 yp+18 w35 Number vCopyDelay   , %CopyDelay%
 Gui Settings:Add,  Edit    , xp+45 yp    w35 Number vPasteDelay  , %PasteDelay%
 
 If AllowDupes
@@ -143,6 +150,8 @@ If ActivateBackup
 	GuiControl,, ActivateBackup, 1
 If ShowLines
 	GuiControl,, ShowLines, 1
+If ShowTime
+	GuiControl,, ShowTime, 1
 If AutoReplaceTrayTip
 	GuiControl,, AutoReplaceTrayTip, 1
 
@@ -230,6 +239,7 @@ IniWrite, %ActivateApi%        , %ini%, Settings, ActivateApi
 IniWrite, %ActivateBackup%     , %ini%, settings, ActivateBackup
 IniWrite, %BackupTimer%        , %ini%, settings, BackupTimer
 IniWrite, %ShowLines%          , %ini%, Settings, ShowLines
+IniWrite, %ShowTime%           , %ini%, Settings, ShowTime
 IniWrite, %AutoReplaceTrayTip% , %ini%, Settings, AutoReplaceTrayTip
 IniWrite, %CopyDelay%          , %ini%, Settings, CopyDelay
 IniWrite, %PasteDelay%         , %ini%, Settings, PasteDelay
@@ -243,10 +253,10 @@ IniWrite, %ShowExit%           , %ini%, Settings, ShowExit
 
 LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 IniWrite, %LineFormat%         , %ini%, settings, LineFormat
+IniWrite, %TimeFormat%         , %ini%, settings, TimeFormat
 
 IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
 IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr
-
 
 Sleep 100
 Reload ; if hotkey(s) have changed we'd need to deactivate/reactive all hotkeys, reloading saves us the trouble

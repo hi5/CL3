@@ -98,6 +98,7 @@ OnClipboardChange("FuncOnClipboardChange", 1)
 StrReplace(ClipText, "`n", "`n", Count)
 History[id,"lines"]:=Count+1
 History[id,"crc"]:=crc32(ClipText)
+History[id,"time"]:=A_Now
 ClipText:=""
 ChooseID:=ID
 id:=""
@@ -132,7 +133,7 @@ Loop, parse, choice, |
 Loop, parse, Removeids, CSV
 	History.Remove(A_LoopField)
 StrReplace(CliptText,"`n","`n",Count)	
-History.Insert(1,{"text":ClipText,"icon": "res\" iconA, "lines": Count+1 })
+History.Insert(1,{"text":ClipText,"icon": "res\" iconA, "lines": Count+1,"time":A_Now})
 Gosub, CheckHistory
 ClipText:="",Removeids:=""
 Return

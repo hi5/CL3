@@ -1,4 +1,4 @@
-# CL3 <sup>v1.106</sup> - Clipboard caching utility
+# CL3 <sup>v1.107</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -353,6 +353,7 @@ crc:=crc32(ClipText)
 History[1,"text"]:=ClipText
 History[1,"lines"]:=Count+1,
 History[1,"crc"]:=crc
+History[1,"time"]:=A_Now
 Clipboard:=ClipText
 Sleep, 100
 ClipText:="",Count:="",crc:=""
@@ -370,6 +371,7 @@ crc:=crc32(ClipText)
 History[1,"text"]:=ClipText
 History[1,"lines"]:=Count+1,
 History[1,"crc"]:=crc
+History[1,"time"]:=A_Now
 Clipboard:=ClipText
 Sleep, 100
 ClipText:="",Count:="",crc:=""
