@@ -1,10 +1,19 @@
 # Changelog
 
+### v1.108
+
+* New: also show timestamp in tooltip (cycle forward, backward, plugin) and search.
+* New: also show number of lines in search results (number only)
+* Change: timestamp now has two parts, separated by a pipe character (|)  
+  first part (before |): either a character, default @, or a number, for example 128336 for Unicode clock character 🕐  
+  second part (after |): time format options - see v1.107
+* Change: when cycling back past "z" show number in tooltip instead of character that no longer had any relation to "menu order"
+
 ### v1.107
 
 * New: Option to show timestamp in clipboard history menu - https://github.com/hi5/CL3/issues/23  
   See https://www.autohotkey.com/docs/v1/lib/FormatTime.htm#Time_Formats for options (e.g. HH:mm (24hr) or hh:mm tt (12hr AM/PM))
-* Fix: Open Template folder - now use commander_path env. variable/registry combined with WinGet ProcessPath/ProcessName, so it should now work with running 32/64 versions. Starts 32bit by default if TC is not running but can be detected.
+* Fix: Open Template folder - now use commander_path environment variable/registry combined with WinGet ProcessPath/ProcessName, so it should now work with running 32/64 versions. Starts 32bit by default if TC is not running but can be detected.
 * Fix: Use MenuWidth setting in DispMenuText() function to check length instead of previously hardcoded value of 60
 
 ### v1.106

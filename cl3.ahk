@@ -1,10 +1,12 @@
 /*
 
-Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+ (Ansi and Unicode)
-Version     : 1.107
+Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
+Version     : 1.108
 Author      : hi5
-Purpose     : A lightweight clone of the CLCL clipboard caching utility which can be found at
-              http://www.nakka.com/soft/clcl/index_eng.html written in AutoHotkey
+Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
+              which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
+              But some unique features have been added making it more versatile
+              "text only" Clipboard manager. 
 Source      : https://github.com/hi5/CL3
 
 Features:
@@ -40,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.107"
+version:="v1.108"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -58,7 +60,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.107
+;@Ahk2Exe-SetFileVersion 1.108
 ;@Ahk2Exe-SetDescription CL3
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
@@ -303,7 +305,13 @@ While GetKeyState(hk_cyclemodkey,"D") and cyclebackward
 	 If (ClipCycleCounter = 1) and (ClipboardPrivate = 1)
 		Indicator:="*"
 	 If (ClipCycleCounter <> 0)
-		ttext:=% Chr(96+ClipCycleCounter) Indicator " : " DispToolTipText(History[ClipCycleCounter].text)
+	 	{
+	 	 If (ClipCycleCounter < 27)
+			ClipCycleCounterIndicator:=Chr(96+ClipCycleCounter)
+	 	 Else
+			ClipCycleCounterIndicator:=ClipCycleCounter
+		 ttext:=% ClipCycleCounterIndicator Indicator " : " DispToolTipText(History[ClipCycleCounter].text,,History[ClipCycleCounter].time)
+	 	}
 	 else
 		ttext:="[cancelled]"
 	 If (oldttext <> ttext)
@@ -352,8 +360,12 @@ While GetKeyState(hk_cyclemodkey,"D") and cycleforward
 	 Indicator:=""
 	 If (ClipCycleCounter = 1) and (ClipboardPrivate = 1)
 		Indicator:="*"
+	 If (ClipCycleCounter < 27)
+		ClipCycleCounterIndicator:=Chr(96+ClipCycleCounter)
+	 Else
+	  	ClipCycleCounterIndicator:=ClipCycleCounter		
 	 If (ClipCycleCounter <> 0)
-		ttext:=% Chr(96+ClipCycleCounter) Indicator " : " DispToolTipText(History[ClipCycleCounter].text)
+		ttext:=% ClipCycleCounterIndicator Indicator " : " DispToolTipText(History[ClipCycleCounter].text,,History[ClipCycleCounter].time)
 	 else
 		ttext:="[cancelled]"
 	 If (oldttext <> ttext)
@@ -397,8 +409,17 @@ If (ClipCycleCounter = 0) or (ClipCycleCounter = "")
 	ClipCycleCounter:=1
 While GetKeyState(hk_cyclemodkey,"D")
 	{
+	 If ShowTime
+	 	{
+	 	 time:=History[ClipCycleCounter].time	
+		 If TimeFormat and time
+		 	{
+		  	 FormatTime, disptime, %time%, %TimeFormatTime%
+		  	 disptime := Ltrim(TimeFormatIndicator) disptime " "
+		 	}
+	 	}
 	 If (ClipCycleCounter <> 0)
-		ttext:=% "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) CyclePluginsToolTipLine DispToolTipText(History[ClipCycleCounter].text,CycleFormat)
+		ttext:=% disptime "Plugin: " ((CyclePlugins.HasKey(CycleFormat) = "0") ? "[none]" : CyclePlugins[CycleFormat]) CyclePluginsToolTipLine DispToolTipText(History[ClipCycleCounter].text,CycleFormat)
 	 else
 		ttext:="Plugin: [cancelled]" CyclePluginsToolTipLine
 	 If (oldttext <> ttext)
@@ -406,7 +427,7 @@ While GetKeyState(hk_cyclemodkey,"D")
 		 ToolTip, % ttext, %A_CaretX%, %A_CaretY%
 		 oldttext:=ttext
 		}
-
+	 disptime:="",time:=""
 	 Sleep 100
 	 KeyWait, %hk_cycleplugins% ; This prevents the keyboard's auto-repeat feature from interfering.
 	}
@@ -648,7 +669,7 @@ Return
 
 DispMenuText(TextIn,lines="1",time="")
 	{
-	 global MenuWidth,ShowLines,LineTextFormat,ShowTime,TimeFormat
+	 global MenuWidth,ShowLines,LineTextFormat,ShowTime,TimeFormat,TimeFormatIndicator,TimeFormatTime
 
 	 If (lines=1)
 		linetext:=LineTextFormat[1]
@@ -676,22 +697,31 @@ DispMenuText(TextIn,lines="1",time="")
 	 	 disptime:=""
 	 	 If TimeFormat and Time
 	 	 	{
-	 	 	 FormatTime, disptime, %time%, %TimeFormat%
-	 	 	 TextOut .= " " Chr(128336) " " disptime
+	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
+	 	 	 TextOut .= TimeFormatIndicator disptime
 	 	 	}
 	 	}
 
 	 Return LTRIM(TextOut," `t")
 	}
 
-DispToolTipText(TextIn,Format=0)
+DispToolTipText(TextIn,Format=0,time=0)
 	{
+	 Global ShowTime, TimeFormat, TimeFormatIndicator, TimeFormatTime
 	 TextOut:=RegExReplace(TextIn,"^\s*")
 	 TextOut:=SubStr(TextOut,1,750)
 	 ;StringReplace,TextOut,TextOut,`;,``;,All
 	 FormatFunc:=StrReplace(CyclePlugins[Format]," ")
 	 If IsFunc(FormatFunc)
 		TextOut:=%FormatFunc%(TextOut)
+	 If ShowTime
+	 	{
+	 	 If TimeFormat and Time
+	 	 	{
+	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
+	 	 	 TextOut := Ltrim(TimeFormatIndicator) disptime "`n" TextOut
+	 		}
+	 	}			
 	 Return TextOut
 	}
 

@@ -34,9 +34,22 @@ StartList:=""
 for k, v in History
 	{
 	 add:=v.text
+	 time:=v.time
+	 if ShowLines
+		linetext:=" - " v.lines
+	 else
+	 	linetext:=""	
+
+	 disptime:=""
 	 stringreplace, add, add, |,,All
 	 stringreplace, add, add, `n,%A_Space%,All
-	 StartList .= "[" SubStr("00" A_Index,-2) "] " Add "|"
+	 If ShowTime
+	 	If TimeFormat and Time
+	 		{
+	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
+	 	 	 disptime := Ltrim(TimeFormatIndicator) disptime " "
+			}
+	 StartList .= disptime "[" SubStr("00" A_Index,-2) linetext "] " Add "|"
 	}
 
 Gui, Search:Destroy
@@ -81,7 +94,10 @@ if (Choice = "")
 	{
 	 ControlGet, Choice, list, , ListBox1, A
 	}
-id:=Ltrim(SubStr(Choice,2,InStr(Choice,"]")-2),"0")
+; id:=Ltrim(SubStr(Choice,2,InStr(Choice,"]")-2),"0")
+RegExMatch(Choice,"\[0*(\d+)",id)
+Id:=id1
+id1:=""
 if (id = "")
 	id:=1
 ClipText:=History[id].text

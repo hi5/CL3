@@ -34,7 +34,7 @@ Settings()
 	 IniRead, BackupTimer        , %ini%, settings, BackupTimer, 10
 	 IniRead, Exclude            , %ini%, settings, Exclude, 0
 	 IniRead, LineFormat         , %ini%, settings, LineFormat, \t(\l line),\t(\l lines)
-	 IniRead, TimeFormat         , %ini%, settings, TimeFormat, HH:mm
+	 IniRead, TimeFormat         , %ini%, settings, TimeFormat, @|HH:mm
 	 IniRead, SettingsFolders    , %ini%, settings, SettingsFolders, 0
 	 IniRead, ShowSpecial        , %ini%, settings, ShowSpecial  , 1
 	 IniRead, ShowTemplates      , %ini%, settings, ShowTemplates, 1
@@ -58,6 +58,20 @@ Settings()
 		 folders:=StrReplace(folders,"%A_" Trim(A_LoopField," ") "%", %tmpfolder%)
 	 	}
 
+	 If InStr(TimeFormat,"|")
+		{
+		 TimeFormatIndicator:=StrSplit(TimeFormat,"|").1
+		 If TimeFormatIndicator is number
+		 	TimeFormatIndicator:=Chr(TimeFormatIndicator)
+		 TimeFormatIndicator:=A_Space TimeFormatIndicator A_Space	
+		 TimeFormatTime:=StrSplit(TimeFormat,"|").2
+		}
+	 Else
+		{
+		 TimeFormatIndicator:=""
+		 TimeFormatTime:=TimeFormat
+		}
+	 		
 	 ClipDataFolder:=StrSplit(folders,";").1 "\ClipData\"
 	 If (ClipDataFolder = "\ClipData\")
 		ClipDataFolder:=A_ScriptDir "\ClipData\"
@@ -137,7 +151,7 @@ Settings_Default()
 		, ShowMorehistory   : 1
 		, ShowExit          : 1
 		, Exclude           : ""
-		, TimeFormat        : "HH:mm"		
+		, TimeFormat        : "@|HH:mm"		
 		, LineFormat        : "\t(\l line),\t(\l lines)" }
 	}
 
