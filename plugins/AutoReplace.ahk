@@ -141,8 +141,10 @@ Return
 
 AutoReplace()
 	{
-	 global AutoReplace,IconExe,AutoReplaceTrayTip
+	 global AutoReplace,IconExe,AutoReplaceTrayTip,ClipboardHistoryToggle
 	 if !AutoReplace.Settings.Active ; bypass AutoReplace
+		Return clipboard
+	 if ClipboardHistoryToggle ; bypass AutoReplace
 		Return clipboard
 	 if RegExMatch(IconExe, "im)\\(" StrReplace(AutoReplace.Settings.Bypass,",","|") ")$") ; bypass AutoReplace
 		Return

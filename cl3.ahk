@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
-Version     : 1.108
+Version     : 1.109
 Author      : hi5
 Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
               which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
@@ -42,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.108"
+version:="v1.109"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -60,7 +60,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.108
+;@Ahk2Exe-SetFileVersion 1.109
 ;@Ahk2Exe-SetDescription CL3
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
@@ -738,6 +738,7 @@ PasteIt(source="")
 	 If PasteDelay
 		Sleep % PasteDelay
 	 Send ^v
+
 	 PasteTime := A_TickCount
 	 oldttext:="", ttext:="", ActiveWindowID:="",ClipboardOwnerProcessName:=""
 
@@ -953,6 +954,7 @@ else ; Excel is active; check CF_METAFILEPICT, if not present we can safely stor
 If (Clipboard = "") ; or (ScriptClipClipChain = 1) ; avoid empty entries or changes made by script which you don't want to keep
 	Return
 
+; we could check for AutoReplace or ClipboardHistoryToggle settings here, but is taken care of in AutoReplace()
 AutoReplace()
 
 If (Clipboard == History[1].text) ; v1.95

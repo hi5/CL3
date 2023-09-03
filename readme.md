@@ -6,6 +6,9 @@ But some unique [features](#features) have been added making it more versatile "
 
 Intended for AutoHotkey Unicode (64-bit version of AutoHotkey is automatically Unicode).
 
+Relies standard copy/paste shortcuts for the applications you are using, so <kbd>Ctrl</kbd>+<kbd>c</kbd> and <kbd>Ctrl</kbd>+<kbd>v</kbd>, and right click "copy" via mouse actions.
+Programs that rely on other shortcuts to store/restore clipboard contents may not work (e.g. vim).
+
 Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
 
 ### Shortcuts

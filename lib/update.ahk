@@ -12,6 +12,7 @@ update(v)
      ; "tag_name":"v1.00"
      text:=whr.ResponseText
      RegExMatch(text,"U)\x22tag_name\x22:\x22\K(.*)\x22",version)
+     ; MsgBox % v ":" version1 ":" version
      If (v <> version1) and (version <> "")
          {
           MsgBox, 68, New version of CL3, A new version seems to be available.`nVisit website to download it?`n`n(See releases/assets on Github)

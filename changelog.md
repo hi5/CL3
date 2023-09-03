@@ -1,5 +1,10 @@
 # Changelog
 
+### v1.109
+
+* Fix: AutoReplace was still active when Clipboard History was Paused
+* Fix: remove debug MsgBox in SlotPaste (cl3apiclass.ahk)
+
 ### v1.108
 
 * New: also show timestamp in tooltip (cycle forward, backward, plugin) and search.
