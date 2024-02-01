@@ -69,7 +69,7 @@ if InStr(GetText,A_Space) ; prepare regular expression to ensure search is done 
 	re:="iUms)(?=.*" RegExReplace(GetText,"iUms)(.*)\s","$1)(?=.*") ")"
 Loop, Parse, StartList, |
 	{
-	 if RegExMatch(A_LoopField,re) 
+	 if RegExMatch(StrSplit(A_LoopField,"]",,2).2,re) 
 		UpdatedStartList .= A_LoopField "|"
 	}
 GuiControl, Search:, ListBox1, |%UpdatedStartList%

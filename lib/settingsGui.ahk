@@ -72,7 +72,8 @@ Gui Settings:Add,  GroupBox, xp+60 y20 w130 h320                        , Other
 Gui Settings:Add,  Text, xp+8 yp+24                                     , Max History:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMaxHistory Number         , %MaxHistory%
 Gui Settings:Add,  Text, xp-70 yp+25                                    , Menu width:
-Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20 vMenuWidth Number          , %MenuWidth%
+Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20
+Gui Settings:Add,  UpDown, Range20-100 vMenuWidth                       , %MenuWidth%
 Gui Settings:Add,  Text, xp-70 yp+25                                    , More History:
 Gui Settings:Add,  Edit, xp+70 yp-3  w40 h20
 Gui Settings:Add,  UpDown, Range-100-300 vMoreHistory                   , %MoreHistory%
@@ -113,8 +114,8 @@ Gui Settings:Add,  Checkbox, xp+8 yp+24 vActivateApi             , Activate API
 Gui Settings:Add,  Checkbox, xp yp+25 vActivateCmdr              , ccmdr plugin
 Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_cmdr        , %hk_cmdr%
 
-Gui Settings:Add,  Checkbox, xp-20 yp+25 vActivateNotes          , notes plugin
-Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_notes       , %hk_notes%
+;Gui Settings:Add,  Checkbox, xp-20 yp+25 vActivateNotes          , notes plugin
+;Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vhk_notes       , %hk_notes%
 
 Gui Settings:Add,  Checkbox, xp-20 yp+25 vActivateBackup         , Auto Backup
 Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vBackupTimer Number, %BackupTimer%
@@ -129,9 +130,9 @@ Gui Settings:Add,  Edit    , xp+20 yp+15 w60 h20 vTimeFormat     , %TimeFormat%
 Gui Settings:Add,  Checkbox, xp-20 yp+24 vAutoReplaceTrayTip     , AutoRepl. TT
 Gui Settings:Add,  Text    , xp    yp+25                         , Clipchain HK:
 Gui Settings:Add,  Edit    , xp    yp+15 w80 vhk_ClipChainPaste  , %hk_ClipChainPaste%
-Gui Settings:Add,  Text    , xp    yp+25                         , Bypass AutoRepl.`npaste [1st entry]:
-Gui Settings:Add,  Edit    , xp    yp+25 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
-Gui Settings:Add,  Text    , xp    yp+25                         , Clipb. delay (ms)
+Gui Settings:Add,  Text    , xp    yp+30                         , Bypass AutoRepl.`npaste [1st entry]:
+Gui Settings:Add,  Edit    , xp    yp+30 w80 vhk_BypassAutoReplace, %hk_BypassAutoReplace%
+Gui Settings:Add,  Text    , xp    yp+30                         , Clipb. delay (ms)
 Gui Settings:Font, cRed
 Gui Settings:Add,  Text    , xp+80 yp gModHelp2                  , ?
 Gui Settings:Font, cBlack
@@ -142,8 +143,8 @@ If AllowDupes
 	GuiControl,, AllowDupes, 1
 If ActivateApi
 	GuiControl,, ActivateApi, 1
-If ActivateNotes
-	GuiControl,, ActivateNotes, 1
+;If ActivateNotes
+;	GuiControl,, ActivateNotes, 1
 If ActivateCmdr
 	GuiControl,, ActivateCmdr, 1
 If ActivateBackup
@@ -219,7 +220,7 @@ IniWrite, %hk_cyclebackward% , %ini%, Hotkeys, hk_cyclebackward
 IniWrite, %hk_cycleforward%  , %ini%, Hotkeys, hk_cycleforward
 IniWrite, %hk_cycleplugins%  , %ini%, Hotkeys, hk_cycleplugins
 IniWrite, %hk_cyclecancel%   , %ini%, Hotkeys, hk_cyclecancel
-IniWrite, %hk_notes%         , %ini%, Hotkeys, hk_notes
+;IniWrite, %hk_notes%         , %ini%, Hotkeys, hk_notes
 IniWrite, %hk_cmdr%          , %ini%, Hotkeys, hk_cmdr
 IniWrite, %hk_BypassAutoReplace%, %ini%, Hotkeys, hk_BypassAutoReplace
 
@@ -255,7 +256,7 @@ LineFormat:=StrReplace(LineFormat,A_Tab,"\t")
 IniWrite, %LineFormat%         , %ini%, settings, LineFormat
 IniWrite, %TimeFormat%         , %ini%, settings, TimeFormat
 
-IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
+;IniWrite, %ActivateNotes% , %ini%, Plugins, ActivateNotes
 IniWrite, %ActivateCmdr%  , %ini%, Plugins, ActivateCmdr
 
 Sleep 100
@@ -337,7 +338,6 @@ ClipData:
 * AutoReplace
 * ClipChain
 * History
-* Notes
 * Slots
 
 Templates:

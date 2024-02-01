@@ -56,7 +56,7 @@ Gosub, FifoInit
 Gosub, AutoReplaceInit
 Gosub, SortMenuSetup
 Gosub, ccmdersetup
-Gosub, NotesMenuSetup
+;Gosub, NotesMenuSetup
 
 ;@Ahk2Exe-IgnoreBegin
 #include *i %A_ScriptDir%\plugins\MyPlugins.ahk
@@ -77,4 +77,4 @@ Gosub, NotesMenuSetup
 #include %A_ScriptDir%\plugins\Fifo.ahk
 #include %A_ScriptDir%\plugins\PasteUnwrapped.ahk
 #include %A_ScriptDir%\plugins\ccmdr.ahk
-#include %A_ScriptDir%\plugins\notes.ahk
+;#include %A_ScriptDir%\plugins\notes.ahk

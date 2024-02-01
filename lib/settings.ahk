@@ -42,10 +42,13 @@ Settings()
 	 IniRead, ShowMorehistory    , %ini%, settings, ShowMorehistory, 1
 	 IniRead, ShowExit           , %ini%, settings, ShowExit     , 1
 	 IniRead, ActivateCmdr       , %ini%, plugins , ActivateCmdr, 0
-	 IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
+	 ;IniRead, ActivateNotes      , %ini%, plugins , ActivateNotes, 0
 	 If (Exclude = 0) or (Exclude = "Error")
 		Exclude:=""
 	 StringLower, Exclude, Exclude
+
+	 if MenuWidth not between 19 and 101
+		MenuWidth:=40
 
 	 If (SettingsFolders = "") or (SettingsFolders = "ERROR") or (SettingsFolders = 0)
 		SettingsFolders:=""
@@ -81,7 +84,7 @@ Settings()
 
 	 If !FileExist(ClipDataFolder)
 		FileCreateDir, %ClipDataFolder%
-	 Loop, parse, % "History,ClipChain,AutoReplace,Slots,Notes", CSV
+	 Loop, parse, % "History,ClipChain,AutoReplace,Slots,", CSV ; Notes
 		{
 		 If !FileExist(ClipDataFolder A_LoopField)
 			FileCreateDir, %ClipDataFolder%%A_LoopField%
@@ -130,7 +133,7 @@ Settings_Default()
 		, hk_slot9         :">^9"
 		, hk_slot0         :">^0"
 		, hk_slotsmenu     :""
-		, hk_notes         :"#n"
+		;, hk_notes         :"#n"
 		, hk_BypassAutoReplace :""
 		, hk_cmdr          :"#j" }
 	 Settings_Settings:={ MaxHistory :"150"
@@ -195,7 +198,7 @@ Settings_Hotkeys()
 	 IniRead, hk_cycleforward  , %ini%, Hotkeys, hk_cycleforward  ,c
 	 IniRead, hk_cycleplugins  , %ini%, Hotkeys, hk_cycleplugins  ,f
 	 IniRead, hk_cyclecancel   , %ini%, Hotkeys, hk_cyclecancel   ,x
-	 IniRead, hk_notes         , %ini%, Hotkeys, hk_notes         ,#n
+	 ;IniRead, hk_notes         , %ini%, Hotkeys, hk_notes         ,#n
 	 IniRead, hk_cmdr          , %ini%, Hotkeys, hk_cmdr          ,#j
 	 IniRead, hk_BypassAutoReplace, %ini%, Hotkeys, hk_BypassAutoReplace
 	 If (hk_BypassAutoReplace = "ERROR")
@@ -282,15 +285,15 @@ Settings_Hotkeys()
 	 If hk_cmdr
 		Try
 			Hotkey, %hk_cmdr%                               , hk_cmdr
-	 If hk_notes
-		Try
-			Hotkey, %hk_notes%                              , hk_notes
+;	 If hk_notes
+;		Try
+;			Hotkey, %hk_notes%                              , hk_notes
 	 if !ActivateCmdr
 		Try
 			Hotkey, %hk_cmdr%, off
-	 if !ActivateNotes
-		Try
-			Hotkey, %hk_notes%, off
+;	 if !ActivateNotes
+;		Try
+;			Hotkey, %hk_notes%, off
 	}
 
 Settings_menu:

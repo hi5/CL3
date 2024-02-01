@@ -1,5 +1,12 @@
 # Changelog
 
+### v1.110
+
+* Fix: Add minimum (20) and maximum value (100) for MenuWidth setting (safety check) - https://github.com/hi5/CL3/issues/26  
+* Change: Search plugin, only search text after [ID] marker (also excludes possible timestamp)
+* New: ClipChain preview of full item on mouseover
+* Removed: Notes plugin/settings (commented code so easy to reactivate for those who need it)
+
 ### v1.109
 
 * Fix: AutoReplace was still active when Clipboard History was Paused

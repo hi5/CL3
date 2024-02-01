@@ -1,4 +1,4 @@
-# CL3 <sup>v1.108</sup> - Clipboard caching utility
+# CL3 <sup>v1.110</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -6,10 +6,12 @@ But some unique [features](#features) have been added making it more versatile "
 
 Intended for AutoHotkey Unicode (64-bit version of AutoHotkey is automatically Unicode).
 
-Relies standard copy/paste shortcuts for the applications you are using, so <kbd>Ctrl</kbd>+<kbd>c</kbd> and <kbd>Ctrl</kbd>+<kbd>v</kbd>, and right click "copy" via mouse actions.
+💡 Relies standard copy/paste shortcuts for the applications you are using, so <kbd>Ctrl</kbd>+<kbd>c</kbd> and <kbd>Ctrl</kbd>+<kbd>v</kbd>, and right click "copy" via mouse actions.
 Programs that rely on other shortcuts to store/restore clipboard contents may not work (e.g. vim).
 
-Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
+💬 Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
+
+💡 _The [changelog.md](changelog.md) contains some additional information about certain features._
 
 ### Shortcuts
 
@@ -420,4 +422,4 @@ Note: your `PastePrivateRules.ahk` will never be part of this GitHub repository 
 
 # Changelog
 
-The changelog is now available in a separate file, [changelog.md](changelog.md)
+The changelog is available here: [changelog.md](changelog.md)

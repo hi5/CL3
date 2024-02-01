@@ -115,7 +115,6 @@ class CL3API
 		{
 		 if (SlotID = 10)
 			SlotID:=0
-	 MsgBox % SlotID
 		 OnClipboardChange("FuncOnClipboardChange", 0)
 		 Clipboard:=Slots[SlotID]
 		 PasteIt()

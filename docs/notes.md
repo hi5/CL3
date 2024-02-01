@@ -1,4 +1,6 @@
-﻿# Notes
+Note: Notes has been removed as of CL3 v1.110 (code is commented so easy to reinstate for those wanting to keep it)
+
+# Notes
 
 The Notes plugin must be enabled first and you can change the default hotkey `#n`
 via the Setting menu (see Tray menu)

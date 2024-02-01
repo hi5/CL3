@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.71
+Version           : 1.8
 CL3 version       : 1.5
 
 History:
+- 1.8 Preview ToolTip on Mouse Hover
 - 1.71 fix cancelled Load from Clipboard (Set Delim)
 - 1.7 enter (multiple) delimiter(s) to split elements from clipboard;
       define send key(s) after paste (AutoHotkey notation) e.g. {tab};
@@ -30,6 +31,7 @@ IniRead, ClipChainSend       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings
 IniRead, ClipChainPause      , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause     , 0
 IniRead, ClipChainTrim       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrim      , 0
 IniRead, ClipChainTrimSet    , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrimSet
+IniRead, ClipChainPreview    , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPreview   , 1
 
 If (ClipChainX = "") or (ClipChainX = "ERROR")
 	ClipChainX:=100
@@ -60,6 +62,7 @@ If !IsObject(ClipChainData)
 	}
 
 ClipChainIndex:=1
+LVM_SUBITEMHITTEST := 4096 + 57
 
 ;ClipboardPrivateRulesFunc:="ClipboardPrivateRules"
 
@@ -75,7 +78,7 @@ Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Add, Clear ClipChain, ClipChainClear
 
 Gui, ClipChain:Default
-Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate 
+Gui, ClipChain:+Border +ToolWindow +AlwaysOnTop +E0x08000000 ; +E0x08000000 = WS_EX_NOACTIVATE ; ontop and don't activate
 Gui, ClipChain:Font, % dpi("s8")
 Gui, ClipChain:Add, Listview, % dpi("x0 y0 w185 h350 NoSortHdr grid vLVCGIndex gClipChainClicked hwndHLV"),?|ClipChain|IDX
 LV_ModifyCol(1,dpi()*25)
@@ -91,31 +94,33 @@ Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26   gClipChainMoveUp   vBut
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown vButton2"), % Chr(0x25BC) ; ▼
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert   vButton3"), Ins
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings"
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit     vButton4"), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil) 
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit     vButton4"), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil)
 Gui, ClipChain:font
 Gui, ClipChain:font, % dpi("s12 bold")
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainDel      vButton5"), % Chr(0x1f5d1) ; trashcan ; X ; Del (X)
 Gui, ClipChain:font
-Gui, ClipChain:font,% dpi("s11") ; " Wingdings " 
+Gui, ClipChain:font,% dpi("s11") ; " Wingdings "
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMenu     vButton6"), % Chr(0x1F4C2) ; open folder 📂; % Chr(49)
 Gui, ClipChain:font
 Gui, ClipChain:font,% dpi("s8")
-Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h140 vGbox2"), Options
-Gui, ClipChain:Add, Checkbox, % dpi("xp+10 yp+18 w75 h24 vClipChainNoHistory gClipChainCheckboxes"), No History
-Gui, ClipChain:Add, Checkbox, % dpi("xp+80 yp    w85 h24 vClipChainTrans     gClipChainCheckboxes"), Transparent
-Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainSend      gClipChainCheckboxes"), Send after
-Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainKey       gClipChainKeyUpdate" ), %ClipChainKey%
-Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainTrim      gClipChainCheckboxes"), Trim
-Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainTrimSet   gClipChainTrimUpdate"), %ClipChainTrimSet%
+Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+40 w181 h170 vGbox2"), Options
+Gui, ClipChain:Add, Checkbox, % dpi("xp+10 yp+18  w75 h24 vClipChainNoHistory gClipChainCheckboxes"), No History
+Gui, ClipChain:Add, Checkbox, % dpi("xp+80 yp     w85 h24 vClipChainTrans     gClipChainCheckboxes"), Transparent
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30  w75 h24 vClipChainSend      gClipChainCheckboxes"), Send after
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp     w85 h24 vClipChainKey       gClipChainKeyUpdate" ), %ClipChainKey%
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30  w75 h24 vClipChainTrim      gClipChainCheckboxes"), Trim
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp     w85 h24 vClipChainTrimSet   gClipChainTrimUpdate"), %ClipChainTrimSet%
 
-Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w75 h24 vClipChainPause     gClipChainCheckboxes"), Pause
-Gui, ClipChain:Add, Button  , % dpi("xp+80 yp    w85 h24 vClipChainGuiClose  gClipChainGuiClose"  ), Close ClipChain
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30  w75 h24 vClipChainPause     gClipChainCheckboxes"), Pause
+Gui, ClipChain:Add, Button  , % dpi("xp+80 yp     w85 h24 vClipChainGuiClose  gClipChainGuiClose"  ), Close ClipChain
+Gui, ClipChain:Add, Checkbox, % dpi("xp-80 yp+30 w150 h24 vClipChainPreview   gClipChainCheckboxes"), Show preview TT on Hover
 
 GuiControl, ClipChain:, ClipChainNoHistory  , %ClipChainNoHistory%
 GuiControl, ClipChain:, ClipChainTrans      , %ClipChainTrans%
 GuiControl, ClipChain:, ClipChainKey        , %ClipChainKey%
 GuiControl, ClipChain:, ClipChainTrim       , %ClipChainTrim%
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
+GuiControl, ClipChain:, ClipChainPreview    , %ClipChainPreview%
 
 Gosub, ClipChainCheckboxes
 ClipChainLvHandle := New LV_Rows(HLV)
@@ -211,13 +216,17 @@ Return
 ;^#F11::
 hk_clipchain:
 If !WinExist("CL3ClipChain ahk_class AutoHotkeyGUI")
-	Gui, ClipChain:Show, % dpi("w185 NA x") ClipChainX " y" ClipChainY, CL3ClipChain
+	{
+	 ; https://www.autohotkey.com/boards/viewtopic.php?t=77789
+	 OnMessage( WM_MOUSEMOVE := 0x200, "WM_MOUSEMOVE" ) ; monitor mouse moving over our windowOnMessage( WM_MOUSEMOVE := 0x200, "WM_MOUSEMOVE" ) ; monitor mouse moving over our window
+	 Gui, ClipChain:Show, % dpi("w185 NA x") ClipChainX " y" ClipChainY, CL3ClipChain
+	}
 else
  	{
 	 Gosub, ClipChainSaveWindowPosition
 	 Gui, ClipChain:Hide
  	}
-Gosub, ClipChainCheckboxes	
+Gosub, ClipChainCheckboxes
 Return
 
 ClipChainMenu:
@@ -261,13 +270,13 @@ ClipChainData:=[]
 ClipChainData:=ClipChainDataNew
 ClipChainDataNew:=[]
 Gosub, ClipChainUpdateIDX
-Gosub, ClipChainUpdateIndicator	
+Gosub, ClipChainUpdateIndicator
 Return
 
 ClipChainUpdateIDX:
 Loop, % LV_GetCount()
 	LV_Modify(A_Index,"Col3",A_Index)
-Return	
+Return
 
 ClipChainEdit: ; falls through to Insert
 ClipChainGuiTitle:="CL3ClipChain Edit text"
@@ -304,12 +313,12 @@ If (ClipChainIns = "")
 	 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 	 Return
 	}
-If (ClipChainInsEdit = 1)	
+If (ClipChainInsEdit = 1)
 	{
 	 ClipChainData[ClipChainDataIndex]:=ClipChainIns
 	 If (ClipChainInsertCounter = 0)
 	 	LV_Add(1,,,,1)
-	 LV_Modify(ClipChainDataIndex,"Col2",ClipChainHelper(ClipChainIns)) 
+	 LV_Modify(ClipChainDataIndex,"Col2",ClipChainHelper(ClipChainIns))
 	}
 else
 	{
@@ -317,7 +326,7 @@ else
 	 LV_Insert(ClipChainDataIndex+1, , , ClipChainHelper(ClipChainIns))
 	}
 Gosub, ClipChainUpdateIDX
-ClipChainInsEdit:=0	
+ClipChainInsEdit:=0
 
 ClipChainPause:=ClipChainPauseStore
 ClipChainPauseStore:=""
@@ -343,7 +352,7 @@ Gui, ClipChainInsertGui:Add, Button, xp+120 gClipChainInsertGuiCancel w100, Canc
 Gui, ClipChainInsertGui:Show, , %ClipChainGuiTitle%
 	While (ClipChainInsertActive = 0)
 		{
-		 Sleep 20 
+		 Sleep 20
 		}
 Return
 
@@ -487,6 +496,7 @@ If (ClipChainKey = "[press to set]")
 IniWrite, %ClipChainKey%         , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainKey
 IniWrite, %ClipChainSend%        , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainSend
 IniWrite, %ClipChainPause%       , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPause
+IniWrite, %ClipChainPreview%     , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainPreview
 
 IniWrite, %ClipChainTrim%     , %ClipDataFolder%ClipChain\ClipChain.ini, Settings, ClipChainTrim
 If (ClipChainTrimSet = "[press to set]")
@@ -498,7 +508,7 @@ ClipChainMoveUp:
 ClipChainLvHandle.Move(1) ; Move selected rows up.
 Gosub, ClipChainSet
 return
- 
+
 ClipChainMoveDown:
 ClipChainLvHandle.Move() ; Move selected rows down.
 Gosub, ClipChainSet
@@ -552,5 +562,62 @@ ClipChainActive()
 	 Else
 		Return false
 	}
+
+; https://www.autohotkey.com/boards/viewtopic.php?t=77789
+HoverTooltip:
+If !ClipChainPreview
+	Return
+If (Mouse_Hwnd = HLV)
+	{
+	 VarSetCapacity( LVHITTESTINFO, 24, 0 )       ;- allocate structure
+	 NumPut( Mouse_X, LVHITTESTINFO, 0, "Int" )   ;- fill coordinate data
+	 NumPut( Mouse_Y, LVHITTESTINFO, 4, "Int" )
+	 ;- http://msdn.microsoft.com/en-us/library/bb774754%28VS.85%29.aspx
+	 SendMessage, LVM_SUBITEMHITTEST, 0, &LVHITTESTINFO,, Ahk_ID %HLV%
+	 LVHT_Flags := NumGet( LVHITTESTINFO, 8, "Int" )
+	 LVHT_Row := 1 + NumGet( LVHITTESTINFO, 12, "Int" )
+	 LVHT_Column := 1 + NumGet( LVHITTESTINFO, 16, "Int" )
+	 LV_GetText(Cx,LVHT_Row,2) ; we need second column
+	 ;text= You are hovering over Row %LVHT_Row% and Col %LVHT_Column%`n%cx%
+	 Text=%cx%
+	 Text:=StrReplace(text,"\n","`n")
+	 ;WinGetPos, ttX, ttY, , ttHeight, ClipChain
+	 If (text = "ClipChain")
+		{
+		 ToolTip
+		 Return
+		}
+	 text:=text
+	 DisplayToolTip(text)
+	 SetTimer, ToolTipTimer, 3000
+	 Return
+	}
+ToolTip
+Return
+
+DisplayToolTip(text,Columns=50)
+	{
+	 DispText := RegExReplace(Text, "(.{1," . Columns . "})", "$1`n")
+	 ToolTip, % DispText ;, %ttX%, % tty + ttHeight
+	}
+
+ToolTipTimer:
+MouseGetPos, , , WinID
+WinGetTitle, WinTitle, ahk_id %WinID%
+If (WinTitle = "CL3ClipChain")
+	Return
+SetTimer, ToolTipTimer, Off
+ToolTip
+Return
+
+
+;--------------
+WM_MOUSEMOVE( wparam, lparam, msg, hwnd ) { ; ----------------------------------
+	Global Mouse_X, Mouse_Y, Mouse_Hwnd
+	Mouse_X := lparam & 0xFFFF       ;- store the mouse position relative
+	Mouse_Y := lparam >> 16          ;-     to the window's client areas client area
+	Mouse_Hwnd := hwndMouse_Hwnd := hwnd
+	Gosub,HoverTooltip
+} ; WM_MOUSEMOVE( wparam, lparam, msg, hwnd ) ----------------------------------}
 
 #include %A_ScriptDir%\lib\class_lv_rows.ahk

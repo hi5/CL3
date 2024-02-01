@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
-Version     : 1.109
+Version     : 1.110
 Author      : hi5
 Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
               which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
@@ -42,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.109"
+version:="v1.110"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -682,7 +682,7 @@ DispMenuText(TextIn,lines="1",time="")
 	 TextOut:=RegExReplace(TextOut, "\s+", " ")
 	 StringReplace,	TextOut, TextOut, &amp;amp;, &, All
 	 StringReplace, TextOut, TextOut, &, &&, All
-	 
+
 	 If StrLen(TextOut) > MenuWidth
 		{
 		 TextOut:=SubStr(TextOut,1,MenuWidth) " " Chr(8230) " " SubStr(RTrim(TextOut,".`n"),-10) ; 8230 ...
@@ -690,17 +690,17 @@ DispMenuText(TextIn,lines="1",time="")
 	 TextOut .= " " Chr(171)
 
 	 If ShowLines
-		 TextOut .= StrReplace(linetext,"\l",lines)
+		TextOut .= StrReplace(linetext,"\l",lines)
 
 	 If ShowTime
-	 	{
-	 	 disptime:=""
-	 	 If TimeFormat and Time
-	 	 	{
-	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
-	 	 	 TextOut .= TimeFormatIndicator disptime
-	 	 	}
-	 	}
+		{
+		 disptime:=""
+		 If TimeFormat and Time
+			{
+			 FormatTime, disptime, %time%, %TimeFormatTime%
+			 TextOut .= TimeFormatIndicator disptime
+			}
+		}
 
 	 Return LTRIM(TextOut," `t")
 	}
@@ -715,13 +715,13 @@ DispToolTipText(TextIn,Format=0,time=0)
 	 If IsFunc(FormatFunc)
 		TextOut:=%FormatFunc%(TextOut)
 	 If ShowTime
-	 	{
-	 	 If TimeFormat and Time
-	 	 	{
-	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
-	 	 	 TextOut := Ltrim(TimeFormatIndicator) disptime "`n" TextOut
-	 		}
-	 	}			
+		{
+		 If TimeFormat and Time
+			{
+			 FormatTime, disptime, %time%, %TimeFormatTime%
+			 TextOut := Ltrim(TimeFormatIndicator) disptime "`n" TextOut
+			}
+		}
 	 Return TextOut
 	}
 
@@ -830,7 +830,7 @@ TemplateMenuHandler:
 If (A_ThisMenuItem = "&0. Open templates folder")
 	{
 
-	 ; try to get Commander_Path, it will be empty if TC is not running (yet)
+	 ; try to get Commander_Path, it will be empty if TC is not running (yet) or Cl3 was started before TC
 	 EnvGet, Commander_Path, Commander_Path
 	
 	 If (Commander_Path = "") ; try to read registry
@@ -841,7 +841,7 @@ If (A_ThisMenuItem = "&0. Open templates folder")
 		WinGet TCPath, ProcessPath, ahk_exe %TCName%
 
 	 If (TCPath = "") and (Commander_Path <> "")
-	 	TCPath:=Commander_Path "\TOTALCMD.EXE"
+		TCPath:=Commander_Path "\TOTALCMD.EXE"
 
 	 If (TCPath = "") and (Commander_Path = "")
 		{
@@ -849,10 +849,10 @@ If (A_ThisMenuItem = "&0. Open templates folder")
 		 Return
 		}
 	 Try
-	 	{
-	 	 If FileExist(TCPath)	
-		 	Run, %TCPath% /O /T %TemplateFolder%
-	 	}
+		{
+		 If FileExist(TCPath)	
+			Run, %TCPath% /O /T %TemplateFolder%
+		}
 	 Return
 
 	}
@@ -879,9 +879,9 @@ If (ClipText <> Clipboard)
 	 else
 		IconExe:="res\" iconT
 	 If History[MenuItemPos].HasKey("crc")	
-			crc:=History[MenuItemPos,"crc"]
-		 else
-	 crc:=crc32(ClipText)	 
+		crc:=History[MenuItemPos,"crc"]
+	 else
+	 	crc:=crc32(ClipText)	 
 	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc,"time":A_Now})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
