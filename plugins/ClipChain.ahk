@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.8
+Version           : 1.9
 CL3 version       : 1.5
 
 History:
+- 1.9 Reset ClipChain index correctly to 1 after loading from Clipboard (in plugin and API)
 - 1.8 Preview ToolTip on Mouse Hover
 - 1.71 fix cancelled Load from Clipboard (Set Delim)
 - 1.7 enter (multiple) delimiter(s) to split elements from clipboard;
@@ -169,10 +170,10 @@ If (A_TimeSincePriorHotkey<400) and (A_TimeSincePriorHotkey<>-1)
 	{ ; check if you double clicked on the listview if so move away focus from listview otherwise we couldn't set the new active item by double clicking in the LV
 	 ControlGetFocus, CL3ClipChainListview, CL3ClipChain ahk_class AutoHotkeyGUI
 	 If (CL3ClipChainListview = "SysListView321")
-	 	{
-	 	 ControlFocus, Button12, CL3ClipChain ahk_class AutoHotkeyGUI ; Button12 is Close ClipChain
-	 	 Return
-	 	}
+		{
+		 ControlFocus, Button12, CL3ClipChain ahk_class AutoHotkeyGUI ; Button12 is Close ClipChain
+		 Return
+		}
 	 Gosub, ClipChainPasteDoubleClick
 	}
 Return
@@ -411,6 +412,7 @@ CCDelim:=StrReplace(CCDelim,"\s"," ")
 
 ClipChainLoad:
 XMLSave("ClipChainData","-" A_Now)
+ClipChainIndex:=1
 ClipChainData:=RegExReplace(Clipboard,"m)^\s+$") ; v1.1 remove white space from empty lines
 If (Asc(SubStr(ClipChainData,1,1)) = 65279) ; fix: remove BOM char from first entry, could mess up a file path...
 	ClipChainData:=SubStr(ClipChainData,2)
@@ -420,10 +422,10 @@ If CCDelim
 	{
 	 Loop, parse, CCDelim, CSV
 		{
-		If (A_LoopField = "\c")
+		 If (A_LoopField = "\c")
 			{
-			ClipChainData:=StrReplace(ClipChainData,",",Chr(7))
-			continue
+			 ClipChainData:=StrReplace(ClipChainData,",",Chr(7))
+			 continue
 			}
 		 ClipChainData:=StrReplace(ClipChainData,A_LoopField,Chr(7))
 		}
@@ -444,6 +446,7 @@ CCDelim:=""
 
 ClipChainListview:
 Gui, ClipChain:Default
+ClipChainIndex:=1
 LV_Delete()
 for k,v in ClipChainData
 	LV_Add("", "", ClipChainHelper(v), A_Index)

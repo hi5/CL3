@@ -1,5 +1,12 @@
 # Changelog
 
+### v1.111
+
+* New: Limit entries in Yank entry sub-menu for valid history entries
+* New: Clear History in Yank entry sub-menu
+* Fix: ccmdr plugin: fix for AutoHotkey v1.1.37.02 suddenly stuck in loop calling gCmdr
+* Fix: Reset ClipChain index correctly to 1 after loading from Clipboard (in plugin and API)
+
 ### v1.110
 
 * Fix: Add minimum (20) and maximum value (100) for MenuWidth setting (safety check) - https://github.com/hi5/CL3/issues/26  

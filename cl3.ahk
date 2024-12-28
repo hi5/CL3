@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
-Version     : 1.110
+Version     : 1.111
 Author      : hi5
 Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
               which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
@@ -42,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.110"
+version:="v1.111"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -60,8 +60,10 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.109
-;@Ahk2Exe-SetDescription CL3
+;@Ahk2Exe-SetFileVersion 1.111
+;@Ahk2Exe-SetDescription CL3 Clipboard Manager
+;@Ahk2Exe-SetProductName CL3
+;@Ahk2Exe-SetProductVersion Compiled with AutoHotkey v%A_AhkVersion%
 ;@Ahk2Exe-SetCopyright MIT License - (c) https://github.com/hi5
 ; </for compiled scripts>
 
@@ -600,7 +602,12 @@ If ShowTemplates
 	 	Menu, ClipMenu, Icon, &t. Templates, res\%iconT%,,16
 	}
 Loop 18
-	Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
+	{
+	 If History[A_Index].text 
+		Menu, Submenu3, Add, % "&" Chr(96+A_Index) ".", MenuHandler
+	}
+Menu, SubMenu3, Add,
+Menu, SubMenu3, Add, Clear History, MenuHandler
 }
 
 ; More history... (alt-z)
@@ -750,6 +757,12 @@ PasteIt(source="")
 ; various menu handlers
 
 MenuHandler:
+If (Trim(A_ThisMenuItem) = "Clear History")
+	{
+	 History:=[]
+	 Return
+	}
+
 If (Trim(A_ThisMenuItem) = "E&xit (Close menu)")
 	{
 	 If !FIFOACTIVE:=0
@@ -881,7 +894,7 @@ If (ClipText <> Clipboard)
 	 If History[MenuItemPos].HasKey("crc")	
 		crc:=History[MenuItemPos,"crc"]
 	 else
-	 	crc:=crc32(ClipText)	 
+		crc:=crc32(ClipText)	 
 	 History.Insert(1,{"text":ClipText,"icon": IconExe,"lines": Count+1,"crc":crc,"time":A_Now})
 	}
 OnClipboardChange("FuncOnClipboardChange", 0)
@@ -901,6 +914,12 @@ Critical, On
 ; 0 if the clipboard is now empty;
 ; 1 if it contains something that can be expressed as text (this includes files copied from an Explorer window);
 ; 2 if it contains something entirely non-text such as a picture.
+
+;If (A_EventInfo <> 2)
+;	{
+;		Run runclipboardpng.ahk
+;		MsgBox
+;	}
 
 If (A_EventInfo <> 1)
 	Return
@@ -1233,14 +1252,14 @@ Template_Hotkeys()
 	{
 	 global TemplateFolder,templatesfolderlist
 	 Loop, parse, templatesfolderlist, |
-	 	{
+		{
 		 IniRead, TemplatesShortcut, %TemplateFolder%%A_LoopField%\settings.ini, settings, shortcut
 		 If (TemplatesShortcut <> "ERROR")
 			{
 			 fn := func("ShowMenu").Bind(A_LoopField)
 			 Hotkey, % TemplatesShortcut, % fn
 			}
-	 	}
+		}
 	}
 
 ShowMenu(menuname){

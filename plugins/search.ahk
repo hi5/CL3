@@ -3,7 +3,7 @@
 Plugin            : Search history
 Version           : 1.5
 
-Searchable listbox 
+Searchable listbox
 Combined with Endless scrolling in a listbox http://www.autohotkey.com/forum/topic31618.html
 
 History:
@@ -38,16 +38,16 @@ for k, v in History
 	 if ShowLines
 		linetext:=" - " v.lines
 	 else
-	 	linetext:=""	
+		linetext:=""
 
 	 disptime:=""
 	 stringreplace, add, add, |,,All
 	 stringreplace, add, add, `n,%A_Space%,All
 	 If ShowTime
 	 	If TimeFormat and Time
-	 		{
-	 	 	 FormatTime, disptime, %time%, %TimeFormatTime%
-	 	 	 disptime := Ltrim(TimeFormatIndicator) disptime " "
+			{
+			 FormatTime, disptime, %time%, %TimeFormatTime%
+			 disptime := Ltrim(TimeFormatIndicator) disptime " "
 			}
 	 StartList .= disptime "[" SubStr("00" A_Index,-2) linetext "] " Add "|"
 	}
@@ -69,7 +69,7 @@ if InStr(GetText,A_Space) ; prepare regular expression to ensure search is done 
 	re:="iUms)(?=.*" RegExReplace(GetText,"iUms)(.*)\s","$1)(?=.*") ")"
 Loop, Parse, StartList, |
 	{
-	 if RegExMatch(StrSplit(A_LoopField,"]",,2).2,re) 
+	 if RegExMatch(StrSplit(A_LoopField,"]",,2).2,re)
 		UpdatedStartList .= A_LoopField "|"
 	}
 GuiControl, Search:, ListBox1, |%UpdatedStartList%
@@ -142,13 +142,13 @@ Loop, parse, choice, |
 		continue
 	 id:=Ltrim(SubStr(A_LoopField,2,InStr(A_LoopField,"]")-2),"0")
 	 if (id = "")
-		 id:=1
+		id:=1
 	 ClipText.=History[id].text "`n"
 	 Removeids:=id "," Removeids
 	}
 Loop, parse, Removeids, CSV
 	History.Remove(A_LoopField)
-StrReplace(CliptText,"`n","`n",Count)	
+StrReplace(CliptText,"`n","`n",Count)
 History.Insert(1,{"text":ClipText,"icon": "res\" iconA, "lines": Count+1,"time":A_Now})
 Gosub, CheckHistory
 ClipText:="",Removeids:=""
@@ -165,7 +165,8 @@ Gui, Search:Destroy
 Gui, SearchEdit:Destroy
 Gui, SearchEdit:font, % dpi("s8")
 Gui, SearchEdit:Add, Text, % dpi("x5 y8 w100 h15"), Edit this entry:
-Gui, SearchEdit:Add, Edit, % dpi("vClipText x5 y25 w" SearchWindowWidth-10 " h" SearchWindowHeight-80), %ClipText%
+Gui, SearchEdit:font, , Courier
+Gui, SearchEdit:Add, Edit, % dpi("vClipText x5 y25 w" SearchWindowWidth-10 " h" SearchWindowHeight-80) " hwndEditSearch", %ClipText%
 Gui, SearchEdit:Add, Button, % dpi("gSearchEditOK w100"), OK
 Gui, SearchEdit:Add, Button, % dpi("xp+110 yp gSearchEditCancel w100"), Cancel
 Gui, SearchEdit:Add, StatusBar,,...
@@ -177,7 +178,7 @@ Return
 
 ^Del::
 Gosub, SearchGetID
-Gui, Search:Submit, Destroy	
+Gui, Search:Submit, Destroy
 History.Remove(id)
 id:="",ClipText:="",ChooseID:=""
 ;Gosub, ^#h

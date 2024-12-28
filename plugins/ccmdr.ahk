@@ -4,10 +4,11 @@ Plugin            : ccmdr (optional via settings.ini)
 Purpose           : Allow for (batch) operations on clipboard history vs the
                     usual one by one operations via standard CL3 options.
                     see docs\ccmdr.md
-Version           : 1.2
+Version           : 1.3
 CL3 version       : v1.94
 
 History:
+- 1.3 fix for AutoHotkey v1.1.37.02 suddenly stuck in loop calling gCmdr + missing global var for ClipDataFolder
 - 1.2 burst, added \s for space
 - 1.1 added named slots
 - 1.0 initial version
@@ -51,7 +52,10 @@ If !WinExist("CL3:cmdr ahk_class AutoHotkeyGUI")
 	 GuiControl, cmdr:Text,cmd,
 	}
 else
-	Gosub, CmdrGuiClose
+	{
+	 Gui, cmdr:Hide
+	 GuiControl, cmdr:Text,cmd,
+	}
 Return
 
 #IfWinActive CL3:cmdr
@@ -66,6 +70,8 @@ Return
 Cmdr:
 Gui, cmdr:Submit,NoHide
 Help:=SubStr(cmd,1,1)
+If (Help = "") or (cmd:="")
+	Return
 If (Help = "r")
 	{
 	 Reverse:=1
@@ -94,7 +100,7 @@ Return
 
 Command(cmd)
 	{
-	 global History,History_Save,Slots,SlotsNamed
+	 global History,History_Save,Slots,SlotsNamed,ClipDataFolder
 	 cmd:=trim(cmd," ")
 	 Command:=SubStr(cmd,1,1)
 	 if (Command = "r") ; for burst, paste
@@ -107,7 +113,7 @@ Command(cmd)
 		cmd:=SubStr(cmd,2)
 
 	 if (cmd = "")
-	 	cmd:=1 ; so y,u,l enter is y1,u1,l1 for example
+		cmd:=1 ; so y,u,l enter is y1,u1,l1 for example
 
 	 /*
 	 u	uppercase
