@@ -296,6 +296,27 @@ Settings_Hotkeys()
 ;			Hotkey, %hk_notes%, off
 	}
 
+Settings_PasteShortCuts()
+	{
+	 global PasteShortCuts:=[]
+	 i:=A_ScriptDir "\PasteShortCuts.ini"
+	 If !FileExist(i)
+		Return
+	 IniRead, OutputVarSectionNames, %i%
+	 Loop, parse, OutputVarSectionNames, `n, `r
+	 	{
+		 IniRead, OutputVarPrograms, %i%, %A_LoopField%, Programs, 0
+		 IniRead, OutputVarKey, %i%, %A_LoopField%, Key, 0
+		 StringLower, OutputVarPrograms, OutputVarPrograms ; needed due to "StringCaseSense, On" set at startup
+		 OutputVarPrograms:=Trim(RegExReplace(OutputVarPrograms,"ms)\s*,\s*",","),",") ; trim spaces between program names e.g. program.exe , anotherprogram.exe
+		 If OutputVarPrograms not in 0,error
+		 	PasteShortCuts[A_LoopField,"programs"]:=OutputVarPrograms
+		 If OutputVarKey not in 0,Error
+		 	PasteShortCuts[A_LoopField,"key"]:=Trim(OutputVarKey,Chr(34))
+		 OutputVarPrograms:="",OutputVarKey:=""
+	 	}
+	}
+
 Settings_menu:
 #Include %A_ScriptDir%\lib\SettingsGui.ahk
 

@@ -1,13 +1,13 @@
-# CL3 <sup>v1.111</sup> - Clipboard caching utility
+# CL3 <sup>v1.112</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
-But some unique [features](#features) have been added making it more versatile "text only" Clipboard manager.
+But some unique [features](#features) have been added making it a more versatile "text only" Clipboard manager.
 
-Intended for AutoHotkey Unicode (64-bit version of AutoHotkey is automatically Unicode).
+Intended for AutoHotkey Unicode (the 64-bit version of AutoHotkey is automatically Unicode).
 
-💡 Relies standard copy/paste shortcuts for the applications you are using, so <kbd>Ctrl</kbd>+<kbd>c</kbd> and <kbd>Ctrl</kbd>+<kbd>v</kbd>, and right click "copy" via mouse actions.
-Programs that rely on other shortcuts to store/restore clipboard contents may not work (e.g. vim).
+💡 Relies on standard copy/paste shortcuts for the applications you are using, so <kbd>Ctrl</kbd>+<kbd>c</kbd> and <kbd>Ctrl</kbd>+<kbd>v</kbd>, and right click "copy" via mouse actions.
+Programs that rely on other shortcuts to store and restore clipboard contents may not work (e.g. vim).
 
 💬 Forum thread [https://autohotkey.com/boards/viewtopic.php?f=6&t=814](https://autohotkey.com/boards/viewtopic.php?f=6&t=814)
 
@@ -62,11 +62,11 @@ _CL3 gets its name from CLCL CLone = CL3_
 - Limited history (18 items+26 items in secondary menu, does remember more entries in XML history file)
 - Search history (v1.2+)
 - 10 Slots with options to save/load several sets (v1.2+)
-- Cycle through clipboard - forwards and backwards - with tooltip preview (v1.3+). Cycle through plugins (v1.8+)
+- Cycle through the clipboard history - forwards and backwards - with tooltip preview (v1.3+). Cycle through plugins (v1.8+)
 - ClipChain with preview GUI, paste items in predefined order, save/load several sets (v1.5+) [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)
 - Supports FIFO (first in first out) pasting (v1.7) [#3](https://github.com/hi5/CL3/issues/3)
 - Remove (yank) entries from history
-- No duplicate entries in clipboard (automatically removed)
+- No duplicate entries in the clipboard history (automatically removed)
 - Templates: simply text files which are read at start up
 - Plugins: AutoHotkey functions (scripts) defined in separate files
 
@@ -156,7 +156,7 @@ The text file will be placed in the CL3 script folder.
 
 You can use the AutoReplace plugin to modify the text in the clipboard using a find/replace rule before adding
 it to the history. You can use StringReplace or a Regular Expression. Settings are stored in _AutoReplace.xml_
-**Note: very experimental plugin. The plugin interface (GUI) needs to refined, entire process should be improved.
+**Note: very experimental plugin. The plugin interface (GUI) needs to be refined, entire process should be improved.
 A Listview would be more logical and flexible. But for now it does the job, albeit crudely.**
 
 Feedback available via "Tray Tip" - see settings.
@@ -206,7 +206,7 @@ d. 1
 
 If you start FIFO at 'D' pressing <kbd>Ctrl</kbd>+<kbd>v</kbd> four times will paste 1, 2, 3, 4.  
 After pasting the last (here fourth) item, FIFO stops.  
-TrayTips will appear at the start and stop of a FIFO cycle.
+TrayTips will appear at the start and end of a FIFO cycle.
 
 ### Sort [v1.94+]
 
@@ -217,7 +217,7 @@ See [Sort](https://www.autohotkey.com/docs/commands/Sort.htm) documentation for 
 
 If you select the yank option in the menu you will be presented with a 
 simple **a** to **r** menu to indicate which of the most recent items you wish to
-delete.
+delete. To delete the entire history select "Clear History" (v1.111+)
 
 ## Cycle through clipboard history [v1.3+]
 
@@ -258,8 +258,8 @@ Some ideas for further development you may wish to consider:
 - ~~Extending the number of menu entries in the secondary menu ("more history")~~ _v1.100+_
 - Include rich text formats
 - Include images - rough guide to add it (very alpha) here https://www.autohotkey.com/boards/viewtopic.php?p=314319#p314319
-- Introduce various paste methods, also for specific programs 
-  for example send each character individually
+- ~~Introduce various paste methods, also for specific programs? 
+  for example send each character individually~~ _v1.112+_
 - More (default) plugins:
 	- Improved title case (various scripts are available which could replace the current basic one)
 	- Strip HTML
@@ -343,7 +343,7 @@ Apart from plugins, `plugins\MyPlugins.ahk` is also a useful method to add addit
 
 1. Copy or Cut and Append to clipboard
 
-Some text editors already offer this functionality, but you make it available everywhere using CL3.  
+Some text editors already offer this functionality, but you can make it available everywhere using CL3.  
 Add the following code for copy and/or cut to `plugins\MyPlugins.ahk`
 
 ```autohotkey
@@ -415,10 +415,34 @@ Return
 Add an optional include file that "does something" before it actually pastes.  
 The file is not present in the repository and a new file has to be created in `cl3\plugins\` with the name `PastePrivateRules.ahk`
 
+Examples:
+
 * Pasting file(s) from CL3 history https://www.autohotkey.com/boards/viewtopic.php?p=314316#p314316 using `ClipboardSetFiles()` and `If WinActive()`
 * Append to File name in "Open/Save as" dialogs - https://github.com/hi5/CL3/issues/14
+* Paste in putty.exe (as of v1.112 can be care of using PasteShortCuts.ini) - https://github.com/hi5/CL3/issues/27
 
 Note: your `PastePrivateRules.ahk` will never be part of this GitHub repository so anything you add won't be overwritten if you update CL3 in the future. 
+
+# PasteShortCuts.ini
+
+Note: a default setup can be found in `res\PasteShortCuts.ini` (online [here](https://github.com/hi5/CL3/blob/master/res/PasteShortCuts.ini)) - copy the file to the CL3 folder and restart CL3.
+
+To setup CL3 for programs where you don't want to use the standard Windows shortcut (Ctrl+v) to paste
+create or edit `PasteShortCuts.ini` in the CL3 program folder. Details below and in the ini file as well.
+
+```ini
+[SectionName] - Create a section (any name)
+Programs=       CSV list of program executables
+Key=            Use AHK notation (^=ctrl +=shift !=alt), if KEY is empty or "[SEND]" (no quotes)
+                CL3 will use SendRaw to send the clipboard to the application - results may vary
+```
+Terminal programs often prefer <kbd>Shift</kbd>+<kbd>Insert</kbd> (`+{Ins}`) as Paste shortcut
+
+Using `PastePrivateRules.ahk` is another option, see examples listed above.
+
+# Experimental
+
+* [HistoryRules](https://github.com/hi5/CL3/blob/master/docs/HistoryRules.md) to allow CL3 to filter clipboard content before adding it to history, allowing or skipping text.
 
 # Changelog
 

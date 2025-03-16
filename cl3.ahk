@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
-Version     : 1.111
+Version     : 1.112
 Author      : hi5
 Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
               which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
@@ -42,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.111"
+version:="v1.112"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -60,7 +60,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.111
+;@Ahk2Exe-SetFileVersion 1.112
 ;@Ahk2Exe-SetDescription CL3 Clipboard Manager
 ;@Ahk2Exe-SetProductName CL3
 ;@Ahk2Exe-SetProductVersion Compiled with AutoHotkey v%A_AhkVersion%
@@ -87,6 +87,7 @@ Suspend, Off
 
 Settings()
 Settings_Hotkeys()
+Settings_PasteShortCuts()
 HistoryRules()
 
 ahk_icons_path:=A_AhkPath
@@ -571,6 +572,7 @@ If ShowTemplates
 				 MenuAccelerator:=0
 				 Loop, parse, templatefolderFiles, |
 					{
+					 FileEncoding, UTF-8
 					 FileRead, a, %TemplateFolder%%subtemplatefolder%\%A_LoopField%
 					 Templates[subtemplatefolder,A_Index]:=a
 					 if (Mod(MenuAccelerator,26)=0)
@@ -734,17 +736,32 @@ DispToolTipText(TextIn,Format=0,time=0)
 
 PasteIt(source="")
 	{
-	 global StartTime,PasteTime,ActiveWindowID,oldttext,ttext,ClipboardOwnerProcessName,ClipboardPrivate
+	 global StartTime,PasteTime,ActiveWindowID,oldttext,ttext,ClipboardOwnerProcessName,ClipboardPrivate,PasteShortCuts
+	 PasteKey:="^v"
 	 StartTime:=A_TickCount
 	 If ((StartTime - PasteTime) < 75) ; to prevent double paste after using #f/#v in combination
 		Return
 ;@Ahk2Exe-IgnoreBegin
 	 #Include *i %A_ScriptDir%\plugins\PastePrivateRules.ahk
 ;@Ahk2Exe-IgnoreEnd		
+
 	 WinActivate, ahk_id %ActiveWindowID%
+	 WinGet, CurrentProcessName, ProcessName, A
+	 StringLower, CurrentProcessName, CurrentProcessName ; needed due to "StringCaseSense, On" set at startup
+
+	 for k, v in PasteShortCuts
+		{
+		 If CurrentProcessName in % v.programs
+		 	PasteKey:=v.key
+		}
+
 	 If PasteDelay
 		Sleep % PasteDelay
-	 Send ^v
+
+	 If (PasteKey = "") or (PasteKey = "[SEND]")
+		SendRaw % clipboard
+	 else	
+		Send % PasteKey
 
 	 PasteTime := A_TickCount
 	 oldttext:="", ttext:="", ActiveWindowID:="",ClipboardOwnerProcessName:=""

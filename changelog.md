@@ -1,5 +1,9 @@
 # Changelog
 
+### v1.112
+
+* New: Define alternative Paste shortcuts in PasteShortCuts.ini (e.g. Shift+Insert for console programs)
+
 ### v1.111
 
 * New: Limit entries in Yank entry sub-menu for valid history entries
