@@ -1,4 +1,4 @@
-﻿# CL3 API Functions v1.4
+﻿# CL3 API Functions v1.5
 
 You can modify CL3's clipboard history via external scripts by using this API.
 
@@ -114,6 +114,14 @@ Paste Slot item (1, 10)
 
 ```autohotkey
 CL3Api_SlotPaste(2) ; Paste Slot number 2
+```
+
+### CL3Api_SlotGet(Index)
+
+Get contents of Slot item (1, 10)
+
+```autohotkey
+MyText:=CL3Api_SlotGet(2) ; Get text of Slot number 2
 ```
 
 ### CL3Api_Burst(Object,Reverse=0)

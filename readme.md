@@ -1,4 +1,4 @@
-# CL3 <sup>v1.112</sup> - Clipboard caching utility
+# CL3 <sup>v1.113</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -167,6 +167,13 @@ The CL3 ClipChain plugin allows you to cycle through a predefined clipboard hist
 With each paste it advances to the next item in the chain. The item to be pasted next is indicated in the listview with a ```>>```.  
 When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)  
 The most recently used chain is stored in _clipchain.xml_.
+
+Via the "Insert" button in the ClipChain Gui it is possible to insert "special" values:
+
+|Value                     |Action |
+|--------------------------|--------|
+|{CL3.ClipChain=Clipboard} | Use the current clipboard as chain item -- https://www.autohotkey.com/boards/viewtopic.php?p=611662#p611662 |
+|{CL3.ClipChain=Slot1-0}   | Use the content of Slot 1 to 10 as chain item |
 
 #### ClipChain Hotkey
 

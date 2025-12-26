@@ -2,10 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.9
+Version           : 1.10
 CL3 version       : 1.5
 
 History:
+- 1.10 Added insert special items
 - 1.9 Reset ClipChain index correctly to 1 after loading from Clipboard (in plugin and API)
 - 1.8 Preview ToolTip on Mouse Hover
 - 1.71 fix cancelled Load from Clipboard (Set Delim)
@@ -67,6 +68,25 @@ LVM_SUBITEMHITTEST := 4096 + 57
 
 ;ClipboardPrivateRulesFunc:="ClipboardPrivateRules"
 
+ClipChainInsSpecial:=""
+Menu, InsertClipChainMenu, Add
+Menu, InsertClipChainMenu, Delete
+Menu, InsertClipChainMenuSpecial, Add
+Menu, InsertClipChainMenuSpecial, Delete
+Menu, InsertClipChainMenuSpecial, Add, Clipboard, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 1, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 2, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 3, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 4, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 5, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 6, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 7, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 8, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 9, InsertClipChainMenuHandler
+Menu, InsertClipChainMenuSpecial, Add, Slot 10, InsertClipChainMenuHandler
+Menu, InsertClipChainMenu, Add, Insert new entry, ClipChainInsert
+Menu, InsertClipChainMenu, Add, Insert special, :InsertClipChainMenuSpecial
+
 Menu, ClipChainMenu, Add
 Menu, ClipChainMenu, Delete
 
@@ -93,7 +113,7 @@ Gui, ClipChain:font,% dpi("s8")
 Gui, ClipChain:Add, GroupBox, % dpi("x2 yp+355 w181 h50 vGbox1"), Chain(s)
 Gui, ClipChain:Add, Button, % dpi("xp+8  yp+18 w26 h26   gClipChainMoveUp   vButton1"), % Chr(0x25B2) ; ▲
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainMoveDown vButton2"), % Chr(0x25BC) ; ▼
-Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsert   vButton3"), Ins
+Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainInsertMenu vButton3"), Ins
 Gui, ClipChain:font,% dpi("s11") ; " Wingdings"
 Gui, ClipChain:Add, Button, % dpi("xp+28 yp    w26 h26   gClipChainEdit     vButton4"), % Chr(0x270E) ; ✎ ; % Chr(33) ; Edit (pencil)
 Gui, ClipChain:font
@@ -195,12 +215,25 @@ If ClipChainNoHistory
 	OnClipboardChange("FuncOnClipboardChange", 0)
 ;If IsFunc(ClipboardPrivateRulesFunc)
 ;	%ClipboardPrivateRulesFunc%("ClipChain")
-Clipboard:=ClipChainData[ClipChainIndex]
+
+If InStr(ClipChainData[ClipChainIndex], "{CL3.ClipChain=")
+	{
+	 If (ClipChainData[ClipChainIndex] = "{CL3.ClipChain=Clipboard}")
+		Clipboard:=Clipboard
+	 else
+		{
+		 SlotIDChainInsert:=SubStr(ClipChainData[ClipChainIndex],20,1)
+		 Clipboard:=Slots[SlotIDChainInsert]
+		 SlotIDChainInsert:=""
+		}
+	}
+else
+	Clipboard:=ClipChainData[ClipChainIndex]
+
 If ClipChainTrim
-{
-	Clipboard:=Trim(Clipboard,TrimSet)
-msgbox hi %TrimSet%
-}
+	{
+	 Clipboard:=Trim(Clipboard,TrimSet)
+	}
 PasteIt()
 Sleep 100
 Clipboard:=History[1].text
@@ -279,6 +312,10 @@ Loop, % LV_GetCount()
 	LV_Modify(A_Index,"Col3",A_Index)
 Return
 
+ClipChainInsertMenu:
+Menu, InsertClipChainMenu, Show
+Return
+
 ClipChainEdit: ; falls through to Insert
 ClipChainGuiTitle:="CL3ClipChain Edit text"
 ClipChainInsEdit:=1
@@ -291,7 +328,13 @@ ClipChainPauseStore:=ClipChainPause
 ClipChainPause:=1
 GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 
-ClipChainIns:=""
+If !ClipChainInsSpecial
+	ClipChainIns:=""
+Else
+{
+	ClipChainIns:=ClipChainInsSpecial
+	MsgBox % ClipChainIns
+}
 ClipChainDataIndex:=""
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
@@ -306,7 +349,9 @@ If (ClipChainDataIndex = "")
 	}
 If (ClipChainInsEdit = 1)
 	ClipChainIns:=ClipChainData[ClipChainDataIndex]
-Gosub, ClipChainInsertGui
+If !ClipChainInsSpecial
+	Gosub, ClipChainInsertGui
+ClipChainInsSpecial:=""
 If (ClipChainIns = "")
 	{
 	 ClipChainPause:=ClipChainPauseStore
@@ -555,6 +600,15 @@ If (XA_Load(ClipDataFolder "ClipChain\" A_ThisMenuItem) = 1) ; the name of the v
 Gui, ClipChain:Default
 LV_Delete()
 Gosub, ClipChainListview
+Return
+
+InsertClipChainMenuHandler:
+; MsgBox % A_ThisMenuItem
+If (A_ThisMenuItem = "Clipboard")
+	ClipChainInsSpecial:="{CL3.ClipChain=Clipboard}"
+Else
+	ClipChainInsSpecial:="{CL3.ClipChain=Slot" SubStr(A_ThisMenuItem,0) "}"
+Gosub, ClipChainInsert
 Return
 
 ; v1.5.1 for #If Hotkeys

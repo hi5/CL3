@@ -1,5 +1,11 @@
 # Changelog
 
+### v1.113
+
+* New: Get Slot content via Api `CL3Api_SlotGet(Idx)` - https://github.com/hi5/CL3/issues/30  
+* New: Insert "special" values into ClipChain, insert option Gui, {CL3.ClipChain=Clipboard}, {CL3.ClipChain=Slot1-0}  - https://www.autohotkey.com/boards/viewtopic.php?p=611662#p611662  
+* Fix: Remove stray debugging MsgBox in clipchain :/
+
 ### v1.112
 
 * New: Define alternative Paste shortcuts in PasteShortCuts.ini (e.g. Shift+Insert for console programs)
