@@ -2,11 +2,11 @@
 
 Plugin            : ClipChain
 Purpose           : Cycle through a predefined clipboard history on each paste
-Version           : 1.10
+Version           : 1.11
 CL3 version       : 1.5
 
 History:
-- 1.10 Added insert special items
+- 1.10-11 Added insert special items
 - 1.9 Reset ClipChain index correctly to 1 after loading from Clipboard (in plugin and API)
 - 1.8 Preview ToolTip on Mouse Hover
 - 1.71 fix cancelled Load from Clipboard (Set Delim)
@@ -331,10 +331,9 @@ GuiControl, ClipChain:, ClipChainPause      , %ClipChainPause%
 If !ClipChainInsSpecial
 	ClipChainIns:=""
 Else
-{
-	ClipChainIns:=ClipChainInsSpecial
-	MsgBox % ClipChainIns
-}
+	{
+	 ClipChainIns:=ClipChainInsSpecial
+	}
 ClipChainDataIndex:=""
 Gui, ClipChain:Default
 Gui, ClipChain:Submit, NoHide
