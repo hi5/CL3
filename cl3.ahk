@@ -1,7 +1,7 @@
 /*
 
 Script      : CL3 ( = CLCL CLone ) - AutoHotkey 1.1+
-Version     : 1.113.1
+Version     : 1.114
 Author      : hi5
 Purpose     : CL3 started as a lightweight clone of the CLCL clipboard caching utility  
               which can be found at http://www.nakka.com/soft/clcl/index_eng.html.
@@ -42,7 +42,7 @@ SetWorkingDir, %A_ScriptDir%
 AutoTrim, off
 StringCaseSense, On
 name:="CL3 "
-version:="v1.113.1"
+version:="v1.114"
 CycleFormat:=0
 Templates:={}
 Global CyclePlugins,History,SettingsObj,Slots,ClipChainData ; CyclePlugins v1.72+, others v1.9.4 for API access
@@ -60,7 +60,7 @@ loop, parse, iconlist, CSV
 	 icon%A_LoopField%:="icon-" A_LoopField ".ico"
 
 ; <for compiled scripts>
-;@Ahk2Exe-SetFileVersion 1.113.1
+;@Ahk2Exe-SetFileVersion 1.114
 ;@Ahk2Exe-SetDescription CL3 Clipboard Manager
 ;@Ahk2Exe-SetProductName CL3
 ;@Ahk2Exe-SetProductVersion Compiled with AutoHotkey v%A_AhkVersion%

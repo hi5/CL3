@@ -8,10 +8,11 @@ using ObjRegisterActive() by Lexikos @ https://www.autohotkey.com/boards/viewtop
 We use JSON Dump/Load to pass on strings from-to CL3 to client script.
 Code by cocobelgica @ https://github.com/cocobelgica/AutoHotkey-JSON
 
-Version           : 1.5
+Version           : 1.6
 CL3 version       : 1.113
 
 History:
+- 1.6 True/False for CL3Api_Init() to determine success/check Cl3 is running
 - 1.5 added SlotGet
 - 1.4 added SlotPaste, ClearClipChain
 - 1.3 added ToggleCheck for tray menu

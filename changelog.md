@@ -1,9 +1,14 @@
 # Changelog
 
+### v1.114
+
+* Added `MS Shell Dlg` to most "Gui, font" code (settings, clipchain, slots, autoreplace) so the Gui should be consistent even when the default font is set to something else.
+* New: API added True/Fail error handling + MsgBox Error for `CL3Api_Init()`
+
 ### v1.113.1
 
-* New: Get Slot content via Api `CL3Api_SlotGet(Idx)` - https://github.com/hi5/CL3/issues/30  
-* New: Insert "special" values into ClipChain, insert option Gui, {CL3.ClipChain=Clipboard}, {CL3.ClipChain=Slot1-0}  - https://www.autohotkey.com/boards/viewtopic.php?p=611662#p611662  
+* New: Get Slot content via Api `CL3Api_SlotGet(Idx)` - https://github.com/hi5/CL3/issues/30
+* New: Insert "special" values into ClipChain, insert option Gui, {CL3.ClipChain=Clipboard}, {CL3.ClipChain=Slot1-0}  - https://www.autohotkey.com/boards/viewtopic.php?p=611662#p611662
 * Fix: Remove stray debugging MsgBox in clipchain :/ (twice)
 
 ### v1.112
@@ -19,7 +24,7 @@
 
 ### v1.110
 
-* Fix: Add minimum (20) and maximum value (100) for MenuWidth setting (safety check) - https://github.com/hi5/CL3/issues/26  
+* Fix: Add minimum (20) and maximum value (100) for MenuWidth setting (safety check) - https://github.com/hi5/CL3/issues/26
 * Change: Search plugin, only search text after [ID] marker (also excludes possible timestamp)
 * New: ClipChain preview of full item on mouseover
 * Removed: Notes plugin/settings (commented code so easy to reactivate for those who need it)
@@ -33,14 +38,14 @@
 
 * New: also show timestamp in tooltip (cycle forward, backward, plugin) and search.
 * New: also show number of lines in search results (number only)
-* Change: timestamp now has two parts, separated by a pipe character (|)  
-  first part (before |): either a character, default @, or a number, for example 128336 for Unicode clock character 🕐  
+* Change: timestamp now has two parts, separated by a pipe character (|)
+  first part (before |): either a character, default @, or a number, for example 128336 for Unicode clock character 🕐
   second part (after |): time format options - see v1.107
 * Change: when cycling back past "z" show number in tooltip instead of character that no longer had any relation to "menu order"
 
 ### v1.107
 
-* New: Option to show timestamp in clipboard history menu - https://github.com/hi5/CL3/issues/23  
+* New: Option to show timestamp in clipboard history menu - https://github.com/hi5/CL3/issues/23
   See https://www.autohotkey.com/docs/v1/lib/FormatTime.htm#Time_Formats for options (e.g. HH:mm (24hr) or hh:mm tt (12hr AM/PM))
 * Fix: Open Template folder - now use commander_path environment variable/registry combined with WinGet ProcessPath/ProcessName, so it should now work with running 32/64 versions. Starts 32bit by default if TC is not running but can be detected.
 * Fix: Use MenuWidth setting in DispMenuText() function to check length instead of previously hardcoded value of 60
@@ -62,7 +67,7 @@
 * Fix: ClipChain plugin - fix cancelled "Load from Clipboard (Set Delim)"
 * Prepare code for compiling FileInstall icons, ;@Ahk2Exe-IgnoreBegin and ;@Ahk2Exe-IgnoreEnd
   for Private includes (rules marked optional and QEDlg)
-  
+
 ### v1.103
 
 * Change: Limit Cycle through clipboard history to MaxHistory (useful for smaller values) https://github.com/hi5/CL3/issues/18
@@ -101,10 +106,10 @@
 
 ### v1.99
 
-* New setting: Exclude programs so copied text will not be added to the clipboard history (useful for password managers for example).  
-  A "*" is added to the Menu and "Cycle" tooltips for the first entry (a*.) to indicate the current clipboard has different content as to what is shown.  
+* New setting: Exclude programs so copied text will not be added to the clipboard history (useful for password managers for example).
+  A "*" is added to the Menu and "Cycle" tooltips for the first entry (a*.) to indicate the current clipboard has different content as to what is shown.
   Selecting 'a*' will still paste the selected text, not the actual current clipboard.
-* New setting: Lineformat (edit control under "Show Lines") \t placeholder for tab to right align, \l placeholder for number of lines.  
+* New setting: Lineformat (edit control under "Show Lines") \t placeholder for tab to right align, \l placeholder for number of lines.
   Default: \t(\l line),\t(\l lines)
   Comma separated for single and multiple lines.
 * New setting: Show "TrayTip" using OSDTIP_Pop when AutoReplace has been executed on a new clipboard entry.
@@ -120,9 +125,9 @@
 
 ### v1.97
 
-* New setting: CopyDelay to set time in milliseconds to wait before adding a copy of a new clipboard entry to the CL3 history.  
-  This may resolve some conflicts when other programs or scripts access the clipboard.  
-  Increasing this value may work around this issue.  
+* New setting: CopyDelay to set time in milliseconds to wait before adding a copy of a new clipboard entry to the CL3 history.
+  This may resolve some conflicts when other programs or scripts access the clipboard.
+  Increasing this value may work around this issue.
   The previously hardcoded PasteDelay (50ms) can now also be set.
 
 ### v1.96
@@ -192,7 +197,7 @@
 * Basic stats, accessible via Tray menu "Usage statistics"
 * Search Plugin: fix for first Down:: (see comment in code plugins\search.ahk)
 * Search Plugin: pressing hotkey again toggles Gui (e.g. hide, show like slots and Clipchain already do)
-* Attempt to have more stable ToolTip (less/no flickering as it no longer continuously updates the TT if nothing changes)  
+* Attempt to have more stable ToolTip (less/no flickering as it no longer continuously updates the TT if nothing changes)
   (Note: using ToolTipFont https://autohotkey.com/boards/viewtopic.php?f=6&t=4777 results in error for these cycle tooltips)
 * Updated from OnClipboardChange: to OnClipboardChange() - improved efficiency by turning it on/off at various "actions" and "plugins"
 * Improved MaxHistory, not just on OnExit but now continuously keep it at set entries - should help with memory consumption and overall speed
@@ -249,7 +254,7 @@
 ### v1.5
 
 * Added [ClipChain plugin](https://github.com/hi5/CL3/wiki/ClipChain)
-* Moved all xml data files to their own separate folder ClipData\* (History, Slots, ClipChain, AutoReplace)   
+* Moved all xml data files to their own separate folder ClipData\* (History, Slots, ClipChain, AutoReplace)
   Note: to upgrade, close CL3, run the Migrate.ahk script to move all XML files to their own folder. You only need to do this once.
 
 ### v1.43

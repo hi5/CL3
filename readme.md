@@ -1,4 +1,4 @@
-# CL3 <sup>v1.113.1</sup> - Clipboard caching utility
+# CL3 <sup>v1.114</sup> - Clipboard caching utility
 
 CL3 started as a lightweight clone of the CLCL clipboard caching utility
 which can be found at <http://www.nakka.com/soft/clcl/index_eng.html>.
@@ -40,8 +40,8 @@ current application.
 <a name='note3'></a>
 Note 3: As CL3 might modify the clipboard content when using AutoReplace, the most recently copied
 item to the clipboard (after <kbd>Ctrl</kbd>+<kbd>c</kbd>) is also stored unmodified thus preserving
-the original format (layout, images, etc) - Define a hotkey in the Settings to paste this unmodified Clipboard.  
-Suggestion: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Capslock</kbd>, define as: ^+CAPSLOCK  
+the original format (layout, images, etc) - Define a hotkey in the Settings to paste this unmodified Clipboard.
+Suggestion: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Capslock</kbd>, define as: ^+CAPSLOCK
 This may be useful in Word processing or other specific formats if you notice formatting is
 lost or changed upon a regular paste (<kbd>Ctrl</kbd>+<kbd>v</kbd>).
 
@@ -83,7 +83,7 @@ entries by naming your files in the order you wish them to appear.
 As of v1.9+ Templates now support sub-folders. A Sub-folder will be added as a
 sub-menu entry and its text files processed as described above. If a "favicon.ico"
 is present in a sub-folder it will be used in the Templates Menu, otherwise it
-will use the default Template icon (res\icon-t.ico)  
+will use the default Template icon (res\icon-t.ico)
 As of v1.100+: Add `settings.ini` to (each) sub-folder with a shortcut key (AutoHotkey syntax) to be able to display the templates in the sub-folder directly to avoid the need to bring up the main menu (allowing for faster access)
 
 ```ini
@@ -149,7 +149,7 @@ To display the Slots as a menu, define a Hotkey in the Settings, this will also 
 
 ### Dump History plugin [v1.32+]
 
-You can export the current clipboard history to a plain text file via the Special, Dump History menu option.  
+You can export the current clipboard history to a plain text file via the Special, Dump History menu option.
 The text file will be placed in the CL3 script folder.
 
 ### AutoReplace [v1.4+]
@@ -163,9 +163,9 @@ Feedback available via "Tray Tip" - see settings.
 
 ### ClipChain [v1.5+]
 
-The CL3 ClipChain plugin allows you to cycle through a predefined clipboard history.  
-With each paste it advances to the next item in the chain. The item to be pasted next is indicated in the listview with a ```>>```.  
-When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)  
+The CL3 ClipChain plugin allows you to cycle through a predefined clipboard history.
+With each paste it advances to the next item in the chain. The item to be pasted next is indicated in the listview with a ```>>```.
+When the last item is reached it moves back to the start. See [Wiki](https://github.com/hi5/CL3/wiki/ClipChain)
 The most recently used chain is stored in _clipchain.xml_.
 
 Via the "Insert" button in the ClipChain Gui it is possible to insert "special" values:
@@ -195,7 +195,7 @@ a bit sluggish. You can use the Compact plugin to:
 the order in which the entries were added to the clipboard history.
 
 Press <kbd>Ctrl</kbd>+<kbd>Win</kbd>+<kbd>F10</kbd> to bring up the clipboard history menu (sans plugins
-and templates) and select the entry you want FIFO to start with, nothing is pasted yet.  
+and templates) and select the entry you want FIFO to start with, nothing is pasted yet.
 You can **stop** FIFO by:
 
 * Bringing up the regular Clipboard history <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>v</kbd>
@@ -211,13 +211,13 @@ c. 2
 d. 1
 ```
 
-If you start FIFO at 'D' pressing <kbd>Ctrl</kbd>+<kbd>v</kbd> four times will paste 1, 2, 3, 4.  
-After pasting the last (here fourth) item, FIFO stops.  
+If you start FIFO at 'D' pressing <kbd>Ctrl</kbd>+<kbd>v</kbd> four times will paste 1, 2, 3, 4.
+After pasting the last (here fourth) item, FIFO stops.
 TrayTips will appear at the start and end of a FIFO cycle.
 
 ### Sort [v1.94+]
 
-Sort via a number of predefined settings or set specific options via small Gui (see "Set Delimiter and other options" in Sort menu).  
+Sort via a number of predefined settings or set specific options via small Gui (see "Set Delimiter and other options" in Sort menu).
 See [Sort](https://www.autohotkey.com/docs/commands/Sort.htm) documentation for explanation.
 
 ## Yank (delete) entry
@@ -232,7 +232,7 @@ If you press <kbd>LWin</kbd>+<kbd>v</kbd>, hold <kbd>LWin</kbd> and repeatedly t
 backwards through the clipboard history - a tooltip with the text to paste will be shown, if you release <kbd>LWin</kbd>
 the text will be pasted.
 
-To cycle forwards press <kbd>LWin</kbd>+<kbd>c</kbd>.  
+To cycle forwards press <kbd>LWin</kbd>+<kbd>c</kbd>.
 **Caveat:** if you press <kbd>LWin</kbd>+<kbd>c</kbd> before <kbd>LWin</kbd>+<kbd>v</kbd> nothing will be pasted upon release 
 of the <kbd>LWin</kbd> key.
 
@@ -350,7 +350,7 @@ Apart from plugins, `plugins\MyPlugins.ahk` is also a useful method to add addit
 
 1. Copy or Cut and Append to clipboard
 
-Some text editors already offer this functionality, but you can make it available everywhere using CL3.  
+Some text editors already offer this functionality, but you can make it available everywhere using CL3.
 Add the following code for copy and/or cut to `plugins\MyPlugins.ahk`
 
 ```autohotkey
@@ -419,7 +419,7 @@ Return
 
 # PastePrivateRules.ahk
 
-Add an optional include file that "does something" before it actually pastes.  
+Add an optional include file that "does something" before it actually pastes.
 The file is not present in the repository and a new file has to be created in `cl3\plugins\` with the name `PastePrivateRules.ahk`
 
 Examples:

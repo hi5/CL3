@@ -14,12 +14,13 @@ for k, v in StrSplit("Show Special|Show Templates|Show Yank|Show More history|Sh
 
 Gui, Settings:Destroy
 Gui, Settings:New
-
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  GroupBox, x5 y20 w170 h320, General hotkeys
 Gui Settings:Font, cRed
 Gui Settings:Add,  Text, xp+140   yp w25  gHelpHotkeys, %A_Space% [?] %A_Space%
 Gui Settings:Font, cBlack
 
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  Text, xp-132  yp+25                         , Show Menu (History*):
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_menu         , %hk_menu%
 Gui Settings:Add,  Text, xp-110 yp+25                          , Show Menu 2 (History):
@@ -39,6 +40,7 @@ Gui Settings:Font, cRed
 Gui Settings:Add,  Text, xp     yp+20 w150  gModHelp           , Do not add modifiers below! [?]
 Gui Settings:Font, cBlack
 
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  Text, xp     yp+23                          , Cycle forward:
 Gui Settings:Add,  Edit, xp+110 yp-3  w40 h20 vhk_cycleforward , %hk_cycleforward%
 Gui Settings:Add,  Text, xp-110 yp+30                          , Cycle backward:
@@ -53,6 +55,7 @@ Gui Settings:Font, cRed
 Gui Settings:Add,  Text, xp+70   yp w25  gHelpHotkeys   , %A_Space% [?] %A_Space%
 Gui Settings:Font, cBlack
 
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  Text, xp-62 yp+24                     , Show:
 Gui Settings:Add,  Edit, xp+40 yp-3  w40 h20   vhk_slots, %hk_slots%
 
@@ -100,9 +103,9 @@ Gui Settings:Font, cRed
 Gui Settings:Add,  Text, xp+100   yp w25  gFoldersHelp   , %A_Space% [?] %A_Space%
 Gui Settings:Font, cBlack
 
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  Edit, xp-90 yp+20   w110 h20 vSettingsFolders HwndFldrs, %SettingsFolders%
 SetEditCueBanner(Fldrs,"Default CL3 Folders")
-
 
 Gui Settings:Add,  Button, x5 yp+40   w100 h25 gSettingsSave     , &Save
 Gui Settings:Add,  Button, xp+158 yp  w100 h25 gSettingsDefault  , &Default
@@ -136,6 +139,7 @@ Gui Settings:Add,  Text    , xp    yp+30                         , Clipb. delay 
 Gui Settings:Font, cRed
 Gui Settings:Add,  Text    , xp+80 yp gModHelp2                  , ?
 Gui Settings:Font, cBlack
+Gui Settings:Font, , MS Shell Dlg
 Gui Settings:Add,  Edit    , xp-80 yp+18 w35 Number vCopyDelay   , %CopyDelay%
 Gui Settings:Add,  Edit    , xp+45 yp    w35 Number vPasteDelay  , %PasteDelay%
 

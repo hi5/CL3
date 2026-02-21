@@ -5,7 +5,7 @@
 You can modify CL3's clipboard History, Slots and ClipChain via external scripts by using this API.
 See docs\cl3api.md
 
-Version           : 1.5
+Version           : 1.6
 CL3 version       : 1.113
 
 History:
@@ -14,10 +14,20 @@ History:
 
 */
 
-CL3Api_Init()
+CL3Api_Init(Warning:=true)
 	{
 	 global cl3api,CL3_MaxHistory
-	 cl3api:=ComObjActive("{01DA04FA-790F-40B6-9FB7-CE6C1D53DC38}")
+	 try
+		{
+		 cl3api:=ComObjActive("{01DA04FA-790F-40B6-9FB7-CE6C1D53DC38}")
+		 Return true
+		}
+	 catch
+		{
+		 If Warning
+			MsgBox, 16, CL3 API, Error: Can not connect to CL3.`nCheck if it is actually running.
+		 Return false
+		}
 	}
 
 CL3Api_Close()
